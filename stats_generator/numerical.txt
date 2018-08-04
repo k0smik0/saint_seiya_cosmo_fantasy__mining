@@ -1,0 +1,24 @@
+Level
+Power
+Vitality Growth Rate
+Aura Growth Rate
+Tech. Growth Rate
+Vitality
+Aura
+Technique
+Max HP
+Phys. Attack
+Fury Attack
+Phys. Defense
+Fury Resistance
+Phys. Critical
+Fury Critical
+Null Phys. Defense
+Null Fury Resistance
+HP Drain
+Accuracy
+Evasion
+HP Recovery
+Cosmo Recovery
+Cosmo Cost Reduction
+Silence Resistance

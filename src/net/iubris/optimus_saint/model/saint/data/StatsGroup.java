@@ -5,4 +5,5 @@ public class StatsGroup {
 	public PromotionClass promotionClass;
 	public ClothKind clothKind;
 	public ActiveTime activeTime;
+	public Category category;
 }

@@ -70,7 +70,7 @@ public class SaintData {
 		private SaintData[] saints;
 	}
 	
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 //		JsonbConfig config = new JsonbConfig();
 //			    .withAdapters(new LocalizedAdapter<Name>("Name"));
 		
