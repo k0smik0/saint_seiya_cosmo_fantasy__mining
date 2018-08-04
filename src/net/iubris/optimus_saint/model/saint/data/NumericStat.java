@@ -2,7 +2,7 @@ package net.iubris.optimus_saint.model.saint.data;
 
 import javax.json.bind.annotation.JsonbProperty;
 
-public class NumericStat extends Stat {
+public class NumericStat extends AbstractStat {
 	
 //	private String minAsString;
 //	private String maxAsString;

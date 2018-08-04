@@ -3,8 +3,6 @@ package net.iubris.optimus_saint.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.json.bind.annotation.JsonbAnnotation;
-
 import net.iubris.optimus_saint.model.equipment.Item;
 
 public class Shop {
