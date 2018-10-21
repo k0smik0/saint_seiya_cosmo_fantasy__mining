@@ -10,7 +10,7 @@ import net.iubris.optimus_saint.model.saint.data.skills.SkillsAdapter;
 import net.iubris.optimus_saint.model.saint.data.skills.SkillsGroup;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsArrayAdapter;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsGroup;
-import net.iubris.optimus_saint.model.saint.data.tiers.Tiers;
+import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroup;
 import net.iubris.optimus_saint.model.saint.data.value.description.Description;
 import net.iubris.optimus_saint.model.saint.data.value.description.DescriptionAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.lane.Lane;
@@ -39,7 +39,7 @@ public class SaintData {
 //	@JsonbProperty(value="strongagainst")
 	public List<String> strongAgainst;
 	
-	public Tiers tiers;
+	public TiersGroup tiers;
 	
 	public String id;
 	

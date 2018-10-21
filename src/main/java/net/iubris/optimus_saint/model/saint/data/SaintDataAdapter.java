@@ -8,6 +8,7 @@ import javax.json.bind.adapter.JsonbAdapter;
 
 import net.iubris.optimus_saint.model.saint.data.stats.StatsArrayAdapter;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsGroup;
+import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroup;
 import net.iubris.optimus_saint.model.saint.data.value.description.Description;
 import net.iubris.optimus_saint.model.saint.data.value.description.DescriptionAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.name.Name;
@@ -17,73 +18,68 @@ import net.iubris.optimus_saint.model.saint.data.value.type.TypeAdapter;
 
 public class SaintDataAdapter implements JsonbAdapter<SaintData, JsonObject> {
 	
-	private static final NameAdapter nameAdapter = new NameAdapter();
-	private static final DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
+	private static final NameAdapter NAME_ADAPTER = new NameAdapter();
+	private static final DescriptionAdapter DESCRIPTION_ADAPTER = new DescriptionAdapter();
+	private static final TypeAdapter TYPE_ADAPTER = new TypeAdapter();
+	private static final StatsArrayAdapter STATS_ARRAY_ADAPTER = new StatsArrayAdapter();
+	private static final TiersGroupAdapter TIERS_GROUP_ADAPTER = new TiersGroupAdapter();
+	
+//	private static final Executor ITEMS_DOWNLOADER_EXECUTOR = Executors.newFixedThreadPool(30);
 	
 	@Override
 	public SaintData adaptFromJson(JsonObject saintAsJsonObject) throws Exception {
-//		JsonArray asJsonArray = jsonObject.asJsonArray();
-//		
-//		asJsonArray.stream().map(eJV->{
+		SaintData saintData = new SaintData();
 			
-//			JsonObject saintAsJsonObject = eJV.asJsonObject();
+		int unitId = saintAsJsonObject.getInt("unitId");
+		saintData.unitId = unitId;
 			
-//			boolean incomplete = saintAsJsonObject.getBoolean("incomplete");
+		String fyi_name = saintAsJsonObject.getString("fyi_name");
+		saintData.fyi_name = fyi_name;
 			
-			int unitId = saintAsJsonObject.getInt("unitId");
-			String fyi_name = saintAsJsonObject.getString("fyi_name");
+		List<String> goodWith = saintAsJsonObject.getJsonArray("goodwith")
+				.stream().map(jv->jv.toString()).collect(Collectors.toList());
+		saintData.goodWith = goodWith;
 			
-			List<String> goodWith = saintAsJsonObject.getJsonArray("goodwith")
-					.stream().map(jv->jv.toString()).collect(Collectors.toList());
+		List<String> strongAgainst = saintAsJsonObject.getJsonArray("strongagainst")
+				.stream().map(jv->jv.toString()).collect(Collectors.toList());
+		saintData.strongAgainst = strongAgainst;
+
+		JsonObject jsonObjectTiers = saintAsJsonObject.getJsonObject("tiers");
+		TiersGroup tiers = TIERS_GROUP_ADAPTER.adaptFromJson(jsonObjectTiers);
+		saintData.tiers = tiers;
 			
-			List<String> strongAgainst = saintAsJsonObject.getJsonArray("strongagainst")
-					.stream().map(jv->jv.toString()).collect(Collectors.toList());
+		String id = saintAsJsonObject.getString("id");
+		saintData.id = id;
 			
-			JsonObject jsonObjectTiers = saintAsJsonObject.getJsonObject("tiers");
-			
-			String id = saintAsJsonObject.getString("id");
-			
-			SaintData saintData = new SaintData();
-			saintData.unitId = unitId;
-			saintData.fyi_name = fyi_name;
-			saintData.goodWith = goodWith;
-			saintData.strongAgainst = strongAgainst;
-			saintData.id = id;
-//			saintData.tiers = tiers;
-			
-			try {
-				Name name = nameAdapter.adaptFromJson(saintAsJsonObject.getJsonObject("name"));
-				saintData.name = name;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			try {
-				Description description = descriptionAdapter.adaptFromJson(saintAsJsonObject.getJsonObject("description"));
-				saintData.description = description;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			try {
-				Type type = new TypeAdapter().adaptFromJson(saintAsJsonObject.getJsonObject("type"));
-				saintData.type = type;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			try {
-				StatsGroup sg = new StatsArrayAdapter().adaptFromJson(saintAsJsonObject.getJsonArray("stats"));
-				saintData.stats = sg;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			
-			return saintData;
-//		});
+		try {
+			Name name = NAME_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonObject("name"));
+			saintData.name = name;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
-//		return null;
+		try {
+			Description description = DESCRIPTION_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonObject("description"));
+			saintData.description = description;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			Type type = TYPE_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonObject("type"));
+			saintData.type = type;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			StatsGroup sg = STATS_ARRAY_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonArray("stats"));
+			saintData.stats = sg;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return saintData;
 	}
 
 	@Override

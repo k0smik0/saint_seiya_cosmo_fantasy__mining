@@ -6,4 +6,8 @@ import java.util.List;
 public class SaintsDataBucketPatch {
 
 	public static List<SaintData> saints;
+
+	public static SaintsDataLoader getSaints() {
+		return new SaintsDataLoader(saints);
+	}
 }
