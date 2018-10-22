@@ -9,20 +9,23 @@ import javax.json.bind.adapter.JsonbAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.iubris.optimus_saint.model.saint.data._utils.SaintsDataBucket;
+import net.iubris.optimus_saint.model.saint.data.promote.SaintsPromoteDataLoader;
 import net.iubris.optimus_saint.model.saint.data.value.name.Name;
 import net.iubris.optimus_saint.model.saint.data.value.name.NameAdapter;
 
 public class SaintsDataArrayAdapter implements JsonbAdapter<List<SaintData>, JsonArray> {
 
+	// TODO use this
 //	@Inject
 //	SaintsDataBucketPatch saintsDataBucketPatch;
 	
 	private final SaintDataAdapter saintDataAdapter;
-	private final SaintsDataUpgrader saintsDataUpgrader;
+	private final SaintsPromoteDataLoader saintsDataUpgrader;
 	
 	public SaintsDataArrayAdapter() {
 		this.saintDataAdapter = new SaintDataAdapter();
-		this.saintsDataUpgrader = SaintsDataUpgrader.INSTANCE;
+		this.saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
 	}
 	
 	@Override
@@ -70,7 +73,7 @@ public class SaintsDataArrayAdapter implements JsonbAdapter<List<SaintData>, Jso
    	.filter(sd->!sd.incomplete)
    	.collect(Collectors.toList());
       
-   	SaintsDataBucketPatch.saints = saints;
+   	SaintsDataBucket.INSTANCE.setSaints(saints);
    	
    	saintsDataUpgrader.prepare( saints.size() ).start();
    	

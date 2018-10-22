@@ -1,4 +1,4 @@
-package net.iubris.optimus_saint.model.saint.data;
+package net.iubris.optimus_saint.model.saint.data._utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

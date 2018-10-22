@@ -1,11 +1,7 @@
-package net.iubris.optimus_saint.model.saint.data;
+package net.iubris.optimus_saint.model.saint.data.tiers;
 
 import javax.json.JsonObject;
 import javax.json.bind.adapter.JsonbAdapter;
-
-import net.iubris.optimus_saint.model.saint.data.tiers.Tier;
-import net.iubris.optimus_saint.model.saint.data.tiers.TierAdapter;
-import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroup;
 
 public class TiersGroupAdapter implements JsonbAdapter<TiersGroup, JsonObject> {
 

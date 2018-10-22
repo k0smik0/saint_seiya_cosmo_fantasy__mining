@@ -1,4 +1,4 @@
-package net.iubris.optimus_saint.model.saint.data;
+package net.iubris.optimus_saint.model.saint.data.promote;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,9 +13,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import net.iubris.optimus_saint.model.saint.data._utils.Config;
+import net.iubris.optimus_saint.model.saint.data._utils.HttpUtils;
 import net.iubris.optimus_saint.utils.StringUtils;
 
-public enum SaintsDataUpgrader {
+public enum SaintsPromoteDataLoader {
 	INSTANCE;
 	
 //	private static final DirectDownloader DIRECT_DOWNLOADER = new DirectDownloader(30);
@@ -32,7 +34,7 @@ public enum SaintsDataUpgrader {
 //	protected int progressPercentage;
 	
 	public static void main(String[] args) {
-		SaintsDataUpgrader saintsDataUpgrader = SaintsDataUpgrader.INSTANCE;
+		SaintsPromoteDataLoader saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
 		saintsDataUpgrader.reset();
 		saintsDataUpgrader.prepare(9);
 		IntStream.rangeClosed(1, 9)
@@ -41,14 +43,14 @@ public enum SaintsDataUpgrader {
 		saintsDataUpgrader.start();
 	}
 	
-	public SaintsDataUpgrader reset() {
+	public SaintsPromoteDataLoader reset() {
 		tasks.clear();
 		if (newFixedThreadPool!=null) {
 			newFixedThreadPool.shutdownNow();
 		}
 		return this;
 	}
-	public SaintsDataUpgrader prepare(int amount) {
+	public SaintsPromoteDataLoader prepare(int amount) {
 		this.amount = amount;
 System.out.println("total to download: "+amount);
 		newFixedThreadPool = Executors.newFixedThreadPool(THREADS);
@@ -56,7 +58,7 @@ System.out.println("total to download: "+amount);
 		return this;
 	}
 	
-	public SaintsDataUpgrader handleItemToUpdate(String id) {
+	public SaintsPromoteDataLoader handleItemToUpdate(String id) {
 		if (!Config.UPDATE_ITEMS) {
 			return this;
 		}

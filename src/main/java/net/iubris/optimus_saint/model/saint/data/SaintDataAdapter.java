@@ -9,6 +9,7 @@ import javax.json.bind.adapter.JsonbAdapter;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsArrayAdapter;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsGroup;
 import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroup;
+import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroupAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.description.Description;
 import net.iubris.optimus_saint.model.saint.data.value.description.DescriptionAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.name.Name;

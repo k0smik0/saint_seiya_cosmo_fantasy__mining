@@ -2,6 +2,7 @@ package net.iubris.optimus_saint.model.saint.data;
 
 import javax.json.JsonObject;
 
+import net.iubris.optimus_saint.model.saint.data._utils.Config;
 import net.iubris.optimus_saint.utils.StringUtils;
 
 public class LocalizationUtils {
