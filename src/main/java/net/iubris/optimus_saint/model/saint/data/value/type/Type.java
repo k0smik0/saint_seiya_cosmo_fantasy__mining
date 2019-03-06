@@ -1,8 +1,10 @@
 package net.iubris.optimus_saint.model.saint.data.value.type;
 
-import net.iubris.optimus_saint.model.saint.data.value.AbstractValue;
-
-public class Type extends AbstractValue {
+public enum Type /*extends AbstractValue*/ {
+	
+	VITALITY,
+	AURA,
+	TECHNIQUE;
 
 	/*@Override
 	StatsValue findByInternalEnum(JsonObject jsonObject, String what, String localization) {

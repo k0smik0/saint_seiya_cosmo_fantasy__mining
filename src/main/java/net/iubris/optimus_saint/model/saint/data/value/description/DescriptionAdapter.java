@@ -1,16 +1,11 @@
 package net.iubris.optimus_saint.model.saint.data.value.description;
 
-import net.iubris.optimus_saint.model.saint.data.LocalizedAdapter;
+import net.iubris.optimus_saint.model.saint.data.StringableLocalizedAdapter;
 
-public class DescriptionAdapter extends LocalizedAdapter<Description> {
+public class DescriptionAdapter extends StringableLocalizedAdapter {
+	
 	public DescriptionAdapter() {
-		super(Description.class);
+		super("description");
 	}
 	
-	/*@Override
-	public Description adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
-		Description description = super.adaptFromJson(jsonObject);
-		System.out.println(description.value);
-		return description;
-	}*/
 }

@@ -11,29 +11,41 @@ import javax.naming.OperationNotSupportedException;
 public class SaintDataPromoteObjectAdapter implements JsonbAdapter<SaintDataPromoteObject, JsonObject> {
 	
 	private static final PromoteAdapter PROMOTE_ADAPTER = new PromoteAdapter();
+	private static final ItemAdapter ITEM_ADAPTER = new ItemAdapter();
 
 	@Override
 	public SaintDataPromoteObject adaptFromJson(JsonObject jo) throws Exception {
 		JsonObject joPromotes = jo.getJsonObject("promotes");
 		
 		// the real promotes
+		// we would store these in some db...
 		List<Promote> promotes = joPromotes.getJsonArray("promotes").stream()
-			.map(jv-> {
+			.map(jv -> {
 				try {
 					Promote promote = PROMOTE_ADAPTER.adaptFromJson(jv.asJsonObject());
 					return promote;
 				} catch (Exception e) {
 					return new Promote();
 				}
-			}).filter(p->p.id>0).collect(Collectors.toList());
+			})
+			.filter(p -> p.id > 0)
+			.collect(Collectors.toList());
 		
-		JsonObject joItems = joPromotes.getJsonObject("items");
+		// we would store also these in some db...
+		Set<Item> items = joPromotes.getJsonObject("items").values().stream()
+			.map(itemAsJsonValue -> {
+				try {
+					Item item = ITEM_ADAPTER.adaptFromJson(itemAsJsonValue.asJsonObject());
+					return item;
+				} catch (Exception e) {
+					return new Item();
+				}
+			})
+			.filter(i -> i.id > 0)
+			.filter(i -> i.available)
+			.collect(Collectors.toSet());
 		
-		
-//		Set<Item> collect = joItems.values().stream().map(item->{ 
-//				return null;
-//			})
-//			.collect(Collectors.toList());
+		SaintDataPromoteObject saintDataPromoteObject = new SaintDataPromoteObject();
 		
 		return null;
 	}

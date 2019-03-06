@@ -54,7 +54,7 @@ public class HttpUtils {
 		}
 	}
 
-	static int httpDownloader_2(URL website, String outputFilePath) throws NoSuchAlgorithmException, KeyManagementException, FileNotFoundException, IOException {
+	public static int httpDownloader_2(URL website, String outputFilePath) throws NoSuchAlgorithmException, KeyManagementException, FileNotFoundException, IOException {
 			// Activate the new trust manager
 			SSLContext sc = SSLContext.getInstance("SSL");
 			sc.init(null, HttpUtils.TRUST_ALL_CERTS, new java.security.SecureRandom());

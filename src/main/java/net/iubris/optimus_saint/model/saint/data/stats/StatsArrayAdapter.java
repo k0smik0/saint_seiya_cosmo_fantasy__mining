@@ -185,8 +185,23 @@ public class StatsArrayAdapter implements JsonbAdapter<StatsGroup, JsonArray> {
 	private static <eLS extends LiteralStat> void handleGenericalLiteralStat(JsonObject jsonObject, String nameValue, 
 				Class<eLS> extendingLiteralStatClass, StatsGroup stats, String statsField) {
 		try {
-			eLS eLS = handleLiteralStat(jsonObject, nameValue, extendingLiteralStatClass);
-			stats.getClass().getField(statsField).set(stats, eLS);
+//			eLS eLS = handleLiteralStat(jsonObject, nameValue, extendingLiteralStatClass);
+//			stats.getClass().getField(statsField).set(stats, eLS);
+			
+			eLS extendingLiteralStat = extendingLiteralStatClass.newInstance();
+			
+			Localization localizationE = LocalizationUtils.getLocalization();
+			String minAsString = extendingLiteralStat.findByInternalEnum(jsonObject, MIN).getLocalized(localizationE);
+			StatValue min = new StatValue();
+			min.value = minAsString;
+			extendingLiteralStat.min = min;
+			
+			String maxAsString = extendingLiteralStat.findByInternalEnum(jsonObject, MAX).getLocalized(localizationE);
+			StatValue max = new StatValue();
+			max.value = maxAsString;
+			extendingLiteralStat.max = max;
+			
+			stats.getClass().getField(statsField).set(stats, extendingLiteralStat);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -199,19 +214,19 @@ public class StatsArrayAdapter implements JsonbAdapter<StatsGroup, JsonArray> {
 			e.printStackTrace();
 		}
 	}
-	private static <LS extends LiteralStat> LS handleLiteralStat(JsonObject jsonObject, String value, 
+	/*private static <LS extends LiteralStat> LS handleLiteralStat(JsonObject jsonObject, String value, 
 			Class<LS> extendingLiteralStatClass) throws InstantiationException, IllegalAccessException {
 		LS literalStat = extendingLiteralStatClass.newInstance();
 		
 		Localization localizationE = LocalizationUtils.getLocalization();
 		String min = literalStat.findByInternalEnum(jsonObject, MIN).getLocalized(localizationE);
-		literalStat.min.value = min;
+		literalStat.min = min;
 		
 		String max = literalStat.findByInternalEnum(jsonObject, MAX).getLocalized(localizationE);
-		literalStat.max.value = max;
+		literalStat.max = max;
 		
 		return literalStat;
-	}
+	}*/
 	
 	private void initNumericalStatsClassesToHandlerMap() {
 		numericalClassesMap.put("Level", Level.class);

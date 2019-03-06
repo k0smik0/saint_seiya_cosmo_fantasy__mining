@@ -1,45 +1,44 @@
 package net.iubris.optimus_saint.model.saint.data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.json.bind.annotation.JsonbTypeAdapter;
 
-import net.iubris.optimus_saint.model.saint.data._utils.Config;
-import net.iubris.optimus_saint.model.saint.data._utils.JsonbUtils;
-import net.iubris.optimus_saint.model.saint.data._utils.SaintsDataBucket;
-
-public class SaintsDataLoaderAsMain {
+public class SaintsDataHolder {
 		
 	@JsonbTypeAdapter(SaintsDataArrayAdapter.class)
 	private List<SaintData> saints;
 	
-	public SaintsDataLoaderAsMain() {}
+	public SaintsDataHolder() {}
 	
-	public SaintsDataLoaderAsMain(List<SaintData> saints) {
+	public SaintsDataHolder(List<SaintData> saints) {
 		this.saints = saints;
 	}
+	
+	public void loadFromDataset() {
+		
+	}
+	
 
-	public static void main(String[] args) {		
+
+	/*public static void mainNO(String[] args) {		
 //		JsonbConfig jc = new JsonbConfig().withFormatting(true);
 		
 		try ( FileInputStream fis = new FileInputStream("data"+File.separator+"saints.json"); 
-				/*Jsonb jsonb = JsonbBuilder.create(jc);*/ ) {
+//				Jsonb jsonb = JsonbBuilder.create(jc); 
+				) {
 //			Jsonb jsonb = JsonbBuilder.create(jc);
 			
-//			Config.UPDATE_ITEMS = true;
+			Config.UPDATE_PROMOTION_ITEMS_DATASET = true;
 			
-			JsonbUtils.INSTANCE.getParser().fromJson(fis, SaintsDataLoaderAsMain.class);
+			JsonbUtils.INSTANCE.getParser().fromJson(fis, SaintsDataHolder.class);
 			
 			SaintsDataBucket.INSTANCE.getSaints().stream()
 			.sorted(Comparator.comparing(SaintData::getId))
 			.forEach(sd->{
 //				String reflectionToString = ToStringBuilder.reflectionToString(sd);
 //				System.out.println(reflectionToString+"\n");
-//				System.out.println( sd.name/*.value*/+" - id:"+sd.id );
+//				System.out.println( sd.name .value+" - id:"+sd.id );
 				guildPrint(sd);
 			});
 			
@@ -73,5 +72,5 @@ public class SaintsDataLoaderAsMain {
 //			.replace(SEPARATOR+SEPARATOR, SEPARATOR)
 			.replaceAll("/[#]{2,}/", "#");
 		System.out.println(s);
-	}
+	}*/
 }

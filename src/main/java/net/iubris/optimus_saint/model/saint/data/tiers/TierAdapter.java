@@ -7,12 +7,12 @@ import net.iubris.optimus_saint.model.saint.data.LocalizedAdapter;
 public class TierAdapter extends LocalizedAdapter<Tier> {
 
 	public TierAdapter() {
-		super(Tier.class);
+		super("tier");
 	}
 	
 	@Override
 	public Tier adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
-		Tier tier = super.adaptFromJson(jsonObject);
+		Tier tier = new Tier();
 		String string = jsonObject.getString("tier");
 		tier.tier = string;
 		return tier;

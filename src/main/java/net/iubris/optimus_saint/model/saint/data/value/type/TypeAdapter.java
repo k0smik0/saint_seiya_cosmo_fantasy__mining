@@ -1,10 +1,20 @@
 package net.iubris.optimus_saint.model.saint.data.value.type;
 
+import javax.json.JsonObject;
+
 import net.iubris.optimus_saint.model.saint.data.LocalizedAdapter;
 
 public class TypeAdapter extends LocalizedAdapter<Type> {
+
 	public TypeAdapter() {
-		super(Type.class);
+		super("type");
+	}
+
+	@Override
+	public Type adaptFromJson(JsonObject jsonObject) throws Exception {
+		String localizedValue = getLocalizedValue(jsonObject);
+		Type type = Type.valueOf(localizedValue.toUpperCase());
+		return type;
 	}
 	
 	/*@Override

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.iubris.optimus_saint.model.saint.data._utils.SaintsDataBucket;
 import net.iubris.optimus_saint.model.saint.data.promote.SaintsPromoteDataLoader;
-import net.iubris.optimus_saint.model.saint.data.value.name.Name;
 import net.iubris.optimus_saint.model.saint.data.value.name.NameAdapter;
 
 public class SaintsDataArrayAdapter implements JsonbAdapter<List<SaintData>, JsonArray> {
@@ -40,11 +39,11 @@ public class SaintsDataArrayAdapter implements JsonbAdapter<List<SaintData>, Jso
    		JsonObject jsonObjectName = saintAsJsonObject.getJsonObject("name");
    		String fyi_name = saintAsJsonObject.getString("fyi_name");
    		try {
-   			Name name = new NameAdapter().adaptFromJson(jsonObjectName);
+   			String name = new NameAdapter().adaptFromJson(jsonObjectName);
    			if (incomplete) {
    				String s = "";
-   				if (StringUtils.isNotBlank(name.value)) {
-   					s = name.value+" :: "+fyi_name;
+   				if (StringUtils.isNotBlank(name/*.value*/)) {
+   					s = name/*.value*/+" :: "+fyi_name;
    				} else {
    					s = saintAsJsonObject.getString("fyi_name");
    					if (StringUtils.isBlank(s)) {

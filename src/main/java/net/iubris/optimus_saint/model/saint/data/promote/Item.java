@@ -1,7 +1,16 @@
 package net.iubris.optimus_saint.model.saint.data.promote;
 
-import net.iubris.optimus_saint.model.saint.data.value.name.Name;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Item extends Name {
+import javax.json.bind.annotation.JsonbTypeAdapter;
 
+import net.iubris.optimus_saint.model.saint.data.NameableDefinition;
+
+public class Item extends NameableDefinition {
+	public String quantity;
+	public int equipmentLevel;
+	public boolean available;
+	@JsonbTypeAdapter(MaterialArrayAdapter.class)
+	public List<String> materialIds = new ArrayList<>();
 }

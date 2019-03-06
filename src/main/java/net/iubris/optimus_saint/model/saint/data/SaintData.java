@@ -4,19 +4,11 @@ package net.iubris.optimus_saint.model.saint.data;
 import java.util.List;
 
 import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.annotation.JsonbTypeAdapter;
 
-import net.iubris.optimus_saint.model.saint.data.skills.SkillsAdapter;
 import net.iubris.optimus_saint.model.saint.data.skills.SkillsGroup;
-import net.iubris.optimus_saint.model.saint.data.stats.StatsArrayAdapter;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsGroup;
 import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroup;
-import net.iubris.optimus_saint.model.saint.data.value.description.Description;
-import net.iubris.optimus_saint.model.saint.data.value.description.DescriptionAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.lane.Lane;
-import net.iubris.optimus_saint.model.saint.data.value.lane.LaneAdapter;
-import net.iubris.optimus_saint.model.saint.data.value.name.Name;
-import net.iubris.optimus_saint.model.saint.data.value.name.NameAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.type.Type;
 
 /**
@@ -41,15 +33,16 @@ public class SaintData {
 	
 	public TiersGroup tiers;
 	
+//	public Long id;
 	public String id;
 	
 	public boolean incomplete;
 
-	@JsonbTypeAdapter(NameAdapter.class)
-	public Name name;
+//	@JsonbTypeAdapter(NameAdapter.class)
+	public String name;
 	
-	@JsonbTypeAdapter(DescriptionAdapter.class)
-	public Description description;
+//	@JsonbTypeAdapter(DescriptionAdapter.class)
+	public String description;
 	
 	@JsonbProperty(value="small")
 	public String imageSmall;
@@ -63,14 +56,18 @@ public class SaintData {
 	public Type type;
 //	public String type;
 	
-	@JsonbTypeAdapter(LaneAdapter.class)
+//	@JsonbTypeAdapter(LaneAdapter.class)
 	public Lane lane;
 	
-	@JsonbProperty(value="stats")
-	@JsonbTypeAdapter(StatsArrayAdapter.class)
+//	@JsonbProperty(value="stats")
+//	@JsonbTypeAdapter(StatsArrayAdapter.class)
 	public StatsGroup stats;
 	
-	@JsonbProperty(value="skills")
-	@JsonbTypeAdapter(SkillsAdapter.class)
+//	@JsonbProperty(value="skills")
+//	@JsonbTypeAdapter(SkillsAdapter.class)
 	public SkillsGroup skills;
+	
+	public String getId() {
+		return id;
+	}
 }

@@ -1,16 +1,9 @@
 package net.iubris.optimus_saint.model.saint.data.value.name;
 
-import net.iubris.optimus_saint.model.saint.data.LocalizedAdapter;
+import net.iubris.optimus_saint.model.saint.data.StringableLocalizedAdapter;
 
-public class NameAdapter extends LocalizedAdapter<Name> {
-
+public class NameAdapter extends StringableLocalizedAdapter {
 	public NameAdapter() {
-		super(Name.class);
+		super("name");
 	}
-	/*@Override
-	public Name adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
-		Name name = super.adaptFromJson(jsonObject);
-		System.out.println(name.value);
-		return name;
-	}*/
 }

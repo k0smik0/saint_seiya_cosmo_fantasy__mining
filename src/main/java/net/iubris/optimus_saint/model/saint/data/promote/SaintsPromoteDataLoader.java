@@ -29,6 +29,7 @@ public enum SaintsPromoteDataLoader {
 	private final List<Callable<Void>> tasks = new ArrayList<>();
 	
 	private static final int THREADS = 3;
+	
 	protected ExecutorService newFixedThreadPool;
 	
 //	protected int progressPercentage;
@@ -59,13 +60,14 @@ System.out.println("total to download: "+amount);
 	}
 	
 	public SaintsPromoteDataLoader handleItemToUpdate(String id) {
-		if (!Config.UPDATE_ITEMS) {
+		if (!Config.isPromotionItemsDatasetToUpdate()) {
 			return this;
 		}
-		String grabbedId = id.substring(0, id.length()-2).replaceFirst("1", StringUtils.EMPTY);
+		String idAsString = ""+id;
+		String grabbedId = idAsString.substring(0, idAsString.length()-2).replaceFirst("1", StringUtils.EMPTY);
 		int urlIntId = Integer.parseInt( grabbedId );
 		try {
-			Callable<Void> task = buildDownloadingTask(urlIntId, id);
+			Callable<Void> task = buildDownloadingTask(urlIntId, idAsString);
 			tasks.add(task);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

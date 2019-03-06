@@ -4,32 +4,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.json.JsonObject;
-import javax.json.bind.adapter.JsonbAdapter;
 
+import net.iubris.optimus_saint.model.saint.data.skills.SkillsGroupAdapter;
+import net.iubris.optimus_saint.model.saint.data.skills.SkillsGroup;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsArrayAdapter;
 import net.iubris.optimus_saint.model.saint.data.stats.StatsGroup;
 import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroup;
 import net.iubris.optimus_saint.model.saint.data.tiers.TiersGroupAdapter;
-import net.iubris.optimus_saint.model.saint.data.value.description.Description;
 import net.iubris.optimus_saint.model.saint.data.value.description.DescriptionAdapter;
-import net.iubris.optimus_saint.model.saint.data.value.name.Name;
+import net.iubris.optimus_saint.model.saint.data.value.lane.Lane;
+import net.iubris.optimus_saint.model.saint.data.value.lane.LaneAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.name.NameAdapter;
 import net.iubris.optimus_saint.model.saint.data.value.type.Type;
 import net.iubris.optimus_saint.model.saint.data.value.type.TypeAdapter;
 
-public class SaintDataAdapter implements JsonbAdapter<SaintData, JsonObject> {
+public class SaintDataAdapter extends AbstractAdapter<SaintData> {
 	
 	private static final NameAdapter NAME_ADAPTER = new NameAdapter();
 	private static final DescriptionAdapter DESCRIPTION_ADAPTER = new DescriptionAdapter();
 	private static final TypeAdapter TYPE_ADAPTER = new TypeAdapter();
+	private static final LaneAdapter LANE_ADAPTER = new LaneAdapter();
 	private static final StatsArrayAdapter STATS_ARRAY_ADAPTER = new StatsArrayAdapter();
 	private static final TiersGroupAdapter TIERS_GROUP_ADAPTER = new TiersGroupAdapter();
+	private static final SkillsGroupAdapter SKILLS_GROUP_ADAPTER = new SkillsGroupAdapter();
 	
 //	private static final Executor ITEMS_DOWNLOADER_EXECUTOR = Executors.newFixedThreadPool(30);
 	
 	@Override
 	public SaintData adaptFromJson(JsonObject saintAsJsonObject) throws Exception {
 		SaintData saintData = new SaintData();
+		
+		String stringId = saintAsJsonObject.getString("id");
+//		long id = Long.parseLong(stringId);
+//		saintData.id = id;
+		saintData.id = stringId;
 			
 		int unitId = saintAsJsonObject.getInt("unitId");
 		saintData.unitId = unitId;
@@ -49,28 +57,33 @@ public class SaintDataAdapter implements JsonbAdapter<SaintData, JsonObject> {
 		TiersGroup tiers = TIERS_GROUP_ADAPTER.adaptFromJson(jsonObjectTiers);
 		saintData.tiers = tiers;
 			
-		String id = saintAsJsonObject.getString("id");
-		saintData.id = id;
-			
 		try {
-			Name name = NAME_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonObject("name"));
+			String name = NAME_ADAPTER.adaptFromJson(saintAsJsonObject);
 			saintData.name = name;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			Description description = DESCRIPTION_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonObject("description"));
+			String description = DESCRIPTION_ADAPTER.adaptFromJson(saintAsJsonObject);
 			saintData.description = description;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			Type type = TYPE_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonObject("type"));
+			Type type = TYPE_ADAPTER.adaptFromJson(saintAsJsonObject);
 			saintData.type = type;
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		try {
+			Lane lane = LANE_ADAPTER.adaptFromJson(saintAsJsonObject);
+			saintData.lane = lane;
+		} catch (Exception e) {
+//			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		
 		try {
@@ -79,13 +92,16 @@ public class SaintDataAdapter implements JsonbAdapter<SaintData, JsonObject> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			SkillsGroup sg =  SKILLS_GROUP_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonArray("skills"));
+			saintData.skills = sg;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+//		SkillsAdapter
 
 		return saintData;
 	}
-
-	@Override
-	public JsonObject adaptToJson(SaintData arg0) throws Exception {
-		return null;
-	}
-
 }

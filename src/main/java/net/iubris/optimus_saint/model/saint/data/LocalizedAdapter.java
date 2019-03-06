@@ -1,37 +1,18 @@
 package net.iubris.optimus_saint.model.saint.data;
 
 import javax.json.JsonObject;
-import javax.json.bind.adapter.JsonbAdapter;
 
-import net.iubris.optimus_saint.model.saint.data.value.AbstractValue;
-import net.iubris.optimus_saint.utils.StringUtils;
-
-public class LocalizedAdapter<L extends AbstractValue> implements JsonbAdapter<L, JsonObject> {
+public abstract class LocalizedAdapter<T> extends AbstractAdapter<T> {
 	
-	private final Class<L> classToInstance;
+	protected final String jsobObjectToParseAndLocalize;
+
+	public LocalizedAdapter(String jsobObjectToParseAndLocalize) {
+		this.jsobObjectToParseAndLocalize = jsobObjectToParseAndLocalize;
+	}
 	
-	public LocalizedAdapter(Class<L> classToInstance) {
-		this.classToInstance = classToInstance;
+	protected String getLocalizedValue(JsonObject arg0) {
+		String localizedValue = LocalizationUtils.getLocalizedValue(arg0, jsobObjectToParseAndLocalize);
+		return localizedValue;
 	}
-
-	@Override
-	public L adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
-		
-		L l = classToInstance.newInstance();
-		
-		if (jsonObject.isEmpty()) {
-			l.value = StringUtils.EMPTY;
-		} else {
-			String value = LocalizationUtils.getLocalizedValue(jsonObject);
-			l.value = value;	
-		}
-		
-		return l;
-	}
-
-	@Override
-	public JsonObject adaptToJson(L l) throws Exception {
-		return null;
-	}
-
+	
 }
