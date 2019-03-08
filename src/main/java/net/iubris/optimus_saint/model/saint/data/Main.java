@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Comparator;
@@ -12,6 +13,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import com.github.jankroken.commandline.CommandLineParser;
+import com.github.jankroken.commandline.OptionStyle;
+import com.github.jankroken.commandline.annotations.LongSwitch;
+import com.github.jankroken.commandline.annotations.Option;
+import com.github.jankroken.commandline.annotations.ShortSwitch;
+import com.github.jankroken.commandline.annotations.Toggle;
 
 import net.iubris.optimus_saint.model.saint.data._utils.Config;
 import net.iubris.optimus_saint.model.saint.data._utils.HttpUtils;
@@ -22,14 +30,25 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		Downloader.start();
+		Arguments arguments = null;
+		try {
+			arguments = CommandLineParser.parse(Arguments.class, args, OptionStyle.SIMPLE);
+		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e1) {
+			e1.printStackTrace();
+		}
+		
+		if ( arguments.download ) {
+			Downloader.start();
+		}
 		
 //		Config.UPDATE_PROMOTION_ITEMS_DATASET = true;
 		
-		try {
-			Loader.loadFromDataset();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (arguments.load) {
+			try {
+				Loader.loadFromDataset();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		SimplePrinter simplePrinter = new SimplePrinter();
@@ -44,6 +63,46 @@ public class Main {
 		});
 	}
 
+/*	public enum Params {
+		DOWNLOAD("download", "d"),
+		LOAD("load", "l");
+		private String longOption;
+		private String shortOption;
+		private Params(String longOption, String shortOption) {
+			this.longOption = longOption;
+			this.shortOption = shortOption;
+		}
+		
+		public String getLongOption() {
+			return longOption;
+		}
+		public String getShortOption() {
+			return shortOption;
+		}
+	}*/
+	
+	public static class Arguments {
+		private boolean download;
+		private boolean load;
+		
+		@Option
+		@LongSwitch("download")
+		@ShortSwitch("d")
+		@Toggle(true)
+		public void setDownload(boolean download) {
+			this.download = download;
+		}
+		
+		@Option
+		@LongSwitch("load")
+		@ShortSwitch("l")
+		@Toggle(true)
+		public void setLoad(boolean load) {
+			this.load = load;
+		}
+	} 
+	
+	
 	public static class Loader {
 		public static void loadFromDataset() throws FileNotFoundException, IOException {
 			try ( FileInputStream fis = new FileInputStream("data"+File.separator+"saints.json"); ) {
