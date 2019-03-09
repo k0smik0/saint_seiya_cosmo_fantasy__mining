@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.iubris.optimus_saint.crawler.SaintData;
-import net.iubris.optimus_saint.crawler.promote.SaintPromoteData;
+import net.iubris.optimus_saint.crawler.model.SaintData;
+import net.iubris.optimus_saint.crawler.model.promote.SaintPromoteData;
 
 // TODO use annotation
 //@Singleton

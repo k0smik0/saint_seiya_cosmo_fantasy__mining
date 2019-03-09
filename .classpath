@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="net/iubris/optimus_saint/model/saint/data/LocalizedAdapterOLD.java|net/iubris/optimus_saint/model/saint/data/value/name/Name.java|net/iubris/optimus_saint/model/saint/data/TypeDeserializer.java" kind="src" output="target/classes" path="src/main/java">
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
