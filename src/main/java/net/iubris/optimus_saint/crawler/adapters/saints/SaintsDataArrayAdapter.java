@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.json.bind.adapter.JsonbAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,7 +12,7 @@ import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.promote.SaintsPromoteDataLoader;
 
-public class SaintsDataArrayAdapter implements JsonbAdapter<List<SaintData>, JsonArray> {
+public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>> {
 
 	// TODO use this
 //	@Inject
@@ -77,11 +76,6 @@ public class SaintsDataArrayAdapter implements JsonbAdapter<List<SaintData>, Jso
    	saintsDataUpgrader.prepare( saints.size() ).start();
    	
 		return saints;
-	}
-	
-	@Override
-	public JsonArray adaptToJson(List<SaintData> arg0) throws Exception {
-		return null;
 	}
 
 }

@@ -2,13 +2,11 @@ package net.iubris.optimus_saint.crawler.main;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Comparator;
 
 import com.github.jankroken.commandline.CommandLineParser;
 import com.github.jankroken.commandline.OptionStyle;
 
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
-import net.iubris.optimus_saint.crawler.model.SaintData;
 
 public class Main {
 	
@@ -35,11 +33,15 @@ public class Main {
 			}
 		}
 		
-		new CSVPrinter();
+//		new CSVPrinter();
 		
 		Printer simplePrinter = new SimplePrinter();
-		
 		simplePrinter.print(SaintsDataBucket.INSTANCE.getSaints());
+		
+		
+		Exporter<Void> googleSpreadSheetExporter = new GoogleSpreadSheetExporter();
+		googleSpreadSheetExporter.export(SaintsDataBucket.INSTANCE.getSaints());
+		
 		
 //		SaintsDataBucket.INSTANCE.getSaints().stream()
 //		.sorted(Comparator.comparing(SaintData::getId))

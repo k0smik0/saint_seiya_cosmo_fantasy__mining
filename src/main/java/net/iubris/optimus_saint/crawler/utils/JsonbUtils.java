@@ -5,8 +5,6 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 
-import net.iubris.optimus_saint.crawler.model.promote.MaterialArrayAdapter;
-
 // TODO use this
 @Singleton
 public enum JsonbUtils {
@@ -16,7 +14,7 @@ public enum JsonbUtils {
 
 	private JsonbUtils() {
 		JsonbConfig jc = new JsonbConfig()
-				.withAdapters(new MaterialArrayAdapter())
+//				.withAdapters(new MaterialArrayAdapter())
 				.withFormatting(true);
 		jsonb = JsonbBuilder.create(jc);
 	}

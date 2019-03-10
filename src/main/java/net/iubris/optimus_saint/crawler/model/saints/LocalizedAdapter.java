@@ -2,10 +2,10 @@ package net.iubris.optimus_saint.crawler.model.saints;
 
 import javax.json.JsonObject;
 
-import net.iubris.optimus_saint.crawler.adapters.saints.AbstractAdapter;
+import net.iubris.optimus_saint.crawler.adapters.saints.AbstractObjectAdapter;
 import net.iubris.optimus_saint.crawler.model.LocalizationUtils;
 
-public abstract class LocalizedAdapter<T> extends AbstractAdapter<T> {
+public abstract class LocalizedAdapter<T> extends AbstractObjectAdapter<T> {
 	
 	protected final String jsobObjectToParseAndLocalize;
 

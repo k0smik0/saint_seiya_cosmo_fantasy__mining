@@ -5,10 +5,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.json.JsonObject;
-import javax.json.bind.adapter.JsonbAdapter;
-import javax.naming.OperationNotSupportedException;
 
-public class SaintDataPromoteObjectAdapter implements JsonbAdapter<SaintDataPromoteObject, JsonObject> {
+import net.iubris.optimus_saint.crawler.adapters.saints.AbstractObjectAdapter;
+
+public class SaintDataPromoteObjectAdapter extends AbstractObjectAdapter<SaintDataPromoteObject> {
 	
 	private static final PromoteAdapter PROMOTE_ADAPTER = new PromoteAdapter();
 	private static final ItemAdapter ITEM_ADAPTER = new ItemAdapter();
@@ -48,10 +48,5 @@ public class SaintDataPromoteObjectAdapter implements JsonbAdapter<SaintDataProm
 		SaintDataPromoteObject saintDataPromoteObject = new SaintDataPromoteObject();
 		
 		return null;
-	}
-
-	@Override
-	public JsonObject adaptToJson(SaintDataPromoteObject arg0) throws Exception {
-		throw new OperationNotSupportedException();
 	}
 }

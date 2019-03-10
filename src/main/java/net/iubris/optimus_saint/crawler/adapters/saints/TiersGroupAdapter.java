@@ -1,12 +1,11 @@
 package net.iubris.optimus_saint.crawler.adapters.saints;
 
 import javax.json.JsonObject;
-import javax.json.bind.adapter.JsonbAdapter;
 
 import net.iubris.optimus_saint.crawler.model.saints.value.tiers.Tier;
 import net.iubris.optimus_saint.crawler.model.saints.value.tiers.TiersGroup;
 
-public class TiersGroupAdapter implements JsonbAdapter<TiersGroup, JsonObject> {
+public class TiersGroupAdapter extends AbstractObjectAdapter<TiersGroup> {
 
 	private static final TierAdapter TIER_ADAPTER = new TierAdapter();
 	

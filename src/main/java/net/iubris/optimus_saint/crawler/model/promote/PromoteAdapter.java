@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 
-import net.iubris.optimus_saint.crawler.adapters.saints.AbstractAdapter;
+import net.iubris.optimus_saint.crawler.adapters.saints.AbstractObjectAdapter;
 import net.iubris.optimus_saint.crawler.model.LocalizationUtils;
 
-public class PromoteAdapter extends AbstractAdapter<Promote> {
+public class PromoteAdapter extends AbstractObjectAdapter<Promote> {
 	@Override
 	public Promote adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
 		Promote promote = new Promote();

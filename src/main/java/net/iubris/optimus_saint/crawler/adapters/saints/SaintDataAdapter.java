@@ -12,7 +12,7 @@ import net.iubris.optimus_saint.crawler.model.saints.value.lane.Lane;
 import net.iubris.optimus_saint.crawler.model.saints.value.tiers.TiersGroup;
 import net.iubris.optimus_saint.crawler.model.saints.value.type.Type;
 
-public class SaintDataAdapter extends AbstractAdapter<SaintData> {
+public class SaintDataAdapter extends AbstractObjectAdapter<SaintData> {
 	
 	private static final NameAdapter NAME_ADAPTER = new NameAdapter();
 	private static final DescriptionAdapter DESCRIPTION_ADAPTER = new DescriptionAdapter();

@@ -4,11 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.json.JsonArray;
-import javax.json.bind.adapter.JsonbAdapter;
 
-public class MaterialArrayAdapter implements JsonbAdapter<Set<Long>, JsonArray> {
+import net.iubris.optimus_saint.crawler.adapters.saints.AbstractArrayAdapter;
 
-	private static final MaterialAdapter MATERIAL_ADAPTER = new MaterialAdapter();
+public class MaterialArrayAdapter extends AbstractArrayAdapter<Set<Long>> {
+
+//	private static final MaterialAdapter MATERIAL_ADAPTER = new MaterialAdapter();
 	
 	@Override
 	public Set<Long> adaptFromJson(JsonArray materialArray) throws Exception {
@@ -18,12 +19,4 @@ public class MaterialArrayAdapter implements JsonbAdapter<Set<Long>, JsonArray> 
 		});
 		return materialIds;
 	}
-
-	@Override
-	public JsonArray adaptToJson(Set<Long> arg0) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
 }

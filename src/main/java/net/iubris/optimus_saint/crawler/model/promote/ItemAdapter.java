@@ -1,12 +1,11 @@
 package net.iubris.optimus_saint.crawler.model.promote;
 
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 
-import net.iubris.optimus_saint.crawler.adapters.saints.AbstractAdapter;
+import net.iubris.optimus_saint.crawler.adapters.saints.AbstractObjectAdapter;
 import net.iubris.optimus_saint.crawler.model.LocalizationUtils;
 
-public class ItemAdapter extends AbstractAdapter<Item> {
+public class ItemAdapter extends AbstractObjectAdapter<Item> {
 
 	private static final MaterialAdapter MATERIAL_ADAPTER = new MaterialAdapter(); 
 	

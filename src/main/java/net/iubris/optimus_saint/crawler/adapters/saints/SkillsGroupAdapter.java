@@ -7,15 +7,16 @@ import java.util.stream.Collector.Characteristics;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.json.bind.adapter.JsonbAdapter;
 
 import net.iubris.optimus_saint.crawler.model.LocalizationUtils;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.model.saints.skills.SkillsGroup;
 
-public class SkillsGroupAdapter implements JsonbAdapter<SkillsGroup, JsonArray> {
+public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 
-	private static final String ROOT_NODE = "name";
+//	private static final String NAME = "name";
+//	private static final String DESCRIPTION = "description";
+//	private static final String ID = "id";
 	
 	@Override
 	public SkillsGroup adaptFromJson(JsonArray jsonArray) {
@@ -34,13 +35,13 @@ public class SkillsGroupAdapter implements JsonbAdapter<SkillsGroup, JsonArray> 
 		SkillsGroupBuilder skillsGroupBuilder = jsonArray.stream().map(jv->{
 			JsonObject jsonObjectRoot = jv.asJsonObject();
 			
-			String idS = jsonObjectRoot.getString("id");
+			String idS = jsonObjectRoot.getString(FIELD_ID);
 			long id = Long.parseLong(idS);
 			
-			JsonObject jsonObjectName = jsonObjectRoot.getJsonObject("name");
+			JsonObject jsonObjectName = jsonObjectRoot.getJsonObject(FIELD_NAME);
 			String name = LocalizationUtils.getLocalizedValue(jsonObjectName);
 			
-			JsonObject jsonObjectDescription = jsonObjectRoot.getJsonObject("description");
+			JsonObject jsonObjectDescription = jsonObjectRoot.getJsonObject(FIELD_DESCRIPTION);
 			String descriptionString = LocalizationUtils.getLocalizedValue(jsonObjectDescription);
 //			Description description = new Description(); 
 //			description.value = descriptionString;
@@ -53,8 +54,7 @@ public class SkillsGroupAdapter implements JsonbAdapter<SkillsGroup, JsonArray> 
 			return skill;
 		})
 		.sorted(Comparator.comparing(Skill::getId))
-		.collect(collector)
-		;
+		.collect(collector);
 		
 		SkillsGroup skillsGroup = skillsGroupBuilder.get();
 		
@@ -85,17 +85,12 @@ public class SkillsGroupAdapter implements JsonbAdapter<SkillsGroup, JsonArray> 
 				skillsGroup.fourth = t;
 			}
 			else if ((""+t.id).endsWith("7")) {
-				skillsGroup.seventhSense = t;
+				skillsGroup.setSeventhSense(t);
 			}
 		}		
 		
 		SkillsGroup get() {
 			return skillsGroup;
 		}
-	}
-
-	@Override
-	public JsonArray adaptToJson(SkillsGroup arg0) throws Exception {
-		return null;
 	}
 }

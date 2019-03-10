@@ -9,7 +9,7 @@ public class LocalizationUtils {
 	
 	public static boolean isLocalization(String localizationKey) {
 		try {
-			Localization valueOf = Localization.valueOf(localizationKey);
+			Localization.valueOf(localizationKey);
 			return true;
 		} catch (IllegalArgumentException e) {
 			return false;

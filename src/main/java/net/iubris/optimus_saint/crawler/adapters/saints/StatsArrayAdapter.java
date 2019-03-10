@@ -9,7 +9,6 @@ import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
-import javax.json.bind.adapter.JsonbAdapter;
 
 import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.model.Localization;
@@ -50,7 +49,7 @@ import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.VitalityGro
 
 //import static net.iubris.optimus_saint.model.saint.data.SaintData.Saints.LocalizationDefault;
 
-public class StatsArrayAdapter implements JsonbAdapter<StatsGroup, JsonArray> {
+public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 	
 
 	private static final String NAME_NODE = "name";
@@ -146,12 +145,6 @@ public class StatsArrayAdapter implements JsonbAdapter<StatsGroup, JsonArray> {
 			e.printStackTrace();
 		}
 		return esInstance;
-	}
-	
-	@Override
-	public JsonArray adaptToJson(StatsGroup statsGroup) throws Exception {
-		System.out.println("adaptToJson: not implemented");
-		return null;
 	}
 	
 	private void initOtherStatsClassesToHandlerMap() {
