@@ -46,11 +46,9 @@ public class Main {
 		}
 		
 		SaintsDataBucket saintsDataBucket = injector.getInstance(SaintsDataBucket.class);
-		Collection<SaintData> saints = saintsDataBucket.getSaints();
+		Collection<SaintData> saints = saintsDataBucket.getSaints();		
 		
-		
-		if (saints.size()>0) {
-		    
+		if (saints.size()>0) {		    
 		    if (arguments.print) {
 		        SaintsDataPrinter saintsDataPrinter = injector.getInstance(SaintsDataPrinter.class);
 		        saintsDataPrinter.print(saints);
