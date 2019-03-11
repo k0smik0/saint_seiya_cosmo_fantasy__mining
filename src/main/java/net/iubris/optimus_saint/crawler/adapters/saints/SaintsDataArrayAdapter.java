@@ -22,13 +22,14 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
 	
     private final Printer printer;
     
+    private final SaintsDataBucket saintsDataBucket;
 	private final SaintDataAdapter saintDataAdapter;
 	private final SaintsPromoteDataLoader saintsDataUpgrader;
-    
 	
 	@Inject
-	public SaintsDataArrayAdapter(Printer printer) {
-		this.printer = printer;
+	public SaintsDataArrayAdapter(SaintsDataBucket saintsDataBucket, Printer printer) {
+		this.saintsDataBucket = saintsDataBucket;
+        this.printer = printer;
         this.saintDataAdapter = new SaintDataAdapter();
 		this.saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
 	}
@@ -78,7 +79,7 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
    	.filter(sd->!sd.incomplete)
    	.collect(Collectors.toList());
       
-   	SaintsDataBucket.INSTANCE.setSaints(saints);
+   	saintsDataBucket.setSaints(saints);
    	
    	saintsDataUpgrader.prepare( saints.size() ).start();
    	

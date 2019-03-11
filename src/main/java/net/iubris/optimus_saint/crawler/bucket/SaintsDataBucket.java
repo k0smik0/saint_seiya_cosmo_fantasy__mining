@@ -5,14 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.promote.SaintPromoteData;
 
 // TODO use annotation
-//@Singleton
-public enum SaintsDataBucket {
+@Singleton
+public class SaintsDataBucket {
 	
-	INSTANCE;
+//	INSTANCE;
 	
 	private final Map<String, SaintData> idToSaintMap = new HashMap<>();
 	private final Map<String, SaintPromoteData> idToSaintPromoteMap = new HashMap<>();

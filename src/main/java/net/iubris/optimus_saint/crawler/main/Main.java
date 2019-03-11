@@ -2,10 +2,13 @@ package net.iubris.optimus_saint.crawler.main;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 import net.iubris.optimus_saint.crawler._di.CrawlerModule;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
+import net.iubris.optimus_saint.crawler.model.SaintData;
+import net.iubris.optimus_saint.crawler.utils.Printer;
 
 import com.github.jankroken.commandline.CommandLineParser;
 import com.github.jankroken.commandline.OptionStyle;
@@ -17,6 +20,9 @@ public class Main {
 	public static void main(String[] args) {
 	    
 	    Injector injector = Guice.createInjector(new CrawlerModule());
+	    
+	    Printer printer = injector.getInstance(Printer.class);
+	    printer.println("* PREPARING *");
 		
 		Arguments arguments = null;
 		try {
@@ -26,30 +32,35 @@ public class Main {
 		}
 		
 		if ( Saints.isSaintsDatasetToUpdate() || arguments.download ) {
-		    injector.getInstance(Downloader.class)
-            /*Downloader*/.start();
+		    injector.getInstance(Downloader.class).start();
 		}
 		
 //		Config.UPDATE_PROMOTION_ITEMS_DATASET = true;
 		
 		if (arguments.load) {
 			try {
-			    injector.getInstance(Loader.class)
-				/*Loader*/.loadFromDataset();
+			    injector.getInstance(Loader.class).loadFromDataset();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
-//		new CSVPrinter();
-		
-		SaintsDataPrinter saintsDataPrinter = injector.getInstance(SaintsDataPrinter.class)/* new SaintsDataSimplePrinter()*/;
-		saintsDataPrinter.print(SaintsDataBucket.INSTANCE.getSaints());
+		SaintsDataBucket saintsDataBucket = injector.getInstance(SaintsDataBucket.class);
+		Collection<SaintData> saints = saintsDataBucket.getSaints();
 		
 		
-		Exporter<Void> googleSpreadSheetExporter = new GoogleSpreadSheetExporter();
-		googleSpreadSheetExporter.export(SaintsDataBucket.INSTANCE.getSaints());
-		
+		if (saints.size()>0) {
+		    
+		    if (arguments.print) {
+		        SaintsDataPrinter saintsDataPrinter = injector.getInstance(SaintsDataPrinter.class);
+		        saintsDataPrinter.print(saints);
+		    }
+		    
+		    if (arguments.spreadsheet) {
+		        Exporter<Void> googleSpreadSheetExporter = new GoogleSpreadSheetExporter();
+	            googleSpreadSheetExporter.export(saints);    
+		    }
+		}
 		
 //		SaintsDataBucket.INSTANCE.getSaints().stream()
 //		.sorted(Comparator.comparing(SaintData::getId))
@@ -60,7 +71,7 @@ public class Main {
 //			simplePrinter.print(sd);
 //		});
 		
+		printer.println("* FINISHED *");
 		
 	}
-
 }

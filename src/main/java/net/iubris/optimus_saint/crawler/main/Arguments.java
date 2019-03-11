@@ -9,6 +9,8 @@ public class Arguments {
 	boolean download;
 	boolean load;
 	boolean printToCSV;
+    boolean print;
+    boolean spreadsheet;
 	
 	@Option
 	@LongSwitch("download")
@@ -25,6 +27,22 @@ public class Arguments {
 	public void setLoad(boolean load) {
 		this.load = load;
 	}
+	
+	@Option
+    @LongSwitch("print")
+    @ShortSwitch("p")
+    @Toggle(true)
+    public void setPrint(boolean print) {
+        this.print = print;
+    }
+	
+	@Option
+    @LongSwitch("spreadsheet")
+    @ShortSwitch("s")
+    @Toggle(true)
+    public void setSpreadsheet(boolean spreadsheet) {
+        this.spreadsheet = spreadsheet;
+    }
 	
 	@Option
 	@LongSwitch("csv")
