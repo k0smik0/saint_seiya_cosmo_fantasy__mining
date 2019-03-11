@@ -28,7 +28,7 @@ public class SaintDataPromoteObjectAdapter extends AbstractObjectAdapter<SaintDa
 					return new Promote();
 				}
 			})
-			.filter(p -> p.id > 0)
+			.filter(p -> Long.parseLong(p.id) > 0)
 			.collect(Collectors.toList());
 		
 		// we would store also these in some db...
@@ -41,7 +41,7 @@ public class SaintDataPromoteObjectAdapter extends AbstractObjectAdapter<SaintDa
 					return new Item();
 				}
 			})
-			.filter(i -> i.id > 0)
+			.filter(i -> Long.parseLong(i.id) > 0)
 			.filter(i -> i.available)
 			.collect(Collectors.toSet());
 		

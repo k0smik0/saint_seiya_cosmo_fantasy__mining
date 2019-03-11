@@ -14,16 +14,19 @@ public class PromoteAdapter extends AbstractObjectAdapter<Promote> {
 	public Promote adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
 		Promote promote = new Promote();
 		
-		Long id = Long.parseLong( jsonObject.getString("id") );
-		promote.id = id;
+//		Long id = Long.parseLong( jsonObject.getString("id") );
+//		promote.id = id;
+		promote.id = jsonObject.getString(FIELD_ID);
 		
-		String name = LocalizationUtils.getLocalizedValue(jsonObject, "name");
+		String name = LocalizationUtils.getLocalizedValue(jsonObject, FIELD_NAME);
 		promote.name = name;
 		
 		int level = jsonObject.getInt("level");
 		promote.level = level;
 		
-		Set<Integer> promotingItemIds = jsonObject.getJsonArray("items").getValuesAs(JsonNumber.class).stream().map(jn->jn.intValue()).collect(Collectors.toSet());
+		Set<Integer> promotingItemIds = jsonObject.getJsonArray("items").getValuesAs(JsonNumber.class).stream()
+				.map(jn->jn.intValue())
+				.collect(Collectors.toSet());
 		promote.promotingItemIds = promotingItemIds;
 		
 		return promote;

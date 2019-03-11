@@ -13,9 +13,10 @@ public class ItemAdapter extends AbstractObjectAdapter<Item> {
 	public Item adaptFromJson(JsonObject jsonObjectItem) throws Exception {
 		Item item = new Item();
 		
-		item.id = Long.parseLong( jsonObjectItem.getString("id") );
+//		item.id = Long.parseLong( jsonObjectItem.getString(FIELD_ID) );
+		item.id = jsonObjectItem.getString(FIELD_ID);
 		
-		item.name = LocalizationUtils.getLocalizedValue(jsonObjectItem, "name");
+		item.name = LocalizationUtils.getLocalizedValue(jsonObjectItem, FIELD_NAME);
 		
 		item.equipmentLevel = jsonObjectItem.getInt("equipLvl");
 		

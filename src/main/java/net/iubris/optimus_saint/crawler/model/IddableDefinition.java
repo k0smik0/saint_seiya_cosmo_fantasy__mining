@@ -1,9 +1,9 @@
 package net.iubris.optimus_saint.crawler.model;
 
 public class IddableDefinition {
-	public Long id;
+	public String id;
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 }

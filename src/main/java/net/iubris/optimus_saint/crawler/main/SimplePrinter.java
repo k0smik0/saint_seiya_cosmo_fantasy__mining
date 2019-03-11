@@ -21,28 +21,39 @@ class SimplePrinter implements Printer {
 	}
 	
 	private static final String NEW_LINE = "\n";
-	private static final String LINE = "-----------------------";
+	private static final String LINE = "----------------------------------------------";
 	private static void print(SaintData saintData) {
-		String s = "id:"+saintData.id+NEW_LINE
-			+ "name:"+saintData.name+NEW_LINE
-			+ "description:"+saintData.description+NEW_LINE
-			+ "1^ skill : '"+saintData.skills.first.name+"' : "+saintData.skills.first.description.replace("\n", "")+NEW_LINE
-			+ "2^ skill : '"+saintData.skills.second.name+"' : "+saintData.skills.second.description.replace("\n", "")+NEW_LINE
-			+ "3^ skill : '"+saintData.skills.third.name+"' : "+saintData.skills.third.description.replace("\n", "")+NEW_LINE
-			+ "4^ skill : '"+saintData.skills.fourth.name+"' : "+saintData.skills.fourth.description.replace("\n", "")+NEW_LINE;
+		if (saintData.name.contains("LG")) {
+			System.out.println("ahaaaaah! an LG!");
+		}
+		String s =
+				LINE+NEW_LINE
+				+"id: "+saintData.id+NEW_LINE
+			+ "name: "+saintData.name+NEW_LINE
+			+ "description: "+saintData.description+NEW_LINE
+			+ "  - 1^ skill: '"+saintData.skills.first.name+"': "+(saintData.skills.first.description.replace("\n", " "))+NEW_LINE
+			+ "  - 2^ skill: '"+saintData.skills.second.name+"': "+(saintData.skills.second.description.replace("\n", " "))+NEW_LINE
+			+ "  - 3^ skill: '"+saintData.skills.third.name+"': "+(saintData.skills.third.description.replace("\n", " "))+NEW_LINE
+			+ "  - 4^ skill: '"+saintData.skills.fourth.name+"': "+(saintData.skills.fourth.description.replace("\n", " "))+NEW_LINE;
 			
 		
 		if (saintData.skills.hasSeventhSense()) {
 			Skill seventhSense = saintData.skills.getSeventhSense();
-			s+="7^sense skill:"+seventhSense.name+": "+seventhSense.description.replace("\n", "");
+			s+="  - 7^sense skill:"+seventhSense.name+": "+(seventhSense.description.replace("\n", " "))+NEW_LINE;
+		}
+		
+		if (saintData.skills.hasCrusade()) {
+			Skill other = saintData.skills.getCrusade();
+			s+="  - Crusade skill:"+other.name+": "+(other.description.replace("\n", " "));
 		}
 			
-		s+=LINE+NEW_LINE
+		s=
 					// .replace(SEPARATOR+SEPARATOR, SEPARATOR)
-			.replaceAll("/[#]{2,}/", "#")
+			s.replaceAll("/[#]{2,}/", "#")
 			.replaceAll("/\\.\\[/"," [")
 			.replaceAll("/\\] /","]. ")
-			.replaceAll("/\\.N/",". N");
+			.replaceAll("/\\.N/",". N")
+			+NEW_LINE+LINE+NEW_LINE;
 		System.out.println(s);
 	}
 
