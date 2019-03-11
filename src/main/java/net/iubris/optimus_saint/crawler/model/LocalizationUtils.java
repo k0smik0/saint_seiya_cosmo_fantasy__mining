@@ -3,7 +3,6 @@ package net.iubris.optimus_saint.crawler.model;
 import javax.json.JsonObject;
 
 import net.iubris.optimus_saint.common.StringUtils;
-import net.iubris.optimus_saint.crawler.main.Config;
 
 public class LocalizationUtils {
 	
@@ -17,7 +16,7 @@ public class LocalizationUtils {
 	}
 	
 	public static Localization getLocalization() {
-		return Localization.valueOf(Config.LocalizationDefault);
+		return Localization.valueOf(net.iubris.optimus_saint.crawler.main.Config.Localization.LocalizationDefault);
 	}
 	
 	public static String getLocalizedValue(JsonObject jsonObjectParent, String jsonObjectChildName) {
@@ -38,6 +37,6 @@ public class LocalizationUtils {
 //			System.err.println("");
 			return StringUtils.EMPTY;
 		}
-		return jsonObject.getString(Config.LocalizationDefault);
+		return jsonObject.getString(net.iubris.optimus_saint.crawler.main.Config.Localization.LocalizationDefault);
 	}
 }

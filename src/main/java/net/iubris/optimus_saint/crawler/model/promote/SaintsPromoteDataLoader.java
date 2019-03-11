@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import net.iubris.optimus_saint.common.StringUtils;
-import net.iubris.optimus_saint.crawler.main.Config;
+import net.iubris.optimus_saint.crawler.main.Config.Dataset.Promotions;
 import net.iubris.optimus_saint.crawler.utils.HttpUtils;
 
 public enum SaintsPromoteDataLoader {
@@ -60,7 +60,7 @@ System.out.println("total to download: "+amount);
 	}
 	
 	public SaintsPromoteDataLoader handleItemToUpdate(String id) {
-		if (!Config.isPromotionItemsDatasetToUpdate()) {
+		if (!Promotions.isPromotionItemsDatasetToUpdate()) {
 			return this;
 		}
 		String idAsString = ""+id;

@@ -21,7 +21,8 @@ public abstract class LiteralStat extends AbstractStat {
 		String returning = value
 			.toUpperCase()
 			.replaceAll(StringUtils.SPACE, StringUtils.UNDERSCORE)
-			.replaceAll("\\"+StringUtils.DOT, StringUtils.EMPTY);
+			.replaceAll("\\"+StringUtils.DOT, StringUtils.EMPTY)
+		    .replaceAll("\\"+StringUtils.PLUS, StringUtils.EMPTY);
 		return returning;
 	}
 }

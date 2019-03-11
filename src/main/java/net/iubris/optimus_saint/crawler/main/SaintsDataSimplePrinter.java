@@ -3,10 +3,20 @@ package net.iubris.optimus_saint.crawler.main;
 import java.util.Collection;
 import java.util.Comparator;
 
+import javax.inject.Inject;
+
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
+import net.iubris.optimus_saint.crawler.utils.Printer;
 
-class SimplePrinter implements Printer {
+public class SaintsDataSimplePrinter implements SaintsDataPrinter {
+
+    private final Printer printer;
+    
+    @Inject
+    public SaintsDataSimplePrinter(Printer printer) {
+        this.printer = printer;
+    }
 
 	@Override
 	public void print(Collection<SaintData> saintDatas) {
@@ -22,7 +32,7 @@ class SimplePrinter implements Printer {
 	
 	private static final String NEW_LINE = "\n";
 	private static final String LINE = "----------------------------------------------";
-	private static void print(SaintData saintData) {
+	private void print(SaintData saintData) {
 		if (saintData.name.contains("LG")) {
 			System.out.println("ahaaaaah! an LG!");
 		}
@@ -54,7 +64,7 @@ class SimplePrinter implements Printer {
 			.replaceAll("/\\] /","]. ")
 			.replaceAll("/\\.N/",". N")
 			+NEW_LINE+LINE+NEW_LINE;
-		System.out.println(s);
+		printer.println(s);
 	}
 
 	private static final String SEPARATOR = " # ";

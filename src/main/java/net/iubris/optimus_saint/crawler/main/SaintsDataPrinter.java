@@ -4,6 +4,6 @@ import java.util.Collection;
 
 import net.iubris.optimus_saint.crawler.model.SaintData;
 
-interface Printer {
+public interface SaintsDataPrinter {
 	void print(Collection<SaintData> saintDatas);
 }

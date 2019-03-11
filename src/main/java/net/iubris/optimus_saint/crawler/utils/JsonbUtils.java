@@ -7,19 +7,28 @@ import javax.json.bind.JsonbConfig;
 
 // TODO use this
 @Singleton
-public enum JsonbUtils {
-	INSTANCE;
+public class JsonbUtils {
+//	INSTANCE;
 	
-	private Jsonb jsonb;
+    private final JsonbConfig jc;
+    
+    private Jsonb jsonb;
+	
+	/*public void init() {
+	    if (!setup) {
+	        
+	    }
+	}*/
 
-	private JsonbUtils() {
-		JsonbConfig jc = new JsonbConfig()
+	public JsonbUtils() {
+		jc = new JsonbConfig()
 //				.withAdapters(new MaterialArrayAdapter())
 				.withFormatting(true);
-		jsonb = JsonbBuilder.create(jc);
+//		jsonb = JsonbBuilder.create(jc);
 	}
 	
 	public Jsonb getParser() {
+	    jsonb = JsonbBuilder.create(jc);
 		return jsonb;
 	}
 	

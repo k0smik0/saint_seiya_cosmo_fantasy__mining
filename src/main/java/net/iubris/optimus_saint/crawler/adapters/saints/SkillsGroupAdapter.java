@@ -31,9 +31,9 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 		JsonObject jsonObjectName = jsonObjectRoot.getJsonObject(FIELD_NAME);
 		String name = LocalizationUtils.getLocalizedValue(jsonObjectName);
 		
-		if (idS.endsWith("100")) {
+		/*if (idS.endsWith("100")) {
 			System.out.println(idS+" "+name);
-		}
+		}*/
 		
 		JsonObject jsonObjectDescription = jsonObjectRoot.getJsonObject(FIELD_DESCRIPTION);
 		String descriptionString = LocalizationUtils.getLocalizedValue(jsonObjectDescription);

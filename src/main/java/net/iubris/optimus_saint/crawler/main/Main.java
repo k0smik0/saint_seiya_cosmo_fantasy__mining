@@ -3,14 +3,20 @@ package net.iubris.optimus_saint.crawler.main;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+import net.iubris.optimus_saint.crawler._di.CrawlerModule;
+import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
+import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
+
 import com.github.jankroken.commandline.CommandLineParser;
 import com.github.jankroken.commandline.OptionStyle;
-
-import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 public class Main {
 	
 	public static void main(String[] args) {
+	    
+	    Injector injector = Guice.createInjector(new CrawlerModule());
 		
 		Arguments arguments = null;
 		try {
@@ -19,15 +25,17 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
-		if ( arguments.download ) {
-			Downloader.start();
+		if ( Saints.isSaintsDatasetToUpdate() || arguments.download ) {
+		    injector.getInstance(Downloader.class)
+            /*Downloader*/.start();
 		}
 		
 //		Config.UPDATE_PROMOTION_ITEMS_DATASET = true;
 		
 		if (arguments.load) {
 			try {
-				Loader.loadFromDataset();
+			    injector.getInstance(Loader.class)
+				/*Loader*/.loadFromDataset();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -35,8 +43,8 @@ public class Main {
 		
 //		new CSVPrinter();
 		
-		Printer simplePrinter = new SimplePrinter();
-		simplePrinter.print(SaintsDataBucket.INSTANCE.getSaints());
+		SaintsDataPrinter saintsDataPrinter = injector.getInstance(SaintsDataPrinter.class)/* new SaintsDataSimplePrinter()*/;
+		saintsDataPrinter.print(SaintsDataBucket.INSTANCE.getSaints());
 		
 		
 		Exporter<Void> googleSpreadSheetExporter = new GoogleSpreadSheetExporter();

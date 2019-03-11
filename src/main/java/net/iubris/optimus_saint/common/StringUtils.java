@@ -7,6 +7,7 @@ public class StringUtils {
 	public static final String COMMA = ",";
 	public static final String DOT = ".";
 	public static final String SPACE = " ";
+    public static final String PLUS = "+";
 	
 	public static String toCamelCase(String string) {
 		char c[] = string.toCharArray();

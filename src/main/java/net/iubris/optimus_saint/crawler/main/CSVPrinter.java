@@ -15,7 +15,7 @@ import com.opencsv.CSVWriter;
 
 import net.iubris.optimus_saint.crawler.model.SaintData;
 
-public class CSVPrinter implements Printer {
+public class CSVPrinter implements SaintsDataPrinter {
 
 	private static final String CSV_FILENAME_PREFIX = "saints_data__";
 	

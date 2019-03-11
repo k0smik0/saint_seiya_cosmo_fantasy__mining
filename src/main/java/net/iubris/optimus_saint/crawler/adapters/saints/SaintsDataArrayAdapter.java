@@ -3,14 +3,16 @@ package net.iubris.optimus_saint.crawler.adapters.saints;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.promote.SaintsPromoteDataLoader;
+import net.iubris.optimus_saint.crawler.utils.Printer;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>> {
 
@@ -18,11 +20,16 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
 //	@Inject
 //	SaintsDataBucketPatch saintsDataBucketPatch;
 	
+    private final Printer printer;
+    
 	private final SaintDataAdapter saintDataAdapter;
 	private final SaintsPromoteDataLoader saintsDataUpgrader;
+    
 	
-	public SaintsDataArrayAdapter() {
-		this.saintDataAdapter = new SaintDataAdapter();
+	@Inject
+	public SaintsDataArrayAdapter(Printer printer) {
+		this.printer = printer;
+        this.saintDataAdapter = new SaintDataAdapter();
 		this.saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
 	}
 	
@@ -49,7 +56,7 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
    						s = id;
    					}
    				}
-   				System.out.println("skipping '"+s+"' ("+id+")"+": incomplete");
+   				printer.println("skipping '"+s+"' ("+id+")"+": incomplete");
    			}
 			} catch (Exception e) {
 				e.printStackTrace();
