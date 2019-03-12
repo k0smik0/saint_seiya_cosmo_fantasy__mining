@@ -14,6 +14,9 @@ public enum ProviderNotDI {
     public void setInjector(Injector injector) {
         this.injector = injector;
     }
+    public Injector getInjector() {
+        return injector;
+    }
     
     public SaintsDataBucket getSaintsDataBucket() {
         return injector.getInstance(SaintsDataBucket.class);
@@ -22,4 +25,5 @@ public enum ProviderNotDI {
     public Printer getPrinter() {
         return injector.getInstance(Printer.class);
     }
+    
 }

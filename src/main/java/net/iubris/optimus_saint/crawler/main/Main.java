@@ -80,6 +80,11 @@ public class Main {
 		if (saints.size()>0) {
 		    if (/*arguments.print*/CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.PRINT)) {
 		        saintsDataPrinter.print(saints);
+		        System.out.println("");
+		        System.out.println("###########");
+		        System.out.println("");
+		        
+		        ProviderNotDI.INSTANCE.getInjector().getInstance(CSVPrinterSaintsDataPrinter.class).print(saints);
 		    }
 		    
 		    if (/*arguments.spreadsheet*/CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {

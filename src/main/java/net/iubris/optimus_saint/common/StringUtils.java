@@ -8,6 +8,8 @@ public class StringUtils {
 	public static final String DOT = ".";
 	public static final String SPACE = " ";
     public static final String PLUS = "+";
+    public static final String NEW_LINE = "\n";
+    public static final String DASH = "#";
 	
 	public static String toCamelCase(String string) {
 		char c[] = string.toCharArray();
