@@ -21,6 +21,7 @@ public class SaintDataAdapter extends AbstractObjectAdapter<SaintData> {
 	private static final StatsArrayAdapter STATS_ARRAY_ADAPTER = new StatsArrayAdapter();
 	private static final TiersGroupAdapter TIERS_GROUP_ADAPTER = new TiersGroupAdapter();
 	private static final SkillsGroupAdapter SKILLS_GROUP_ADAPTER = new SkillsGroupAdapter();
+	private static final KeywordsAdapter KEYWORDS_ADAPTER = new KeywordsAdapter();
 	
 //	private static final Executor ITEMS_DOWNLOADER_EXECUTOR = Executors.newFixedThreadPool(30);
 	
@@ -93,6 +94,13 @@ public class SaintDataAdapter extends AbstractObjectAdapter<SaintData> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		/*try {
+            String keywords =  KEYWORDS_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonArray("keywords"));
+            saintData.keywords = keywords;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
 		
 //		SkillsAdapter
 

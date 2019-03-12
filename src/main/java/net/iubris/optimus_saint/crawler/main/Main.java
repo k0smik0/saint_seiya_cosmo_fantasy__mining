@@ -14,6 +14,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import net.iubris.optimus_saint.crawler._di.CrawlerModule;
+import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
 import net.iubris.optimus_saint.crawler.model.SaintData;
@@ -96,37 +97,38 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		try {
-			long start = System.currentTimeMillis();
-			CommandLine commandLineOptions = Main.parseArgs(args);
-			long end = System.currentTimeMillis();
-System.out.println("parsed command line options in: "+(end-start)+"ms");
-			
-			if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.HELP)) {
-				CommandLineOptions.printFormattedHelp();
-				return;
-			}
-			
-			if (CommandLineOptions.areAllFalse(commandLineOptions)) {
-				CommandLineOptions.printFormattedHelp();
-				return;
-			}
-			
-			start = System.currentTimeMillis();
-			System.out.println("* PREPARING - START *");
-			Injector injector = Guice.createInjector(new CrawlerModule());
-		   Main main = injector.getInstance(Main.class);
-		   System.out.println("* PREPARING - END *");
-		   end = System.currentTimeMillis();
-System.out.println("create injected instance in: "+(end-start)+"ms");
-		   
-		   main.doStuff(commandLineOptions);
-			
-		} catch (ParseException e) {
-			System.out.println(args+" are not valid options");
-			CommandLineOptions.printFormattedHelp();
-			return;
-		}
+        try {
+            long start = System.currentTimeMillis();
+            CommandLine commandLineOptions = Main.parseArgs(args);
+            long end = System.currentTimeMillis();
+System.out.println("parsed command line options in: " + (end - start) + "ms");
+
+            if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.HELP)) {
+                CommandLineOptions.printFormattedHelp();
+                return;
+            }
+
+            if (CommandLineOptions.areAllFalse(commandLineOptions)) {
+                CommandLineOptions.printFormattedHelp();
+                return;
+            }
+
+            start = System.currentTimeMillis();
+            System.out.println("* PREPARING - START *");
+            Injector injector = Guice.createInjector(new CrawlerModule());
+            ProviderNotDI.INSTANCE.setInjector(injector);
+            Main main = injector.getInstance(Main.class);
+            System.out.println("* PREPARING - END *");
+            end = System.currentTimeMillis();
+System.out.println("create injected instance in: " + (end - start) + "ms");
+
+            main.doStuff(commandLineOptions);
+
+        } catch (ParseException e) {
+            System.out.println(args + " are not valid options");
+            CommandLineOptions.printFormattedHelp();
+            return;
+        }
 		
 	   
 		

@@ -30,12 +30,21 @@ public class SaintsDataSimplePrinter implements SaintsDataPrinter {
 			});
 	}
 	
+	private void print(SaintData saintData) {
+	    String s =
+                LINE+NEW_LINE
+                +"id: "+saintData.id+NEW_LINE
+            + "name: "+saintData.name+NEW_LINE
+            +NEW_LINE+LINE+NEW_LINE;
+        printer.println(s);
+	}
+	
 	private static final String NEW_LINE = "\n";
 	private static final String LINE = "----------------------------------------------";
-	private void print(SaintData saintData) {
-		if (saintData.name.contains("LG")) {
+	private void printA(SaintData saintData) {
+		/*if (saintData.name.contains("LG")) {
 			System.out.println("ahaaaaah! an LG!");
-		}
+		}*/
 		String s =
 				LINE+NEW_LINE
 				+"id: "+saintData.id+NEW_LINE

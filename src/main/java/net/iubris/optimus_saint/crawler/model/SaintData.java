@@ -67,6 +67,8 @@ public class SaintData {
 //	@JsonbTypeAdapter(SkillsAdapter.class)
 	public SkillsGroup skills;
 	
+	public String keywords;
+	
 	public String getId() {
 		return id;
 	}

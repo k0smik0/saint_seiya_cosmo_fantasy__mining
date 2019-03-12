@@ -62,11 +62,9 @@ public class HttpUtils {
 			
 			int downloaded = 0;
 			// And as before now you can use URL and URLConnection
-			try (
-					HttpUtils.CustomUrlConnection connection = new HttpUtils.CustomUrlConnection(website);
-					InputStream is = connection.getInputStream();
-					OutputStream os = new FileOutputStream(outputFilePath);
-					)
+			try ( HttpUtils.CustomUrlConnection connection = new HttpUtils.CustomUrlConnection(website);
+				  InputStream is = connection.getInputStream();
+				  OutputStream os = new FileOutputStream(outputFilePath); )
 			{
 				// Limiting byte written to file per loop
 				byte[] buffer = new byte[2048];
@@ -96,6 +94,5 @@ public class HttpUtils {
 	        }
 	    }
 	};
-
 
 }

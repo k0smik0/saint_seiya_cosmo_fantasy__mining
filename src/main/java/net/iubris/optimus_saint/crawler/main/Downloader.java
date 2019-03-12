@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -60,10 +61,17 @@ public class Downloader {
                     sddir.mkdir();
                 }
                 String outputFilePath = Config.Dataset.Saints.SAINTS_DATASET_FILE;
+                File outputFile = new File(outputFilePath);
+                if (outputFile.exists()) {
+                    outputFile.delete();
+                }
+                long begin = System.currentTimeMillis();
                 int downloaded = HttpUtils.httpDownloader_2(website, outputFilePath);
+                long end = System.currentTimeMillis();
                 double size = Math.floor(downloaded/1024/1024f);
 //System.out.println("Downloaded "+outputFilePath+": "+String.format("%.2f", size)+"MB");
-                printer.println("Downloaded '"+SAINTS_DATASET_UPDATE_URL_PREFIX+"' to: "+outputFilePath+": "+String.format("%.2f", size)+"MB");
+                Date fileDate = new Date(outputFile.lastModified());
+                printer.println("Downloaded '"+SAINTS_DATASET_UPDATE_URL_PREFIX+"' to: "+outputFilePath+": "+String.format("%.2f", size)+"MB"+" in "+((end-begin)/1000.0f)+"s"+" - file modified at: "+fileDate);
 //              toPrint = ""+downloading.get();
             } catch(MalformedURLException e) {
                 e.printStackTrace();
