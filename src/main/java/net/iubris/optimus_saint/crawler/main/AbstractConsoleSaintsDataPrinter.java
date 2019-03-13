@@ -8,7 +8,7 @@ import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
 /**
- * @author Massimiliano Leone - massimiliano.leone@dedalus.eu
+ * @author Massimiliano Leone - massimiliano.leone@iubris.net
  * @since 12/mar/2019
  * @version 1
  *

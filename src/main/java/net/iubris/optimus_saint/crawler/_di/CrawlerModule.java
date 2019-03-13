@@ -8,7 +8,7 @@ import net.iubris.optimus_saint.crawler.utils.SimplePrinter;
 import com.google.inject.AbstractModule;
 
 /**
- * @author Massimiliano Leone - massimiliano.leone@dedalus.eu
+ * @author Massimiliano Leone - massimiliano.leone@iubris.net
  * @since 11/mar/2019
  * @version 1
  *
