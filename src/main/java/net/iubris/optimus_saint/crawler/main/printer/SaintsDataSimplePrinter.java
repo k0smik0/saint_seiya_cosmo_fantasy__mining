@@ -2,9 +2,11 @@ package net.iubris.optimus_saint.crawler.main.printer;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
@@ -25,7 +27,8 @@ public class SaintsDataSimplePrinter extends AbstractConsoleSaintsDataPrinter {
     @Override
     protected String saintDataToString(SaintData saintData) {
         String s = counter.addAndGet(1)+": "+
-                "id:"+saintData.id+", name: "+saintData.name ;
+                "id:"+saintData.id+", name: "+saintData.name 
+                +", keywords:["+saintData.keywords.stream().collect(Collectors.joining(StringUtils.COMMA))+"]";
         return s;
     }
 }

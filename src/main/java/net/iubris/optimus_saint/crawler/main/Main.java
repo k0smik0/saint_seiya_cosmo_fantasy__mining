@@ -32,8 +32,6 @@ public class Main {
 	private final Printer printer;
 	private final SaintsDataBucket saintsDataBucket;
 	
-//	private Arguments arguments;
-
 	@Inject
 	public Main(Downloader downloader, Loader loader, SaintsDataPrinter saintsDataPrinter,
 			GoogleSpreadSheetExporter googleSpreadSheetExporter, SaintsDataBucket saintsDataBucket,
@@ -55,24 +53,21 @@ public class Main {
 	}
 
 	public void doStuff(CommandLine commandLineOptions) {
-		printer.println("* STARTING *");
-		
-		// using CommandLine
-		/*try {
-			arguments = CommandLineParser.parse(Arguments.class, args, OptionStyle.SIMPLE);
-		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e1) {
-			e1.printStackTrace();
-		}*/
+		printer.println("** STARTING **\n");
 		
 		if ( Saints.isSaintsDatasetToUpdate() || CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.DOWNLOAD) /*arguments.download*/ ) {
+		    printer.println("* download phase - begin *");
 		    downloader.start();
+		    printer.println("* download phase - end *\n");
 		}
 		
 //		Config.UPDATE_PROMOTION_ITEMS_DATASET = true;
 		
-		if (/*arguments.load*/CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.LOAD)) {
+		if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.LOAD)) {
 			try {
+			    printer.println("* load phase - begin *");
 				loader.loadFromDataset();
+				printer.println("* load phase - end *\n");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -81,30 +76,29 @@ public class Main {
 		Collection<SaintData> saints = saintsDataBucket.getSaints();
 		
 		if (saints.size()>0) {
-		    if (/*arguments.print*/CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.PRINT)) {
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.PRINT)) {
+		        printer.println("* sample print phase - begin *");
 		        saintsDataPrinter.print(saints);
-//		        System.out.println("");
-//		        System.out.println("###########");
-//		        System.out.println("");
-		        
-//		        ProviderNotDI.INSTANCE.getInjector().getInstance(CSVPrinterSaintsDataPrinter.class).print(saints);
+		        printer.println("* sample print phase - end *\n");
 		    }
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.CSV)) {
+		        printer.println("* csv phase - begin *");
 		        ProviderNotDI.INSTANCE.getInjector().getInstance(CSVPrinterSaintsDataPrinter.class).print(saints);
+		        printer.println("* csv print phase - end *\n");
 		    }
 		    
-		    if (/*arguments.spreadsheet*/CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {
 	           googleSpreadSheetExporter.export(saints);    
 		    }
 		}
 		
-		if (saints.size()==0 && /*arguments.*/CommandLineOptions.areAllFalse(commandLineOptions)) {
+		if (saints.size()==0 && CommandLineOptions.areAllFalse(commandLineOptions)) {
 //			printer.println("PRINT HELP?");
 			CommandLineOptions.printFormattedHelp();
 		}
 		
-		printer.println("* FINISHED *");
+		printer.println("** FINISHED **");
 	}
 
 	public static void main(String[] args) {
@@ -113,7 +107,7 @@ public class Main {
             long start = System.currentTimeMillis();
             CommandLine commandLineOptions = Main.parseArgs(args);
             long end = System.currentTimeMillis();
-System.out.println("parsed command line options in: " + (end - start) + "ms");
+//System.out.println("parsed command line options in: " + (end - start) + "ms");
 
             if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.HELP)) {
                 CommandLineOptions.printFormattedHelp();
@@ -126,35 +120,19 @@ System.out.println("parsed command line options in: " + (end - start) + "ms");
             }
 
             start = System.currentTimeMillis();
-            System.out.println("* PREPARING - START *");
+            System.out.println("** PREPARING - START **");
             Injector injector = Guice.createInjector(new CrawlerModule());
             ProviderNotDI.INSTANCE.setInjector(injector);
             Main main = injector.getInstance(Main.class);
-            System.out.println("* PREPARING - END *");
+            System.out.println("** PREPARING - END **");
             end = System.currentTimeMillis();
-System.out.println("create injected instance in: " + (end - start) + "ms");
+//System.out.println("create injected instance in: " + (end - start) + "ms");
 
             main.doStuff(commandLineOptions);
-
         } catch (ParseException e) {
             System.out.println(args + " are not valid options");
             CommandLineOptions.printFormattedHelp();
             return;
         }
-		
-	   
-		
-//	   main.printer.println("* PREPARING *");
-		
-		
-		
-//		SaintsDataBucket.INSTANCE.getSaints().stream()
-//		.sorted(Comparator.comparing(SaintData::getId))
-//		.forEach(sd->{
-////			String reflectionToString = ToStringBuilder.reflectionToString(sd);
-////			System.out.println(reflectionToString+"\n");
-////			System.out.println( sd.name/*.value*/+" - id:"+sd.id );
-//			simplePrinter.print(sd);
-//		});
 	}
 }
