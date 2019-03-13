@@ -45,7 +45,8 @@ public class HttpUtils {
 		}
 	}
 
-	private static void httpDownloader_1(URL website, String id) throws FileNotFoundException, IOException {
+	@SuppressWarnings("unused")
+    private static void httpDownloader_1(URL website, String id) throws FileNotFoundException, IOException {
 		try (
 				ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 				FileOutputStream fos = new FileOutputStream("data" + File.separator + "promote" + File.separator + id + ".json");

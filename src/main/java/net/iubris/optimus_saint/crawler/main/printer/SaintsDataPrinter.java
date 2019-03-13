@@ -1,4 +1,4 @@
-package net.iubris.optimus_saint.crawler.main;
+package net.iubris.optimus_saint.crawler.main.printer;
 
 import java.util.Collection;
 

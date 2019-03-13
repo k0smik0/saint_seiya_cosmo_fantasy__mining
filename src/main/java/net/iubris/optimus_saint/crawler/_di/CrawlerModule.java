@@ -1,7 +1,7 @@
 package net.iubris.optimus_saint.crawler._di;
 
-import net.iubris.optimus_saint.crawler.main.SaintsDataPrinter;
-import net.iubris.optimus_saint.crawler.main.SaintsDataSimplePrinter;
+import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
+import net.iubris.optimus_saint.crawler.main.printer.SaintsDataSimplePrinter;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 import net.iubris.optimus_saint.crawler.utils.SimplePrinter;
 

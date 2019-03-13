@@ -17,6 +17,9 @@ import net.iubris.optimus_saint.crawler._di.CrawlerModule;
 import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
+import net.iubris.optimus_saint.crawler.main.exporter.GoogleSpreadSheetExporter;
+import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
+import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 

@@ -12,7 +12,6 @@ import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.promote.SaintsPromoteDataLoader;
-import net.iubris.optimus_saint.crawler.utils.Printer;
 
 public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>> {
 
@@ -20,7 +19,7 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
     // @Inject
     // SaintsDataBucketPatch saintsDataBucketPatch;
 
-    private final Printer printer;
+//    private final Printer printer;
 
     private final SaintsDataBucket saintsDataBucket;
     private final SaintDataAdapter saintDataAdapter;
@@ -30,7 +29,7 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
     public SaintsDataArrayAdapter(/*SaintsDataBucket saintsDataBucket, Printer printer*/) {
         
         this.saintsDataBucket = /*saintsDataBucket*/ ProviderNotDI.INSTANCE.getSaintsDataBucket();
-        this.printer = /*printer*/ProviderNotDI.INSTANCE.getPrinter();
+//        this.printer = /*printer*/ProviderNotDI.INSTANCE.getPrinter();
         this.saintDataAdapter = new SaintDataAdapter();
         this.saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
     }
