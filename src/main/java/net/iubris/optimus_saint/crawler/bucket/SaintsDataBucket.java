@@ -20,6 +20,10 @@ public class SaintsDataBucket {
 	private final Map<String, SaintPromoteData> idToSaintPromoteMap = new HashMap<>();
 
 //	public static List<SaintData> saints;
+	
+	public Map<String, SaintData> getIdToSaintsMap() {
+	    return idToSaintMap;
+	}
 
 	public Collection<SaintData> getSaints() {
 		return idToSaintMap.values();

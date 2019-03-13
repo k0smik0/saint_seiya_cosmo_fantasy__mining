@@ -5,6 +5,10 @@ import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -17,8 +21,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 
 public class GoogleSpreadSheetExporter implements Exporter<Void> {
@@ -26,20 +32,38 @@ public class GoogleSpreadSheetExporter implements Exporter<Void> {
 	private final String spreadsheetId = "1b-ZlA_4nnLgFGfxhufL7kDJ8o7_kTwjuWRIAxmhhokA";
 	private final String sheetName = "saints_traduzioni";
 	private final String range = sheetName+"!A2:J";
+	
+	private final SaintsDataBucket saintsDataBucket;
+	
+	@Inject
+	public GoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket) {
+        this.saintsDataBucket = saintsDataBucket;
+    }
 
-	@Override
+    @Override
 	public Void export(Collection<SaintData> saintDataCollection) {
 		try {
-			List<List<Object>> valuesFromSpreadSheet = getValuesFromSpreadSheet();
+		    Sheets sheetService = getSheetService();
+			List<List<Object>> valuesFromSpreadSheet = getValuesFromSpreadSheet(sheetService);
 			
 			if (valuesFromSpreadSheet == null || valuesFromSpreadSheet.isEmpty()) {
 				System.out.println("No data found.");
-			} else {
-				System.out.println("Name, Major");
-				for (@SuppressWarnings("rawtypes") List row : valuesFromSpreadSheet) {
+				return null;
+			}
+			
+			// get(0) -> id
+			Set<String> idAlreadyPresentSet = valuesFromSpreadSheet.stream().map(r->(String)r.get(0)).collect(Collectors.toSet());
+			
+			Set<SaintData> saintDataToAdd = saintsDataBucket.getSaints()/* .getIdToSaintsMap().entrySet()*/
+			.parallelStream()
+			.filter(sd->!idAlreadyPresentSet.contains( sd.id ) )
+			.collect(Collectors.toSet());
+			
+			
+			System.out.println("Name, Major");
+			for (@SuppressWarnings("rawtypes") List row : valuesFromSpreadSheet) {
 				// Print columns A and E, which correspond to indices 0 and 4.
 				System.out.printf("%s, %s\n", row.get(0), row.get(4));
-				}
 			}
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
@@ -49,19 +73,26 @@ public class GoogleSpreadSheetExporter implements Exporter<Void> {
 		
 		return null;
 	}
+    
+    private void putValuesToSpreadsheet(Sheets sheetService) {
+//        new BatchUpdateValuesRequest().p
+//        sheetService.spreadsheets(). get(spreadsheetId, range).
+    }
 	
-	private List<List<Object>> getValuesFromSpreadSheet() throws GeneralSecurityException, IOException {
-	// Build a new authorized API client service.
-      final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-      
-      Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-              .setApplicationName(APPLICATION_NAME)
-              .build();
-      ValueRange response = service.spreadsheets().values()
+	private List<List<Object>> getValuesFromSpreadSheet(Sheets sheetService) throws GeneralSecurityException, IOException {
+      ValueRange response = sheetService.spreadsheets().values()
               .get(spreadsheetId, range)
               .execute();
       List<List<Object>> values = response.getValues();
       return values;
+	}
+	
+	private static Sheets getSheetService() throws GeneralSecurityException, IOException {
+	    NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+	    Sheets sheetService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+        .setApplicationName(APPLICATION_NAME)
+        .build();	    
+	    return sheetService;
 	}
 	
 	
@@ -69,7 +100,7 @@ public class GoogleSpreadSheetExporter implements Exporter<Void> {
 	 * internal to drive
 	 */
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-   private static final String TOKENS_DIRECTORY_PATH = "tokens";
+	private static final String TOKENS_DIRECTORY_PATH = "tokens";
 	private static final String APPLICATION_NAME = "Saint Seiya Searcher Engine Translations";
 	/**
     * Global instance of the scopes required by this quickstart.
