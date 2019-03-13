@@ -22,10 +22,10 @@ public class SaintsDataSimplePrinter extends AbstractConsoleSaintsDataPrinter {
 	    super.print(saintDatas);
 	}
 
-	@Override
-	protected void print(SaintData saintData) {
-	    String s = counter.addAndGet(1)+": "+
+    @Override
+    protected String saintDataToString(SaintData saintData) {
+        String s = counter.addAndGet(1)+": "+
                 "id:"+saintData.id+", name: "+saintData.name ;
-        printer.println(s);
-	}
+        return s;
+    }
 }

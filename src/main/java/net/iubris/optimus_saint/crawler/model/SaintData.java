@@ -2,6 +2,7 @@ package net.iubris.optimus_saint.crawler.model;
 
 
 import java.util.List;
+import java.util.Set;
 
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -67,7 +68,7 @@ public class SaintData {
 //	@JsonbTypeAdapter(SkillsAdapter.class)
 	public SkillsGroup skills;
 	
-	public String keywords;
+	public Set<String> keywords;
 	
 	public String getId() {
 		return id;

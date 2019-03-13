@@ -11,6 +11,7 @@ public enum CommandLineOptions {
 	LOAD("l","load","load data saints from file"),
 	PRINT("p","print","print loaded data"),
 	SPREADSHEET("s","spreadsheet","export data into spreadsheet"),
+	CSV("c","csv","export data on csv file"),
 	
 	HELP("h","help","show this help menu");
 	

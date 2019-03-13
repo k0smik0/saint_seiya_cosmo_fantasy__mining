@@ -22,7 +22,7 @@ public class SaintsDataWithSkillsPrinter extends AbstractConsoleSaintsDataPrinte
     private static final String NEW_LINE = "\n";
     private static final String LINE = "----------------------------------------------";
     @Override
-    protected void print(SaintData saintData) {
+    protected String saintDataToString(SaintData saintData) {
         /*if (saintData.name.contains("LG")) {
             System.out.println("ahaaaaah! an LG!");
         }*/
@@ -53,7 +53,8 @@ public class SaintsDataWithSkillsPrinter extends AbstractConsoleSaintsDataPrinte
             .replaceAll("/\\] /","]. ")
             .replaceAll("/\\.N/",". N")
             +NEW_LINE+LINE+NEW_LINE;
-        printer.println(s);
+        
+        return s;
     }
 
 }

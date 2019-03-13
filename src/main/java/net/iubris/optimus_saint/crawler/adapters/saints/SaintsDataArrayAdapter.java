@@ -58,7 +58,7 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
                             s = id;
                         }
                     }
-                    printer.println("skipping '" + s + "' (" + id + ")" + ": incomplete");
+//printer.println("skipping '" + s + "' (" + id + ")" + ": incomplete");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

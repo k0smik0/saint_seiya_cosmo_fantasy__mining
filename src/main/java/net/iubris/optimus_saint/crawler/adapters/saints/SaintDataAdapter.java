@@ -1,6 +1,7 @@
 package net.iubris.optimus_saint.crawler.adapters.saints;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.json.JsonObject;
@@ -95,12 +96,12 @@ public class SaintDataAdapter extends AbstractObjectAdapter<SaintData> {
 			e.printStackTrace();
 		}
 		
-		/*try {
-            String keywords =  KEYWORDS_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonArray("keywords"));
+		try {
+            Set<String> keywords =  KEYWORDS_ADAPTER.adaptFromJson(saintAsJsonObject.getJsonArray("keywords"));
             saintData.keywords = keywords;
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
 		
 //		SkillsAdapter
 
