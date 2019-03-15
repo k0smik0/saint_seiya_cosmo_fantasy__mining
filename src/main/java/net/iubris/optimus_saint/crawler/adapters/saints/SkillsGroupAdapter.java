@@ -19,7 +19,8 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 	private static final Collector<Skill, SkillsGroupBuilder, SkillsGroupBuilder> collector = 
 			Collector.of(SkillsGroupBuilder::new, 
 					SkillsGroupBuilder::accept, 
-					(a,b)->null, a->a, 
+					(a,b)->null, 
+					a->a, 
 					Characteristics.IDENTITY_FINISH );
 	
 	private static final Function<JsonValue, Skill> jsonValueToSkill = jv->{

@@ -37,31 +37,32 @@ public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinte
         String s = saintData.id
                 + SEPARATOR + saintData.name
                 + SEPARATOR + saintData.description
-                + SEPARATOR + skillToString(saintData.skills.first)
-                + SEPARATOR + skillToString(saintData.skills.second)
-                + SEPARATOR + skillToString(saintData.skills.third)
-                + SEPARATOR + skillToString(saintData.skills.fourth)
-                + SEPARATOR + skillToString(saintData.skills.getSeventhSense())
-                + SEPARATOR + skillToString(saintData.skills.getCrusade())
+                + SEPARATOR + skillToJsonString(saintData.skills.first)
+                + SEPARATOR + skillToJsonString(saintData.skills.second)
+                + SEPARATOR + skillToJsonString(saintData.skills.third)
+                + SEPARATOR + skillToJsonString(saintData.skills.fourth)
+                + SEPARATOR + skillToJsonString(saintData.skills.getSeventhSense())
+                + SEPARATOR + skillToJsonString(saintData.skills.getCrusade())
                         // .replace(SEPARATOR+SEPARATOR, SEPARATOR)
                 .replaceAll("##", "#")
                 + SEPARATOR
                 .replaceAll("/[#]{2,}/", "#");
         return s;
     }
-    private static String skillToString(Skill skill) {
+    public static String skillToJsonString(Skill skill) {
         String descriptionEN = normalizeDescription(skill);
         String s = "{"
-                        +"'name':'"+skill.name+"',"
-                        +"'description':{"
-                            +"'en':'"+descriptionEN+"',";
+                    +"'name':'"+skill.name+"',"
+                    +"'description':{";
         if (org.apache.commons.lang3.StringUtils.isNotBlank(descriptionEN)) {
-            s+=              "'it':'MISSING'";
+                                s+="'en':'"+descriptionEN+"',";
+                                s+="'it':'MISSING'";
         } else {
-            s+=              "'it':''";
+                                s+="'en':'-',";
+                                s+="'it':'-'";
         }
-        s+=               "}"
-                    +"}";
+                            s+="}"
+                 +"}";
         return s;
     }
     private static String normalizeDescription(Skill skill) {

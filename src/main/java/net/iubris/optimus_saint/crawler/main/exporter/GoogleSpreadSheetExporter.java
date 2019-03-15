@@ -2,10 +2,13 @@ package net.iubris.optimus_saint.crawler.main.exporter;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -21,17 +24,20 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
+import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
+import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 
-public class GoogleSpreadSheetExporter implements Exporter<Void> {
+public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 	
-	private final String spreadsheetId = "1b-ZlA_4nnLgFGfxhufL7kDJ8o7_kTwjuWRIAxmhhokA";
-	private final String sheetName = "saints_traduzioni";
-	private final String range = sheetName+"!A2:J";
+	private static final String SPREADSHEET_ID = "1b-ZlA_4nnLgFGfxhufL7kDJ8o7_kTwjuWRIAxmhhokA";
+	private static final String SHEET_NAME = "saints";
+	private static final String RANGE = SHEET_NAME+"!A1:O";
 	
 	private final SaintsDataBucket saintsDataBucket;
 	
@@ -41,48 +47,93 @@ public class GoogleSpreadSheetExporter implements Exporter<Void> {
     }
 
     @Override
-	public Void export(Collection<SaintData> saintDataCollection) {
+	public ExporterStatus export(Collection<SaintData> saintDataCollection) {
 		try {
-		    Sheets sheetService = getSheetService();
-			List<List<Object>> valuesFromSpreadSheet = getValuesFromSpreadSheet(sheetService);
+			List<List<Object>> rowsFromSpreadsheet = getValuesFromSpreadSheet( getSheetService() );
 			
-			if (valuesFromSpreadSheet == null || valuesFromSpreadSheet.isEmpty()) {
+			if (rowsFromSpreadsheet == null || rowsFromSpreadsheet.isEmpty()) {
 				System.out.println("No data found.");
-				return null;
+				return ExporterStatus.KO;
 			}
+			
+			int lastRow = rowsFromSpreadsheet.size();
+			int indexFromStartInt = lastRow-1;
+			AtomicInteger indexFromStartWhich = new AtomicInteger(indexFromStartInt);
 			
 			// get(0) -> id
-			Set<String> idAlreadyPresentSet = valuesFromSpreadSheet.stream().map(r->(String)r.get(0)).collect(Collectors.toSet());
+			Set<String> idAlreadyPresentSet = rowsFromSpreadsheet.stream().map(r->(String)r.get(0)).collect(Collectors.toSet());
 			
-			Set<SaintData> saintDataToAdd = saintsDataBucket.getSaints()/* .getIdToSaintsMap().entrySet()*/
+		    List<List<Object>> valuesToAdd = saintsDataBucket.getSaints()/* .getIdToSaintsMap().entrySet()*/
 			.parallelStream()
 			.filter(sd->!idAlreadyPresentSet.contains( sd.id ) )
-			.collect(Collectors.toSet());
+			.sorted(Comparator.comparing(SaintData::getId))
+			.map(sd->saintDataToList(indexFromStartWhich, sd))
+			.collect(Collectors.toList());
 			
-			
-			System.out.println("Name, Major");
-			for (@SuppressWarnings("rawtypes") List row : valuesFromSpreadSheet) {
-				// Print columns A and E, which correspond to indices 0 and 4.
-				System.out.printf("%s, %s\n", row.get(0), row.get(4));
-			}
+
+		    boolean puttedALl = putValuesToSpreadsheet(getSheetService(), valuesToAdd);
+		    if (puttedALl) {
+		        return ExporterStatus.OK;
+		    }
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return ExporterStatus.KO;
 	}
     
-    private void putValuesToSpreadsheet(Sheets sheetService) {
+    private static List<Object> saintDataToList(AtomicInteger index, SaintData sd) {
+        List<Object> list = new ArrayList<>();
+        list.add(index.incrementAndGet());
+        list.add(sd.id);
+        list.add(sd.name);
+        list.add(sd.type.name().toLowerCase());
+        list.add(sd.lane.name().toLowerCase());
+        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.first));
+        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.second));
+        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.third));
+        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.fourth));
+        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.getSeventhSense()));
+        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.getCrusade()));
+        list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.EMPTY)));
+        
+        return list;
+    }
+    
+    private static boolean putValuesToSpreadsheet(Sheets sheetService, List<List<Object>> valuesToAdd) throws IOException {
+//        String first = "=Rows($A$1:A2)";
+//        List<Object> rowAsList = Arrays.asList("Total", "=E1+E4");
+        ValueRange appendBody = new ValueRange()
+                .setValues(valuesToAdd);
+        AppendValuesResponse appendResult = sheetService.spreadsheets().values()
+                .append(SPREADSHEET_ID, "A1", appendBody)
+                .setValueInputOption("USER_ENTERED")
+                .setInsertDataOption("INSERT_ROWS")
+                .setIncludeValuesInResponse(true)
+                .execute();
+
+        ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
+        
+        totalSent.getValues().stream().forEach(o->{
+            System.out.println(o.get(0)+" "+o.get(1)+" "+o.get(2));
+        });
+        
+        boolean OK = valuesToAdd.size() == totalSent.getValues().size();
+        
+        return OK;
+        
+//        assertThat(total.getValues().get(0).get(1)).isEqualTo("65");
+        
 //        new BatchUpdateValuesRequest().p
 //        sheetService.spreadsheets(). get(spreadsheetId, range).
     }
 	
-	private List<List<Object>> getValuesFromSpreadSheet(Sheets sheetService) throws GeneralSecurityException, IOException {
+	private static List<List<Object>> getValuesFromSpreadSheet(Sheets sheetService) throws GeneralSecurityException, IOException {
       ValueRange response = sheetService.spreadsheets().values()
-              .get(spreadsheetId, range)
-              .execute();
+              .get(SPREADSHEET_ID, RANGE)
+              .execute();      
       List<List<Object>> values = response.getValues();
       return values;
 	}
@@ -91,7 +142,7 @@ public class GoogleSpreadSheetExporter implements Exporter<Void> {
 	    NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 	    Sheets sheetService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
         .setApplicationName(APPLICATION_NAME)
-        .build();	    
+        .build();
 	    return sheetService;
 	}
 	

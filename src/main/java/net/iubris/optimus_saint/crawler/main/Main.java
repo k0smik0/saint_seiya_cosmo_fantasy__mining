@@ -17,6 +17,7 @@ import net.iubris.optimus_saint.crawler._di.CrawlerModule;
 import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
+import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
 import net.iubris.optimus_saint.crawler.main.exporter.GoogleSpreadSheetExporter;
 import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
@@ -89,7 +90,8 @@ public class Main {
 		    }
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {
-	           googleSpreadSheetExporter.export(saints);    
+	           ExporterStatus export = googleSpreadSheetExporter.export(saints);
+	           printer.println("spreadsheet exporter status: "+export);
 		    }
 		}
 		

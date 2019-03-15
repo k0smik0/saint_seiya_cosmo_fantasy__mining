@@ -8,4 +8,8 @@ public interface Exporter<R> {
 
 	public R export(Collection<SaintData> saintDataCollection);
 	
+	public static enum ExporterStatus {
+	    OK,
+	    KO;
+	}
 }
