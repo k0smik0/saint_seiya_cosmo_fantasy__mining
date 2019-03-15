@@ -64,7 +64,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 			Set<String> idAlreadyPresentSet = rowsFromSpreadsheet.stream().map(r->(String)r.get(0)).collect(Collectors.toSet());
 			
 		    List<List<Object>> valuesToAdd = saintsDataBucket.getSaints()/* .getIdToSaintsMap().entrySet()*/
-			.parallelStream()
+			.stream()
 			.filter(sd->!idAlreadyPresentSet.contains( sd.id ) )
 			.sorted(Comparator.comparing(SaintData::getId))
 			.map(sd->saintDataToList(indexFromStartWhich, sd))
@@ -116,12 +116,12 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 
         ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
         
-        System.out.println( "updated cells: "+appendResult.getUpdates().getUpdatedCells() );
+//        System.out.println( "updated cells: "+appendResult.getUpdates().getUpdatedCells() );
         System.out.println( "updated range: "+appendResult.getUpdates().getUpdatedRange() );
         
-        totalSent.getValues().stream().forEach(o->{
-            System.out.println(o.get(0)+" "+o.get(1)+" "+o.get(2));
-        });
+//        totalSent.getValues().stream().forEach(o->{
+//            System.out.println(o.get(0)+" "+o.get(1)+" "+o.get(2));
+//        });
         
         boolean OK = valuesToAdd.size() == totalSent.getValues().size();
         

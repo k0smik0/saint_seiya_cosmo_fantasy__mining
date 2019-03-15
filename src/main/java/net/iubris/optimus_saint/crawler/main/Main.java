@@ -30,17 +30,21 @@ public class Main {
 	private final Loader	loader;
 	private final SaintsDataPrinter saintsDataPrinter;
 	private final GoogleSpreadSheetExporter googleSpreadSheetExporter;
+	private final CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter;
 	private final Printer printer;
 	private final SaintsDataBucket saintsDataBucket;
 	
 	@Inject
 	public Main(Downloader downloader, Loader loader, SaintsDataPrinter saintsDataPrinter,
-			GoogleSpreadSheetExporter googleSpreadSheetExporter, SaintsDataBucket saintsDataBucket,
+			GoogleSpreadSheetExporter googleSpreadSheetExporter,
+			CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter,
+			SaintsDataBucket saintsDataBucket,
 			Printer printer) {
 		this.downloader = downloader;
 		this.loader = loader;
 		this.saintsDataPrinter = saintsDataPrinter;
 		this.googleSpreadSheetExporter = googleSpreadSheetExporter;
+		this.csvPrinterSaintsDataPrinter = csvPrinterSaintsDataPrinter;
 		this.saintsDataBucket = saintsDataBucket;
 		this.printer = printer;
 	}
@@ -85,13 +89,15 @@ public class Main {
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.CSV)) {
 		        printer.println("* csv phase - begin *");
-		        ProviderNotDI.INSTANCE.getInjector().getInstance(CSVPrinterSaintsDataPrinter.class).print(saints);
+		        csvPrinterSaintsDataPrinter.print(saints);
 		        printer.println("* csv print phase - end *\n");
 		    }
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {
-	           ExporterStatus export = googleSpreadSheetExporter.export(saints);
-	           printer.println("spreadsheet exporter status: "+export);
+		        printer.println("* google spreadsheet exporter phase - begin *");
+		        ExporterStatus export = googleSpreadSheetExporter.export(saints);
+		        printer.println("spreadsheet exporter status: "+export);
+		        printer.println("* google spreadsheet exporter phase - end*\n");
 		    }
 		}
 		
