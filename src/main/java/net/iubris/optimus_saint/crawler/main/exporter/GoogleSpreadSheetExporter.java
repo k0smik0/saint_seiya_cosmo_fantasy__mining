@@ -108,13 +108,16 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
         ValueRange appendBody = new ValueRange()
                 .setValues(valuesToAdd);
         AppendValuesResponse appendResult = sheetService.spreadsheets().values()
-                .append(SPREADSHEET_ID, "A1", appendBody)
+                .append(SPREADSHEET_ID, RANGE, appendBody)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true)
                 .execute();
 
         ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
+        
+        System.out.println( "updated cells: "+appendResult.getUpdates().getUpdatedCells() );
+        System.out.println( "updated range: "+appendResult.getUpdates().getUpdatedRange() );
         
         totalSent.getValues().stream().forEach(o->{
             System.out.println(o.get(0)+" "+o.get(1)+" "+o.get(2));
