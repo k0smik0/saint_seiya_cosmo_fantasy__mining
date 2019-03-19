@@ -8,4 +8,5 @@ public class Skill extends IddableDefinition {
 	
 	public String name;
 	public String description;
+	public String imageSmall;
 }

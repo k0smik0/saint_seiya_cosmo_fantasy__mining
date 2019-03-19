@@ -103,6 +103,7 @@ public class SaintDataAdapter extends AbstractObjectAdapter<SaintData> {
             e.printStackTrace();
         }
 		
+		saintData.imageSmall = saintAsJsonObject.getString("small");
 //		SkillsAdapter
 
 		return saintData;

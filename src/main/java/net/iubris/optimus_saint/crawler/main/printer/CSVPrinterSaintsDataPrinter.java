@@ -5,10 +5,11 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import net.iubris.optimus_saint.common.StringUtils;
+import static net.iubris.optimus_saint.common.StringUtils.*;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.utils.Printer;
+
 
 /**
  * @author Massimiliano Leone - massimiliano.leone@iubris.net
@@ -18,7 +19,7 @@ import net.iubris.optimus_saint.crawler.utils.Printer;
  */
 public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinter {
     
-    private static final String SEPARATOR = StringUtils.DASH;
+    private static final String SEPARATOR = DASH;
 
     @Inject
     public CSVPrinterSaintsDataPrinter(Printer printer) {
@@ -28,7 +29,7 @@ public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinte
     @Override
     public void print(Collection<SaintData> saintDatas) {
         String collect = saintsDataToStringStream(saintDatas)
-        .collect(Collectors.joining(StringUtils.NEW_LINE));
+        .collect(Collectors.joining(NEW_LINE));
         printer.println(collect);
     }
     
@@ -37,38 +38,30 @@ public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinte
         String s = saintData.id
                 + SEPARATOR + saintData.name
                 + SEPARATOR + saintData.description
-                + SEPARATOR + skillToJsonString(saintData.skills.first)
-                + SEPARATOR + skillToJsonString(saintData.skills.second)
-                + SEPARATOR + skillToJsonString(saintData.skills.third)
-                + SEPARATOR + skillToJsonString(saintData.skills.fourth)
-                + SEPARATOR + skillToJsonString(saintData.skills.getSeventhSense())
-                + SEPARATOR + skillToJsonString(saintData.skills.getCrusade())
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.first)
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.second)
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.third)
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.fourth)
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.getSeventhSense())
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.getCrusade())
                         // .replace(SEPARATOR+SEPARATOR, SEPARATOR)
                 .replaceAll("##", "#")
                 + SEPARATOR
                 .replaceAll("/[#]{2,}/", "#");
         return s;
     }
-    public static String skillToJsonString(Skill skill) {
+    private static String skillNameWithDescriptionToString(Skill skill) {
         String descriptionEN = normalizeDescription(skill);
-        String s = "{"
-                    +"'name':'"+skill.name+"',"
-                    +"'description':{";
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(descriptionEN)) {
-                                s+="'en':'"+descriptionEN+"',";
-                                s+="'it':'MISSING'";
-        } else {
-                                s+="'en':'-',";
-                                s+="'it':'-'";
-        }
-                            s+="}"
-                 +"}";
+        String s = skill.name+t+t+SPACE+descriptionEN;
         return s;
     }
+    private static final String t = COLONS;
+    
     private static String normalizeDescription(Skill skill) {
         return skill.description.trim()
-                .replace(StringUtils.QUOTE, StringUtils.EMPTY)
-                .replace(StringUtils.NEW_LINE, StringUtils.SPACE);
-    }
-
+//                .replace(QUOTE, EMPTY)
+                .replace(MARKS, QUOTE)
+                .replace(NEW_LINE, SPACE);
+    }    
+    
 }

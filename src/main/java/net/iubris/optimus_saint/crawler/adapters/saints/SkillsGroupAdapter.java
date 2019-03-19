@@ -22,6 +22,8 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 					(a,b)->null, 
 					a->a, 
 					Characteristics.IDENTITY_FINISH );
+
+    private static final String FIELD_IMAGE_SMALL = "small";
 	
 	private static final Function<JsonValue, Skill> jsonValueToSkill = jv->{
 		JsonObject jsonObjectRoot = jv.asJsonObject();
@@ -43,6 +45,7 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 		skill.id = idS;
 		skill.description = descriptionString;
 		skill.name = name;
+		skill.imageSmall = jsonObjectRoot.getString(FIELD_IMAGE_SMALL);
 		
 		return skill;
 	};

@@ -25,6 +25,7 @@ public class SkillsGroup {
 
 	public void setSeventhSense(Skill t) {
 		seventhSense = t;
+		seventhSense.name = net.iubris.optimus_saint.common.StringUtils.EMPTY;
 	}
 	
 	public boolean hasCrusade() {

@@ -12,6 +12,7 @@ public class StringUtils {
 	public static final String QUOTE = "'";
 	public static final String SPACE = " ";
 	public static final String UNDERSCORE = "_";
+    public static final String COLONS = ":";
     
 	
 	public static String toCamelCase(String string) {

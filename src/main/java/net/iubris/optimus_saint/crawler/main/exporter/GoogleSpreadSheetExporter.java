@@ -1,5 +1,13 @@
 package net.iubris.optimus_saint.crawler.main.exporter;
 
+import static net.iubris.optimus_saint.common.StringUtils.COLONS;
+import static net.iubris.optimus_saint.common.StringUtils.COMMA;
+import static net.iubris.optimus_saint.common.StringUtils.DASH;
+import static net.iubris.optimus_saint.common.StringUtils.MARKS;
+import static net.iubris.optimus_saint.common.StringUtils.NEW_LINE;
+import static net.iubris.optimus_saint.common.StringUtils.QUOTE;
+import static net.iubris.optimus_saint.common.StringUtils.SPACE;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -30,8 +38,8 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
-import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.model.SaintData;
+import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 
 public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 	
@@ -88,19 +96,68 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
         List<Object> list = new ArrayList<>();
         list.add(index.incrementAndGet());
         list.add(sd.id);
-        list.add(sd.name);
+        list.add("{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
         list.add(sd.type.name().toLowerCase());
         list.add(sd.lane.name().toLowerCase());
-        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.first));
-        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.second));
-        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.third));
-        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.fourth));
-        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.getSeventhSense()));
-        list.add(CSVPrinterSaintsDataPrinter.skillToJsonString(sd.skills.getCrusade()));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.first));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.second));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.third));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.fourth));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getSeventhSense()));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade()));
         list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.EMPTY)));
         
         return list;
     }
+    private static class DescriptionBuilder {
+    
+        private static String skillToJsonString(Skill skill) {
+            String descriptionEN = normalizeDescription(skill);
+            String s = b 
+                        +m+name+m+t+m+skill.name+m+c
+                        +m+description+m+t
+                        +b;
+            if (hasDescription(descriptionEN)) {
+                            s+=m+EN+m+t+m+descriptionEN+m+c;
+                            s+=m+IT+m+t+m+MISSING+m;
+            } else {
+                            s+=m+EN+m+t+m+DASH+m+c;
+                            s+=m+IT+m+t+m+DASH+m;
+            }
+                      s+=e+c;
+                      s+=m+imageSmall+m+t+m+skill.imageSmall+m
+                     +e;
+    //        s=s.replace(QUOTE, MARKS);
+            return s;
+        }
+        
+        private static String normalizeDescription(Skill skill) {
+            return skill.description.trim()
+//                    .replace(QUOTE, EMPTY)
+                    .replace(MARKS, QUOTE)
+                    .replace(NEW_LINE, SPACE);
+        }
+    
+        private static boolean hasDescription(String descriptionEN) {
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(descriptionEN)) {
+                return true;
+            }
+            return false;
+        }
+        
+        private static final String m = MARKS;
+        private static final String c = COMMA;
+        private static final String t = COLONS;
+        private static final String b = "{";
+        private static final String e = "}";
+        private static final String name = "name";
+        private static final String description = "description";
+        private static final String imageSmall = "imageSmall";
+        private static final String EN = "en";
+        private static final String IT = "it";
+        private static final String MISSING = "MISSING";
+    }
+
     
     private static boolean putValuesToSpreadsheet(Sheets sheetService, List<List<Object>> valuesToAdd) throws IOException {
 //        String first = "=Rows($A$1:A2)";
