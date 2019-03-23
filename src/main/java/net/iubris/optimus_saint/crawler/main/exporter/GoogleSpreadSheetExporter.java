@@ -5,6 +5,7 @@ import static net.iubris.optimus_saint.common.StringUtils.COMMA;
 import static net.iubris.optimus_saint.common.StringUtils.DASH;
 import static net.iubris.optimus_saint.common.StringUtils.MARKS;
 import static net.iubris.optimus_saint.common.StringUtils.NEW_LINE;
+import static net.iubris.optimus_saint.common.StringUtils.PIPE;
 import static net.iubris.optimus_saint.common.StringUtils.QUOTE;
 import static net.iubris.optimus_saint.common.StringUtils.SPACE;
 
@@ -40,6 +41,7 @@ import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
+import net.iubris.optimus_saint.crawler.utils.Printer;
 
 public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 	
@@ -48,10 +50,12 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 	private static final String RANGE = SHEET_NAME+"!A1:O";
 	
 	private final SaintsDataBucket saintsDataBucket;
+    private Printer printer;
 	
 	@Inject
-	public GoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket) {
+	public GoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, Printer printer) {
         this.saintsDataBucket = saintsDataBucket;
+        this.printer = printer;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 			List<List<Object>> rowsFromSpreadsheet = getValuesFromSpreadSheet( getSheetService() );
 			
 			if (rowsFromSpreadsheet == null || rowsFromSpreadsheet.isEmpty()) {
-				System.out.println("No data found.");
+				printer.println("No data found.");
 				return ExporterStatus.KO;
 			}
 			
@@ -68,16 +72,30 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 			int indexFromStartInt = lastRow-1;
 			AtomicInteger indexFromStartWhich = new AtomicInteger(indexFromStartInt);
 			
-			// get(0) -> id
-			Set<String> idAlreadyPresentSet = rowsFromSpreadsheet.stream().map(r->(String)r.get(0)).collect(Collectors.toSet());
+			// get(1) -> id
+			Set<String> alreadyPresentIdsSet = rowsFromSpreadsheet.stream().map(r->(String)r.get(1)).collect(Collectors.toSet());
+//			printer.println("alreadyPresentIdsSet.size: "+alreadyPresentIdsSet.size());
+//			printer.println(alreadyPresentIdsSet.stream().sorted().collect(Collectors.joining(", ")));
 			
 		    List<List<Object>> valuesToAdd = saintsDataBucket.getSaints()/* .getIdToSaintsMap().entrySet()*/
-			.stream()
-			.filter(sd->!idAlreadyPresentSet.contains( sd.id ) )
-			.sorted(Comparator.comparing(SaintData::getId))
-			.map(sd->saintDataToList(indexFromStartWhich, sd))
-			.collect(Collectors.toList());
-			
+                .stream()
+                .filter(sd -> {
+                    if (alreadyPresentIdsSet.contains(sd.id)) {
+                        printer.println(sd.id+" "+sd.name+" already present - skip");
+                        return false;
+                    }
+                    return true;
+                })
+    			.sorted(Comparator.comparing(SaintData::getId))
+    			.map(sd->saintDataToList(indexFromStartWhich, sd))
+    			.collect(Collectors.toList());
+//		    printer.println("valuesToAdd.size: "+valuesToAdd.size());
+//		    printer.println("valuesToAdd: "+valuesToAdd.stream().map(l->l.get(1)+"").collect(Collectors.joining(", ")));
+		    
+		    if (valuesToAdd.size()==0) {
+		        printer.println("valuesToAdd.size: 0 - nothing to add");
+		        return ExporterStatus.OK;
+		    } 
 
 		    boolean puttedALl = putValuesToSpreadsheet(getSheetService(), valuesToAdd);
 		    if (puttedALl) {
@@ -105,7 +123,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.fourth));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.getSeventhSense()));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade()));
-        list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.EMPTY)));
+        list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
         
         return list;
     }
@@ -127,7 +145,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
                       s+=e+c;
                       s+=m+imageSmall+m+t+m+skill.imageSmall+m
                      +e;
-    //        s=s.replace(QUOTE, MARKS);
+            s=s.replace(QUOTE, PIPE);
             return s;
         }
         
@@ -251,32 +269,5 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
    }
-   
-   /**
-    * Prints the names and majors of students in a sample spreadsheet:
-    * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-    */
-   /*public static void main(String... args) throws IOException, GeneralSecurityException {
-       // Build a new authorized API client service.
-       final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-       
-       Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-               .setApplicationName(APPLICATION_NAME)
-               .build();
-       ValueRange response = service.spreadsheets().values()
-               .get(spreadsheetId, range)
-               .execute();
-       List<List<Object>> values = response.getValues();
-       if (values == null || values.isEmpty()) {
-           System.out.println("No data found.");
-       } else {
-           System.out.println("Name, Major");
-           for (List row : values) {
-               // Print columns A and E, which correspond to indices 0 and 4.
-               System.out.printf("%s, %s\n", row.get(0), row.get(4));
-           }
-       }
-   }*/
-
 
 }

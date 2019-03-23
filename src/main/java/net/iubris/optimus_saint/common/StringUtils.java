@@ -13,6 +13,7 @@ public class StringUtils {
 	public static final String SPACE = " ";
 	public static final String UNDERSCORE = "_";
     public static final String COLONS = ":";
+    public static final String PIPE = "|";
     
 	
 	public static String toCamelCase(String string) {
