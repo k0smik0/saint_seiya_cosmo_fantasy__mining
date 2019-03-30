@@ -7,13 +7,14 @@ import net.iubris.optimus_saint.crawler.model.saints.value.tiers.TiersGroup;
 
 public class TiersGroupAdapter extends AbstractObjectAdapter<TiersGroup> {
 
-	private static final TierAdapter TIER_ADAPTER = new TierAdapter();
+//	private static final TierAdapter TIER_ADAPTER = new TierAdapter();
 	
 	@Override
 	public TiersGroup adaptFromJson(JsonObject jsonObject) throws Exception {
 		TiersGroup tiersGroup = new TiersGroup();
 		
-		JsonObject pveJO = jsonObject.getJsonObject("PVE");
+		// OLD
+		/*JsonObject pveJO = jsonObject.getJsonObject("PVE");
 		Tier pve = TIER_ADAPTER.adaptFromJson(pveJO);
 		tiersGroup.playerVersusEnemy = pve;
 		
@@ -23,7 +24,23 @@ public class TiersGroupAdapter extends AbstractObjectAdapter<TiersGroup> {
 		
 		JsonObject crusadeJO = jsonObject.getJsonObject("Crusade");
 		Tier crusade = TIER_ADAPTER.adaptFromJson(crusadeJO);
-		tiersGroup.crusade = crusade;
+		tiersGroup.crusade = crusade;*/
+		
+		String pveJO = jsonObject.getString("PVE");
+        Tier pve = new Tier();// TIER_ADAPTER.adaptFromJson(pveJO);
+        pve.value = pveJO;
+        tiersGroup.playerVersusEnemy = pve;
+        
+        String pvpJO = jsonObject.getString("PVP");
+        Tier pvp = new Tier(); // TIER_ADAPTER.adaptFromJson(pvpJO);
+        pvp.value = pvpJO;
+        tiersGroup.playerVersusPlayer = pvp;
+        
+        String crusadeJO = jsonObject.getString("Crusade");
+        Tier crusade = new Tier(); //TIER_ADAPTER.adaptFromJson(crusadeJO);
+        crusade.value = crusadeJO;
+        tiersGroup.crusade = crusade;
+		
 		
 		return tiersGroup;
 	}

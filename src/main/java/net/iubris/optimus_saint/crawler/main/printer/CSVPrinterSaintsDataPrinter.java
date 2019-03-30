@@ -43,7 +43,8 @@ public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinte
                 + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.third)
                 + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.fourth)
                 + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.getSeventhSense())
-                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.getCrusade())
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.getCrusade1())
+                + SEPARATOR + skillNameWithDescriptionToString(saintData.skills.getCrusade2())
                         // .replace(SEPARATOR+SEPARATOR, SEPARATOR)
                 .replaceAll("##", "#")
                 + SEPARATOR
@@ -59,8 +60,8 @@ public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinte
     
     private static String normalizeDescription(Skill skill) {
         return skill.description.trim()
-//                .replace(QUOTE, EMPTY)
-                .replace(MARKS, QUOTE)
+                .replace(QUOTE, PIPE)
+//                .replace(MARKS, QUOTE)
                 .replace(NEW_LINE, SPACE);
     }    
     

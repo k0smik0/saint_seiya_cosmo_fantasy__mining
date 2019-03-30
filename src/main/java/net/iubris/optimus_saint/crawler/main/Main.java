@@ -27,7 +27,7 @@ import net.iubris.optimus_saint.crawler.utils.Printer;
 public class Main {
 	
 	private final Downloader downloader;
-	private final Loader	loader;
+	private final Loader loader;
 	private final SaintsDataPrinter saintsDataPrinter;
 	private final GoogleSpreadSheetExporter googleSpreadSheetExporter;
 	private final CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter;

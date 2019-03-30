@@ -33,10 +33,16 @@ public class PromotionClass extends LiteralStat {
 		ARAYASHIKI {
 			@Override
 			public String getLocalized(Localization localization) {
-				return _arayashikiMap.get(localization);
+				return _arayashiki0Map.get(localization);
 			}
 		},
 		ARAYASHIKI_1 {
+            @Override
+            public String getLocalized(Localization localization) {
+                return _arayashiki1Map.get(localization);
+            }
+        },
+		ARAYASHIKI_2 {
             @Override
             public String getLocalized(Localization localization) {
                 return _arayashiki1Map.get(localization);
@@ -50,12 +56,14 @@ public class PromotionClass extends LiteralStat {
             }
         };
 		private static Map<Localization,String> _greenMap = new HashMap<>();
-		private static Map<Localization,String> _arayashikiMap = new HashMap<>();
+		private static Map<Localization,String> _arayashiki0Map = new HashMap<>();
 		private static Map<Localization,String> _arayashiki1Map = new HashMap<>();
+		private static Map<Localization,String> _arayashiki2Map = new HashMap<>();
 		static {
 			_greenMap.put(Localization.EN, "Green");
-			_arayashikiMap.put(Localization.EN, "Arayashiki");
+			_arayashiki0Map.put(Localization.EN, "Arayashiki");
 			_arayashiki1Map.put(Localization.EN, "Arayashiki +1");
+			_arayashiki2Map.put(Localization.EN, "Arayashiki +2");
 		}
 		public abstract String getLocalized(Localization localization);
 	}

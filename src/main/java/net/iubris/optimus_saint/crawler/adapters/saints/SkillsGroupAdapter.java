@@ -31,15 +31,18 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 		String idS = jsonObjectRoot.getString(FIELD_ID);
 //		long id = Long.parseLong(idS);
 		
-		JsonObject jsonObjectName = jsonObjectRoot.getJsonObject(FIELD_NAME);
-		String name = LocalizationUtils.getLocalizedValue(jsonObjectName);
+//		JsonObject jsonObjectName = jsonObjectRoot.getJsonObject(FIELD_NAME);
+		String name = 
+		        // LocalizationUtils.getLocalizedValue(jsonObjectName);
+		        jsonObjectRoot.getString(FIELD_NAME);
 		
 		/*if (idS.endsWith("100")) {
 			System.out.println(idS+" "+name);
 		}*/
 		
-		JsonObject jsonObjectDescription = jsonObjectRoot.getJsonObject(FIELD_DESCRIPTION);
-		String descriptionString = LocalizationUtils.getLocalizedValue(jsonObjectDescription);
+//		JsonObject jsonObjectDescription = jsonObjectRoot.getJsonObject(FIELD_DESCRIPTION);
+//		String descriptionString = LocalizationUtils.getLocalizedValue(jsonObjectDescription);
+		String descriptionString = jsonObjectRoot.getString(FIELD_DESCRIPTION);
 		
 		Skill skill = new Skill();
 		skill.id = idS;
@@ -92,8 +95,11 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 				skillsGroup.setSeventhSense(t);
 			}
 			else if ((t.id).endsWith("100")) {
-				skillsGroup.setCrusade(t);
+				skillsGroup.setCrusade1(t);
 			}
+			else if ((t.id).endsWith("101")) {
+                skillsGroup.setCrusade2(t);
+            }
 		}
 		
 		SkillsGroup get() {

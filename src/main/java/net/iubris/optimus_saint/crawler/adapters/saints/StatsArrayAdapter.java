@@ -16,6 +16,7 @@ import net.iubris.optimus_saint.crawler.model.LocalizationUtils;
 import net.iubris.optimus_saint.crawler.model.saints.stats.Category;
 import net.iubris.optimus_saint.crawler.model.saints.stats.StatValue;
 import net.iubris.optimus_saint.crawler.model.saints.stats.StatsGroup;
+import net.iubris.optimus_saint.crawler.model.saints.stats.StatsValue;
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.ActiveTime;
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.ClothKind;
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.LiteralStat;
@@ -80,9 +81,10 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 		for (JsonValue jsonValue : statsJsonArray) {
 //			LocalizedData localizedData = jsonb.fromJson(jsonValue.asJsonObject().toString(), LocalizedData.class);
 			
-			
 			JsonObject jsonObject = jsonValue.asJsonObject();
-			String nameValue = LocalizationUtils.getLocalizedValue( jsonObject.getJsonObject(NAME_NODE) ); 
+			String nameValue = 
+			        // LocalizationUtils.getLocalizedValue( jsonObject.getJsonObject(NAME_NODE) );
+			        jsonObject.getString(NAME_NODE);
 			
 			Set<String> keySet = jsonObject.keySet();
 			keySet.stream().forEach(v->{
@@ -178,7 +180,7 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 	private static interface Action {
 		void adapt(JsonObject jsonObject, String nameValue, StatsGroup stats);
 	}
-	private static <eLS extends LiteralStat> void handleGenericalLiteralStat(JsonObject jsonObject, String nameValue, 
+	private <eLS extends LiteralStat> void handleGenericalLiteralStat(JsonObject jsonObject, String nameValue, 
 				Class<eLS> extendingLiteralStatClass, StatsGroup stats, String statsField) {
 		try {
 //			eLS eLS = handleLiteralStat(jsonObject, nameValue, extendingLiteralStatClass);
@@ -187,7 +189,8 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 			eLS extendingLiteralStat = extendingLiteralStatClass.newInstance();
 			
 			Localization localizationE = LocalizationUtils.getLocalization();
-			String minAsString = extendingLiteralStat.findByInternalEnum(jsonObject, MIN).getLocalized(localizationE);
+			StatsValue minNotLocalized = extendingLiteralStat.findByInternalEnum(jsonObject, MIN);
+			String minAsString = minNotLocalized.getLocalized(localizationE);
 			StatValue min = new StatValue();
 			min.value = minAsString;
 			extendingLiteralStat.min = min;
@@ -199,15 +202,15 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 			
 			stats.getClass().getField(statsField).set(stats, extendingLiteralStat);
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			logger.error("error handling generical literal stat", e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+		    logger.error("error handling generical literal stat", e);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+		    logger.error("error handling generical literal stat", e);
 		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
+		    logger.error("error handling generical literal stat", e);
 		} catch (SecurityException e) {
-			e.printStackTrace();
+		    logger.error("error handling generical literal stat", e);
 		}
 	}
 	/*private static <LS extends LiteralStat> LS handleLiteralStat(JsonObject jsonObject, String value, 

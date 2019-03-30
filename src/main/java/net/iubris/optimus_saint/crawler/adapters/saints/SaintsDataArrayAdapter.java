@@ -43,14 +43,17 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
             JsonObject saintAsJsonObject = jv.asJsonObject();
             boolean incomplete = saintAsJsonObject.getBoolean("incomplete");
             String id = saintAsJsonObject.getString("id");
-            JsonObject jsonObjectName = saintAsJsonObject.getJsonObject("name");
+//            JsonObject jsonObjectName = saintAsJsonObject.getString("name");
+            String name = saintAsJsonObject.getString("name");
             String fyi_name = saintAsJsonObject.getString("fyi_name");
-            try {
+            
+            // OLD
+            /*try {
                 String name = new NameAdapter().adaptFromJson(jsonObjectName);
                 if (incomplete) {
                     String s = "";
-                    if (StringUtils.isNotBlank(name/* .value */)) {
-                        s = name/* .value */ + " :: " + fyi_name;
+                    if (StringUtils.isNotBlank(name)) {
+                        s = name + " :: " + fyi_name;
                     } else {
                         s = saintAsJsonObject.getString("fyi_name");
                         if (StringUtils.isBlank(s)) {
@@ -61,7 +64,21 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
+            
+            // NEW
+            /*if (incomplete) {
+                String s = "";
+                if (StringUtils.isNotBlank(name)) {
+                    s = name;
+                } else if (StringUtils.isBlank(fyi_name)) {
+                    s = fyi_name;
+                } else {
+                    s = id;
+                }
+                printer.println("skipping '" + s + "' (" + id + ")" + ": incomplete");
+            }*/
+            
             return !incomplete;
         })
         .map(jv -> {

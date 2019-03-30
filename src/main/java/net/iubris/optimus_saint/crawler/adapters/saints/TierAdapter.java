@@ -15,7 +15,7 @@ public class TierAdapter extends LocalizedAdapter<Tier> {
 	public Tier adaptFromJson(JsonObject jsonObject) throws InstantiationException, IllegalAccessException {
 		Tier tier = new Tier();
 		String string = jsonObject.getString("tier");
-		tier.tier = string;
+		tier.value = string;
 		return tier;
 	}
 	

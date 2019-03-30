@@ -73,7 +73,9 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 			AtomicInteger indexFromStartWhich = new AtomicInteger(indexFromStartInt);
 			
 			// get(1) -> id
-			Set<String> alreadyPresentIdsSet = rowsFromSpreadsheet.stream().map(r->(String)r.get(1)).collect(Collectors.toSet());
+			Set<String> alreadyPresentIdsSet = rowsFromSpreadsheet.stream()
+			        .filter(r->r.size()>0)
+			        .map(r->(String)r.get(1)).collect(Collectors.toSet());
 //			printer.println("alreadyPresentIdsSet.size: "+alreadyPresentIdsSet.size());
 //			printer.println(alreadyPresentIdsSet.stream().sorted().collect(Collectors.joining(", ")));
 			
@@ -112,17 +114,22 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
     
     private static List<Object> saintDataToList(AtomicInteger index, SaintData sd) {
         List<Object> list = new ArrayList<>();
+        // index
         list.add(index.incrementAndGet());
+        // id
         list.add(sd.id);
+        // name
         list.add("{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
+        // type
         list.add(sd.type.name().toLowerCase());
+        // lane
         list.add(sd.lane.name().toLowerCase());
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.first));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.second));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.third));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.fourth));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.getSeventhSense()));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade()));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade1()));
         list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
         
         return list;

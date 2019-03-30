@@ -9,7 +9,8 @@ public class SkillsGroup {
 	public Skill third;
 	public Skill fourth;
 	private Skill seventhSense;
-	private Skill crusade;
+	private Skill crusade1;
+	private Skill crusade2;
 	
 	public SkillsGroup() {
 //		System.out.println("do nothing");
@@ -28,14 +29,21 @@ public class SkillsGroup {
 		seventhSense.name = net.iubris.optimus_saint.common.StringUtils.EMPTY;
 	}
 	
-	public boolean hasCrusade() {
-		return StringUtils.isNotBlank(crusade.name);
+	public boolean hasCrusade2() {
+        return StringUtils.isNotBlank(crusade2.name);
+    }
+	
+	public Skill getCrusade1() {
+		return crusade1;
+	}
+	public void setCrusade1(Skill crusade1) {
+		this.crusade1 = crusade1;
 	}
 	
-	public Skill getCrusade() {
-		return crusade;
-	}
-	public void setCrusade(Skill crusade) {
-		this.crusade = crusade;
-	}
+	public Skill getCrusade2() {
+        return crusade2;
+    }
+    public void setCrusade2(Skill crusade2) {
+        this.crusade2 = crusade2;
+    }
 }

@@ -42,9 +42,11 @@ public class SaintsDataWithSkillsPrinter extends AbstractConsoleSaintsDataPrinte
             s+="  - 7^sense skill:"+seventhSense.name+": "+(seventhSense.description.replace("\n", " "))+NEW_LINE;
         }
         
-        if (saintData.skills.hasCrusade()) {
-            Skill other = saintData.skills.getCrusade();
-            s+="  - Crusade skill:"+other.name+": "+(other.description.replace("\n", " "));
+        s+=   "  - Crusade skill 1:"+saintData.skills.getCrusade1().name+": "+(saintData.skills.getCrusade1().description.replace("\n", " "))+NEW_LINE;
+        
+        if (saintData.skills.hasCrusade2()) {
+            Skill crusade2 = saintData.skills.getCrusade2();
+            s+="  - Crusade skill 2:"+crusade2.name+": "+(crusade2.description.replace("\n", " "));
         }
             
         s = // .replace(SEPARATOR+SEPARATOR, SEPARATOR)
