@@ -1,7 +1,6 @@
 package net.iubris.optimus_saint.crawler.main;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Inject;
@@ -14,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import net.iubris.optimus_saint.analyzer_new.SaintsDataAnalyzer;
 import net.iubris.optimus_saint.crawler._di.CrawlerModule;
 import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
@@ -30,6 +30,7 @@ public class Main {
 	private final Downloader downloader;
 	private final Loader loader;
 	private final SaintsDataPrinter saintsDataPrinter;
+	private final SaintsDataAnalyzer saintsDataAnalyzer;
 	private final GoogleSpreadSheetExporter googleSpreadSheetExporter;
 	private final CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter;
 	private final Printer printer;
@@ -37,6 +38,7 @@ public class Main {
 	
 	@Inject
 	public Main(Downloader downloader, Loader loader, SaintsDataPrinter saintsDataPrinter,
+			SaintsDataAnalyzer saintsDataAnalyzer,
 			GoogleSpreadSheetExporter googleSpreadSheetExporter,
 			CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter,
 			SaintsDataBucket saintsDataBucket,
@@ -44,6 +46,7 @@ public class Main {
 		this.downloader = downloader;
 		this.loader = loader;
 		this.saintsDataPrinter = saintsDataPrinter;
+		this.saintsDataAnalyzer = saintsDataAnalyzer;
 		this.googleSpreadSheetExporter = googleSpreadSheetExporter;
 		this.csvPrinterSaintsDataPrinter = csvPrinterSaintsDataPrinter;
 		this.saintsDataBucket = saintsDataBucket;
@@ -88,8 +91,13 @@ public class Main {
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.PRINT)) {
 		        printer.println("* sample print phase - begin *");
 		        saintsDataPrinter.print(saints);
-		        
 		        printer.println("* sample print phase - end *\n");
+		    }
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.MINIMAL_ANALYSIS)) {
+		        printer.println("* sample analysis phase - begin *");
+//		        saintsDataPrinter.print(saints);
+		        saintsDataAnalyzer.minimal(saints);
+		        printer.println("* sample analysis phase - end *\n");
 		    }
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.CSV)) {

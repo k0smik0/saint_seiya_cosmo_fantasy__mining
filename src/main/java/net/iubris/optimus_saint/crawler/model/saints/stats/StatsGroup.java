@@ -1,5 +1,10 @@
 package net.iubris.optimus_saint.crawler.model.saints.stats;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.ActiveTime;
@@ -20,6 +25,7 @@ import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.Level;
 import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.MaxHP;
 import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.NullFuryResistance;
 import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.NullPhysicalDefense;
+import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.NumericalStat;
 import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.PhysicalAttack;
 import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.PhysicalCritical;
 import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.PhysicalDefense;
@@ -33,6 +39,26 @@ import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.VitalityGro
 
 public class StatsGroup {
 	
+	private Set<String> FIELDS_TO_SKIP = new HashSet<>( Arrays.asList("rarity","category","promotionClass","clothKind","activeTime","level") ); 
+	public int rawSum() {
+		int sum = 0;
+		Field[] fields = getClass().getFields();
+		for (Field field : fields) {
+			if ( FIELDS_TO_SKIP.contains(field.getName()) ) {
+				continue;
+			}
+			try {
+				NumericalStat numericalStat = (NumericalStat) field.get(this);
+				sum+=numericalStat.max;
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		return sum;
+	}
+	
 	// numerical, specific
 	public Rarity rarity;
 	
@@ -44,9 +70,12 @@ public class StatsGroup {
 	public ActiveTime activeTime;
 	
 	// numerical	
+	public AuraGrowthRate auraGrowthRate;
+	public TechnicalGrowthRate technicalGrowthRate;
+	public VitalityGrowthRate vitalityGrowthRate;
+	
 	public Accuracy accuracy;
 	public Aura aura;
-	public AuraGrowthRate auraGrowthRate;
 	public CosmoCostReduction cosmoCostReduction;
 	public CosmoRecovery cosmoRecovery;
 	public Evasion evasion;
@@ -64,10 +93,9 @@ public class StatsGroup {
 	public PhysicalDefense physicalDefense;
 	public Power power;	
 	public SilenceResistance silenceResistance;
-	public TechnicalGrowthRate technicalGrowthRate;
 	public Technique technique;
 	public Vitality vitality;
-	public VitalityGrowthRate vitalityGrowthRate;
+	
 	
 	@Override
 	public String toString() {

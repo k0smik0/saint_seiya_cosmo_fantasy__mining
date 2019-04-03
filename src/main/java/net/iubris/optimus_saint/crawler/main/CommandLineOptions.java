@@ -13,8 +13,9 @@ public enum CommandLineOptions {
 	SPREADSHEET("s","spreadsheet","export data into spreadsheet, appending"),
 	SPREADSHEET_OVERWRITE("S","spreadsheet-overwrite","export data into spreadsheet, overwriting existing data"),
 	CSV("c","csv","export data on csv file"),
-	
-	HELP("h","help","show this help menu");
+	MINIMAL_ANALYSIS("a", "analysis", "minimal stats analysis"),
+	HELP("h","help","show this help menu"), 
+	;
 	
 	private final String shortOption;
 	private final String longOption;

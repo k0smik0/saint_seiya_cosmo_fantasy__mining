@@ -73,4 +73,16 @@ public class SaintData {
 	public String getId() {
 		return id;
 	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public StatsGroup getStats() {
+		return stats;
+	}
+	
+	public int getRawStatsSum() {
+		return stats.rawSum();
+	}
 }
