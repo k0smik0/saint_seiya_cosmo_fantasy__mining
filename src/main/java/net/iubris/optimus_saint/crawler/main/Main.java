@@ -1,6 +1,7 @@
 package net.iubris.optimus_saint.crawler.main;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Inject;
@@ -53,14 +54,17 @@ public class Main {
 		CommandLineOptions.init();
 		CommandLineParser parser = new DefaultParser();
 		// parse the command line arguments
+//		System.out.println("args: "+Arrays.asList(args));
 		CommandLine commandLineOptions = parser.parse(CommandLineOptions.getOptions(), args);
+//		System.out.println("args: "+args);
 		return commandLineOptions;
 	}
 
 	public void doStuff(CommandLine commandLineOptions) {
 		printer.println("** STARTING **\n");
 		
-		if ( Saints.isSaintsDatasetToUpdate() || CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.DOWNLOAD) /*arguments.download*/ ) {
+		if (   Saints.isSaintsDatasetToUpdate() 
+	        || CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.DOWNLOAD) ) {
 		    printer.println("* download phase - begin *");
 		    downloader.start();
 		    printer.println("* download phase - end *\n");
@@ -84,6 +88,7 @@ public class Main {
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.PRINT)) {
 		        printer.println("* sample print phase - begin *");
 		        saintsDataPrinter.print(saints);
+		        
 		        printer.println("* sample print phase - end *\n");
 		    }
 		    
@@ -95,10 +100,16 @@ public class Main {
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {
 		        printer.println("* google spreadsheet exporter phase - begin *");
-		        ExporterStatus export = googleSpreadSheetExporter.export(saints);
+		        ExporterStatus export = googleSpreadSheetExporter.export(saints, false);
 		        printer.println("spreadsheet exporter status: "+export);
 		        printer.println("* google spreadsheet exporter phase - end*\n");
 		    }
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET_OVERWRITE)) {
+                printer.println("* google spreadsheet exporter (overwriting) phase - begin *");
+                ExporterStatus export = googleSpreadSheetExporter.export(saints, true);
+                printer.println("spreadsheet exporter (overwriting) status: "+export);
+                printer.println("* google spreadsheet exporter (overwriting) phase - end*\n");
+            }
 		}
 		
 		if (saints.size()==0 && CommandLineOptions.areAllFalse(commandLineOptions)) {

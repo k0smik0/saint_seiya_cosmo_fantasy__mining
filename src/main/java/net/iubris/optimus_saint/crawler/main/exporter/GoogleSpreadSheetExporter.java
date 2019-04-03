@@ -34,6 +34,8 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
+import com.google.api.services.sheets.v4.model.ClearValuesRequest;
+import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import net.iubris.optimus_saint.common.StringUtils;
@@ -48,6 +50,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 	private static final String SPREADSHEET_ID = "1b-ZlA_4nnLgFGfxhufL7kDJ8o7_kTwjuWRIAxmhhokA";
 	private static final String SHEET_NAME = "saints";
 	private static final String RANGE = SHEET_NAME+"!A1:O";
+	private static final String RANGE_TO_CLEAR = SHEET_NAME+"!A2:O";
 	
 	private final SaintsDataBucket saintsDataBucket;
     private Printer printer;
@@ -59,8 +62,12 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
     }
 
     @Override
-	public ExporterStatus export(Collection<SaintData> saintDataCollection) {
+	public ExporterStatus export(Collection<SaintData> saintDataCollection, boolean overwrite) {
 		try {
+		    if (overwrite) {
+                clearExistingValues( getSheetService() );
+            }
+		    
 			List<List<Object>> rowsFromSpreadsheet = getValuesFromSpreadSheet( getSheetService() );
 			
 			if (rowsFromSpreadsheet == null || rowsFromSpreadsheet.isEmpty()) {
@@ -82,6 +89,9 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 		    List<List<Object>> valuesToAdd = saintsDataBucket.getSaints()/* .getIdToSaintsMap().entrySet()*/
                 .stream()
                 .filter(sd -> {
+                    if (overwrite) {
+                        return true;
+                    }
                     if (alreadyPresentIdsSet.contains(sd.id)) {
                         printer.println(sd.id+" "+sd.name+" already present - skip");
                         return false;
@@ -97,7 +107,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 		    if (valuesToAdd.size()==0) {
 		        printer.println("valuesToAdd.size: 0 - nothing to add");
 		        return ExporterStatus.OK;
-		    } 
+		    }
 
 		    boolean puttedALl = putValuesToSpreadsheet(getSheetService(), valuesToAdd);
 		    if (puttedALl) {
@@ -130,6 +140,7 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.fourth));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.getSeventhSense()));
         list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade1()));
+        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade2()));
         list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
         
         return list;
@@ -183,6 +194,13 @@ public class GoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
         private static final String MISSING = "MISSING";
     }
 
+    private static void clearExistingValues(Sheets sheetService) throws IOException {
+        ClearValuesResponse clearResponse = sheetService.spreadsheets().values()
+        .clear(SPREADSHEET_ID, RANGE_TO_CLEAR, new ClearValuesRequest())
+        .execute();
+        
+        System.out.println( "cleared range: "+clearResponse.getClearedRange() );
+    }
     
     private static boolean putValuesToSpreadsheet(Sheets sheetService, List<List<Object>> valuesToAdd) throws IOException {
 //        String first = "=Rows($A$1:A2)";

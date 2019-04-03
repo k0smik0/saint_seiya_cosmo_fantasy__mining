@@ -1,5 +1,7 @@
 package net.iubris.optimus_saint.crawler.model.saints.stats;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.ActiveTime;
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.ClothKind;
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.PromotionClass;
@@ -67,4 +69,8 @@ public class StatsGroup {
 	public Vitality vitality;
 	public VitalityGrowthRate vitalityGrowthRate;
 	
+	@Override
+	public String toString() {
+	    return ReflectionToStringBuilder.toString(this);
+	}
 }

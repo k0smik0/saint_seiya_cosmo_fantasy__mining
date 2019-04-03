@@ -29,4 +29,10 @@ public abstract class LiteralStat extends AbstractStat {
 		    .replaceAll("\\"+StringUtils.PLUS, StringUtils.EMPTY);
 		return returning;
 	}
+	
+	@Override
+	public String toString() {
+	    return   "min:"+min.value
+            +",max:"+max.value;
+	}
 }

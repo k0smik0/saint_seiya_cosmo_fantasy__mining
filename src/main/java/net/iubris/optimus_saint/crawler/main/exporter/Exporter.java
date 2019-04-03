@@ -6,7 +6,7 @@ import net.iubris.optimus_saint.crawler.model.SaintData;
 
 public interface Exporter<R> {
 
-	public R export(Collection<SaintData> saintDataCollection);
+	public R export(Collection<SaintData> saintDataCollection, boolean overwrite);
 	
 	public static enum ExporterStatus {
 	    OK,

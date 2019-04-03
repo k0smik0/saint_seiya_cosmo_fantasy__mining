@@ -10,7 +10,8 @@ public enum CommandLineOptions {
 	DOWNLOAD("d","download","download saints definition from http://www.sscfdb.com"),
 	LOAD("l","load","load data saints from file"),
 	PRINT("p","print","print loaded data"),
-	SPREADSHEET("s","spreadsheet","export data into spreadsheet"),
+	SPREADSHEET("s","spreadsheet","export data into spreadsheet, appending"),
+	SPREADSHEET_OVERWRITE("S","spreadsheet-overwrite","export data into spreadsheet, overwriting existing data"),
 	CSV("c","csv","export data on csv file"),
 	
 	HELP("h","help","show this help menu");
@@ -32,6 +33,7 @@ public enum CommandLineOptions {
 		if (!setup) {
 			for (CommandLineOptions optionsEnum : values()) {
 				Option option = new Option(optionsEnum.shortOption, optionsEnum.longOption, false, optionsEnum.description);
+//				System.out.println("adding "+option);
 				options.addOption(option);
 			}
 			setup = true;
@@ -42,8 +44,8 @@ public enum CommandLineOptions {
 		return options;
 	}
 	
-	public static boolean hasOption(CommandLine commandLineOptions, CommandLineOptions optionEnum) {
-		return commandLineOptions.hasOption(optionEnum.shortOption);
+	public static boolean hasOption(CommandLine commandLine, CommandLineOptions optionEnum) {
+		return commandLine.hasOption(optionEnum.shortOption);
 	}
 	
 	public static void printFormattedHelp() {

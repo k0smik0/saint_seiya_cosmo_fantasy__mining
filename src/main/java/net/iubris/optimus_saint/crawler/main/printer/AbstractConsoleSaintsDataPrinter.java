@@ -31,7 +31,6 @@ public abstract class AbstractConsoleSaintsDataPrinter implements SaintsDataPrin
 //                print(sd);
                 printer.println(sd);
             });
-        
     }
     
     protected Stream<String> saintsDataToStringStream(Collection<SaintData> saintDatas) {
@@ -42,5 +41,4 @@ public abstract class AbstractConsoleSaintsDataPrinter implements SaintsDataPrin
     }
     
     protected abstract String saintDataToString(SaintData saintData);
-
 }

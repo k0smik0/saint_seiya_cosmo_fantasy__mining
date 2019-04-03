@@ -18,6 +18,7 @@ public class SaintsDataSimplePrinter extends AbstractConsoleSaintsDataPrinter {
     }
 
     private final AtomicInteger counter = new AtomicInteger(0);
+    
 	@Override
 	public void print(Collection<SaintData> saintDatas) {
 	    counter.set(0);

@@ -8,4 +8,11 @@ public class TiersGroup {
 	public Tier playerVersusPlayer;
 //	@JsonbProperty(value="Crusade")
 	public Tier crusade;
+	
+	@Override
+    public String toString() {
+	    return   "PVE:"+playerVersusEnemy.value
+	            +",PVP:"+playerVersusPlayer.value
+	            +",Crusade:"+crusade.value;
+    }
 }

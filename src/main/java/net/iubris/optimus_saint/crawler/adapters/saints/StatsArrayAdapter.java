@@ -162,8 +162,8 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 		
 		statsToHandlerMap.put(TYPE_NUMERICAL_COMPLEX__CATEGORY, (jsonObject, nameValue, stats) -> {
 			Category category = new Category();
-			category.min = jsonObject.getJsonArray(MIN).getValuesAs(JsonNumber.class).stream().map(f-> f.intValue() ).collect(Collectors.toList());
-			category.max = jsonObject.getJsonArray(MAX).getValuesAs(JsonNumber.class).stream().map(f-> f.intValue() ).collect(Collectors.toList());
+			category.min.addAll( jsonObject.getJsonArray(MIN).getValuesAs(JsonNumber.class).stream().map(f-> f.intValue() ).collect(Collectors.toList()) );
+			category.max.addAll( jsonObject.getJsonArray(MAX).getValuesAs(JsonNumber.class).stream().map(f-> f.intValue() ).collect(Collectors.toList()) );
 			stats.category = category;
 		});
 		
