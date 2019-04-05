@@ -28,21 +28,18 @@ import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
-public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
+public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadSheetExporter<ExporterStatus> {
 	
-	private static final String SPREADSHEET_ID = "1b-ZlA_4nnLgFGfxhufL7kDJ8o7_kTwjuWRIAxmhhokA";
 	private static final String SHEET_NAME = "saints";
 	private static final String RANGE_TO_POPULATE = SHEET_NAME+"!A1:O";
 	private static final String RANGE_TO_CLEAR = SHEET_NAME+"!A2:O";
-	
-	private static final String APPLICATION_NAME = "Saint Seiya Searcher Engine Translations";
 	
 	private final SaintsDataBucket saintsDataBucket;
     private final Printer printer;
 	
 	@Inject
 	public SaintsDataGoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, Printer printer) {
-		super(APPLICATION_NAME, SPREADSHEET_ID);
+		super(GoogleConfig.APPLICATION_NAME, GoogleConfig.SPREADSHEET_ID);
         this.saintsDataBucket = saintsDataBucket;
         this.printer = printer;
     }

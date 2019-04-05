@@ -10,7 +10,7 @@ import com.google.api.services.sheets.v4.model.ClearValuesRequest;
 import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-public class AbstractGoogleSpreadSheetExporter {
+abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S> {
 	
 //	private static final String CLIENT_ID = "329557453456-sc3qimc2sisll4vh80ttuqo82ulhhlpc.apps.googleusercontent.com";
 //	private static final String CLIENT_SECRET = "OIMFazf9V42spDZ5wHV8cifI";
