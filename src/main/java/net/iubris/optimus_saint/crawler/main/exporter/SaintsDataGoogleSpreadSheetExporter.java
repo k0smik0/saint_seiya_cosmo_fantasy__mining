@@ -28,7 +28,7 @@ import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
-public class GoogleSpreadSheetExporter extends AbstractGoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
+public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadSheetExporter implements Exporter<ExporterStatus> {
 	
 	private static final String SPREADSHEET_ID = "1b-ZlA_4nnLgFGfxhufL7kDJ8o7_kTwjuWRIAxmhhokA";
 	private static final String SHEET_NAME = "saints";
@@ -41,7 +41,7 @@ public class GoogleSpreadSheetExporter extends AbstractGoogleSpreadSheetExporter
     private final Printer printer;
 	
 	@Inject
-	public GoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, Printer printer) {
+	public SaintsDataGoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, Printer printer) {
 		super(APPLICATION_NAME, SPREADSHEET_ID);
         this.saintsDataBucket = saintsDataBucket;
         this.printer = printer;

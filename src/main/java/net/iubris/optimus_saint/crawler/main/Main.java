@@ -19,7 +19,7 @@ import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
-import net.iubris.optimus_saint.crawler.main.exporter.GoogleSpreadSheetExporter;
+import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataGoogleSpreadSheetExporter;
 import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.model.SaintData;
@@ -31,7 +31,7 @@ public class Main {
 	private final Loader loader;
 	private final SaintsDataPrinter saintsDataPrinter;
 	private final SaintsDataAnalyzer saintsDataAnalyzer;
-	private final GoogleSpreadSheetExporter googleSpreadSheetExporter;
+	private final SaintsDataGoogleSpreadSheetExporter googleSpreadSheetExporter;
 	private final CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter;
 	private final Printer printer;
 	private final SaintsDataBucket saintsDataBucket;
@@ -39,7 +39,7 @@ public class Main {
 	@Inject
 	public Main(Downloader downloader, Loader loader, SaintsDataPrinter saintsDataPrinter,
 			SaintsDataAnalyzer saintsDataAnalyzer,
-			GoogleSpreadSheetExporter googleSpreadSheetExporter,
+			SaintsDataGoogleSpreadSheetExporter googleSpreadSheetExporter,
 			CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter,
 			SaintsDataBucket saintsDataBucket,
 			Printer printer) {
