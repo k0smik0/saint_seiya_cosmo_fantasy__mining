@@ -15,6 +15,7 @@ public enum CommandLineOptions {
 	CSV("c","csv","export data on csv file"),
 	MINIMAL_ANALYSIS("a", "analysis", "minimal stats analysis"),
 	HELP("h","help","show this help menu"), 
+	SPREADSHEET_BBA("B", "bba classifier", "bba classifier for google") 
 	;
 	
 	private final String shortOption;

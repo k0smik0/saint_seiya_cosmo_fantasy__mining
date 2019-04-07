@@ -26,6 +26,7 @@ public class SkillsGroup {
 
 	public void setSeventhSense(Skill t) {
 		seventhSense = t;
+		// seventhSense name is pleonastic, so make empty
 		seventhSense.name = net.iubris.optimus_saint.common.StringUtils.EMPTY;
 	}
 	
@@ -38,6 +39,7 @@ public class SkillsGroup {
 	}
 	public void setCrusade1(Skill crusade1) {
 		this.crusade1 = crusade1;
+		this.crusade1.name = this.crusade1.name.replace("Ⅳ", "IV");
 	}
 	
 	public Skill getCrusade2() {

@@ -10,7 +10,6 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import net.iubris.optimus_saint.crawler.model.LocalizationUtils;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.model.saints.skills.SkillsGroup;
 

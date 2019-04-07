@@ -19,6 +19,7 @@ import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
+import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataByBBAGoogleExporter;
 import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataGoogleSpreadSheetExporter;
 import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
@@ -35,11 +36,13 @@ public class Main {
 	private final CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter;
 	private final Printer printer;
 	private final SaintsDataBucket saintsDataBucket;
+    private final SaintsDataByBBAGoogleExporter saintsDataByBBAGoogleExporter;
 	
 	@Inject
 	public Main(Downloader downloader, Loader loader, SaintsDataPrinter saintsDataPrinter,
 			SaintsDataAnalyzer saintsDataAnalyzer,
-			SaintsDataGoogleSpreadSheetExporter googleSpreadSheetExporter,
+			SaintsDataGoogleSpreadSheetExporter saintsDataGoogleSpreadSheetExporter,
+			SaintsDataByBBAGoogleExporter saintsDataByBBAGoogleExporter,
 			CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter,
 			SaintsDataBucket saintsDataBucket,
 			Printer printer) {
@@ -47,7 +50,8 @@ public class Main {
 		this.loader = loader;
 		this.saintsDataPrinter = saintsDataPrinter;
 		this.saintsDataAnalyzer = saintsDataAnalyzer;
-		this.googleSpreadSheetExporter = googleSpreadSheetExporter;
+		this.googleSpreadSheetExporter = saintsDataGoogleSpreadSheetExporter;
+        this.saintsDataByBBAGoogleExporter = saintsDataByBBAGoogleExporter;
 		this.csvPrinterSaintsDataPrinter = csvPrinterSaintsDataPrinter;
 		this.saintsDataBucket = saintsDataBucket;
 		this.printer = printer;
@@ -87,7 +91,12 @@ public class Main {
 		
 		Collection<SaintData> saints = saintsDataBucket.getSaints();
 		
-		if (saints.size()>0) {
+		if (saints.size()==0 && CommandLineOptions.areAllFalse(commandLineOptions)) {
+//          printer.println("PRINT HELP?");
+            CommandLineOptions.printFormattedHelp();
+        }
+		
+		else if (saints.size()>0) {
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.PRINT)) {
 		        printer.println("* sample print phase - begin *");
 		        saintsDataPrinter.print(saints);
@@ -118,14 +127,16 @@ public class Main {
                 printer.println("spreadsheet exporter (overwriting) status: "+export);
                 printer.println("* google spreadsheet exporter (overwriting) phase - end*\n");
             }
+		    
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET_BBA)) {
+                printer.println("* google spreadsheet exporter classified by bba phase - begin *");
+                ExporterStatus export = saintsDataByBBAGoogleExporter.export(saints, false);
+                printer.println("spreadsheet exporter status: "+export);
+                printer.println("* google spreadsheet exporter classified by bba phase - end*\n");
+            }
 		}
 		
-		if (saints.size()==0 && CommandLineOptions.areAllFalse(commandLineOptions)) {
-//			printer.println("PRINT HELP?");
-			CommandLineOptions.printFormattedHelp();
-		}
-		
-		printer.println("** FINISHED **");
+		printer.println("** FINISHING **");
 	}
 
 	public static void main(String[] args) {
