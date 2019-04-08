@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +14,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -20,6 +23,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -99,12 +103,22 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         
         Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
         .filter(e->!e.getKey().name.isEmpty())
+        .map(skillNameRemapper)
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        
         return toReturn;
-	}
+	};
 	
-//	private static final Function replacingSkillName
+	private static final Function<Entry<Skill, List<SaintData>>, SimpleEntry<Skill, List<SaintData>>> skillNameRemapper = e -> {
+        Skill skill = e.getKey();
+        skill.name = skill.name
+                .replace("(A.E. Exclusive) BBA", "BBA (A.E. Exclusive)")
+                .replace("(LG Exclusive) BBA", "BBA (LG Exclusive)")
+                .replace("[Specter Exclusive] Combo Plus", "Combo Plus [Specter Exclusive]");
+        return new AbstractMap.SimpleEntry<>(
+            skill, 
+            e.getValue()
+        );
+    };
 
 	private static final Predicate<SaintData> filterNotUsefulSaints = t -> {
         // SSE
