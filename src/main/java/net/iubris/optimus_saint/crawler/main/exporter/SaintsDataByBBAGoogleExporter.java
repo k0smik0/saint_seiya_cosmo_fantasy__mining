@@ -4,26 +4,22 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -39,11 +35,22 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	private Printer printer;
 	
 	private static final Set<ClothKindEnum> usefulCloths = new HashSet<>();
+	private static final Map<String,String> skillToRemapStringsMap = new HashMap<>();
 	static {
-	    usefulCloths.addAll( Arrays.asList( ClothKindEnum.values() ) );
+		usefulCloths.addAll( Arrays.asList( ClothKindEnum.values() ) );
         usefulCloths.remove(ClothKindEnum.NO_CLOTH);
         usefulCloths.remove(ClothKindEnum.BLACK_SAINT);
         usefulCloths.remove(ClothKindEnum.MARINA);
+		
+		skillToRemapStringsMap.put("BBA","BBA");
+		skillToRemapStringsMap.put("BT ","BT");
+		skillToRemapStringsMap.put("Combo","Combo");
+		skillToRemapStringsMap.put("Cosmo Charge","Cosmo Charge");
+		skillToRemapStringsMap.put("Damage","Damage Cut");
+		skillToRemapStringsMap.put("HP Boost","HP Boost");
+		skillToRemapStringsMap.put("PHYS ATK Boost","PHYS ATK Boost");
+		skillToRemapStringsMap.put("RES Boost","RES Boost");
+		skillToRemapStringsMap.put("Recovery","Recovery");		
 	}
 
 	@Inject
@@ -60,11 +67,12 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	    
 		Map<Skill, List<SaintData>> mergedByStreamAndMerge = mergeByStreamAndMerge(saintDataCollection);
 		String mergedByStreamAndMergeToPrint = mapToString(mergedByStreamAndMerge);
-		writeOnFile("mergedByStreamAndMergeToPrint",now, mergedByStreamAndMergeToPrint);
+//		writeOnFile("mergedByStreamAndMergeToPrint",now, mergedByStreamAndMergeToPrint);
+		System.out.println(mergedByStreamAndMergeToPrint);
 		
-		Map<Skill, List<SaintData>> mergedByOldWay = mergeByOldWay(saintDataCollection);
-		String mergedByOldWayToPrint = mapToString(mergedByOldWay);
-		writeOnFile("mergedByOldWayToPrint",now, mergedByOldWayToPrint);
+//		Map<Skill, List<SaintData>> mergedByOldWay = mergeByOldWay(saintDataCollection);
+//		String mergedByOldWayToPrint = mapToString(mergedByOldWay);
+//		writeOnFile("mergedByOldWayToPrint",now, mergedByOldWayToPrint);
 		
 		return ExporterStatus.OK;
 	}
@@ -72,14 +80,15 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	private static Map<Skill, List<SaintData>> mergeByStreamAndMerge(Collection<SaintData> saintDataCollection) {
 	    Function<SaintData,Skill> byCrusadeSkill1Classifier = t -> t.skills.getCrusade1();
         Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
-        
-        
+                
         Map<Skill, List<SaintData>> saintsByCrusadeSkill1 = saintDataCollection.stream()
                 .filter(filterNotUsefulSaints)
+                .map(crusadeSkill1NameFlattingRemapper)
                 .collect(Collectors.groupingBy(byCrusadeSkill1Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
         
         Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.stream()
                 .filter(filterNotUsefulSaints)
+                .map(crusadeSkill2NameFlattingRemapper)
                 .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
@@ -93,45 +102,76 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             .parallelStream()
             .forEach(e -> saintsByCrusadeSkill2ThenGlobal.merge(e.getKey(), e.getValue(), valuesRemappingFunction));
         
-        AtomicInteger i = new AtomicInteger(0);
-        System.out.println( saintsByCrusadeSkill2ThenGlobal
-                .keySet()
-                .stream()
-                .map(s->i.incrementAndGet()+": "+s.name)
-                .collect( Collectors.joining("\n") ) 
-        );
+//        AtomicInteger i = new AtomicInteger(0);
+//        System.out.println( saintsByCrusadeSkill2ThenGlobal
+//                .keySet()
+//                .stream()
+//                .map(s->i.incrementAndGet()+": "+s.name)
+//                .collect( Collectors.joining("\n") ) 
+//        );
         
         Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
-        .filter(e->!e.getKey().name.isEmpty())
-        .map(skillNameRemapper)
+        .filter(e->!e.getKey().name.isEmpty())        
+//        .map(skillNameRemapper)
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return toReturn;
 	};
 	
-	private static final Function<Entry<Skill, List<SaintData>>, SimpleEntry<Skill, List<SaintData>>> skillNameRemapper = e -> {
-        Skill skill = e.getKey();
-        skill.name = skill.name
-                .replace("(A.E. Exclusive) BBA", "BBA (A.E. Exclusive)")
-                .replace("(LG Exclusive) BBA", "BBA (LG Exclusive)")
-                .replace("[Specter Exclusive] Combo Plus", "Combo Plus [Specter Exclusive]");
-        return new AbstractMap.SimpleEntry<>(
-            skill, 
-            e.getValue()
-        );
-    };
+	
+	
+	private static final Function<SaintData, SaintData> crusadeSkill1NameFlattingRemapper = sd -> {
+		Skill crusadeSkill1 = sd.skills.getCrusade1();
+		skillToRemapStringsMap.entrySet().parallelStream()
+		.filter(n->crusadeSkill1.name.contains(n.getKey()) )
+		.map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill1.name = s);
+        return sd;
+	};
+	private static final Function<SaintData, SaintData> crusadeSkill2NameFlattingRemapper = sd -> {
+		Skill crusadeSkill2 = sd.skills.getCrusade2();
+		skillToRemapStringsMap.entrySet().parallelStream()
+		.filter(n->crusadeSkill2.name.contains(n.getKey()) )
+		.map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill2.name = s);
+        return sd;
+	};
+	
+	/*
+	 * private static final Function<Entry<Skill, List<SaintData>>,
+	 * SimpleEntry<Skill, List<SaintData>>> skillNameRemapper = e -> { Skill skill =
+	 * e.getKey(); skill.name = skill.name
+	 * .replace("(A.E. Exclusive) Score Plus BBA",
+	 * "Score Plus BBA (A.E. Exclusive)") .replace("(LG Exclusive) Score Plus BBA",
+	 * "Score Plus BBA (LG Exclusive)") .replace("[Specter Exclusive] Combo Plus",
+	 * "Combo Plus [Specter Exclusive]"); return new AbstractMap.SimpleEntry<>(
+	 * skill, e.getValue() ); };
+	 */
 
-	private static final Predicate<SaintData> filterNotUsefulSaints = t -> {
+    // God, OCE, Athena Exclamation
+    private static final boolean isAGoodGold(String saintName) {
+    	return saintName.contains("God") || saintName.contains("OCE") || saintName.contains("Odin") || saintName.contains("A.E.") || saintName.equalsIgnoreCase("Aries Shion");
+    }
+	private static final Predicate<SaintData> filterNotUsefulSaints = sd -> {
         // SSE
-        boolean isSSE = t.name.contains("SSE");
+        boolean isSSE = sd.name.contains("SSE");
         if (isSSE) return true;
         
-        ClothKindEnum clothKindEnum = ClothKindEnum.valueOf( t.stats.clothKind.max.value.toUpperCase().replace(StringUtils.SPACE, StringUtils.UNDERSCORE) );
+        // remove simple bronze saints, some silver, etc
+        int overBronzeThreshold = 10004000; // this id is a threshold to exclude bronze, silver, etc
+        int saintId = Integer.parseInt(sd.id);
+        if (saintId < overBronzeThreshold) {
+        	return false;
+        }        
+        
+        ClothKindEnum clothKindEnum = ClothKindEnum.valueOf( sd.stats.clothKind.max.value.toUpperCase().replace(StringUtils.SPACE, StringUtils.UNDERSCORE) );
         
         // God Gold Cloth
-        boolean isGodGoldCloth = ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && t.name.contains("God");
+        boolean isGodGoldCloth = ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && isAGoodGold(sd.name);
         if (isGodGoldCloth) return true;
+        if (ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && !isAGoodGold(sd.name)) {
+        	System.out.println("removing Gold Saint: "+sd.name);
+        	return false;
+        }        
         
-        // default
+        // default, by cloth
         return usefulCloths.contains(clothKindEnum);
     };	
 	private static final Comparator<SaintData> comparatorByIdDescending = new Comparator<SaintData>() {
@@ -144,52 +184,52 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             return 0;
         }};
 	
-	private static Map<Skill, List<SaintData>> mergeByOldWay(Collection<SaintData> saintDataCollection) {
-	    Function<SaintData,Skill> byCrusadeSkill1Classifier = t -> t.skills.getCrusade1();
-        Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
-        
-        Map<Skill, List<SaintData>> saintsByCrusadeSkill1 = saintDataCollection.stream()
-                .filter(filterNotUsefulSaints)
-                .collect(Collectors.groupingBy(byCrusadeSkill1Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
-        
-        Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.stream()
-                .filter(filterNotUsefulSaints)
-                .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
-        
-        saintsByCrusadeSkill1.entrySet().parallelStream().forEach(e->{
-            Skill crusadeSkillFrom1 = e.getKey();
-            
-            List<SaintData> listFrom2 = saintsByCrusadeSkill2ThenGlobal.get(crusadeSkillFrom1);
-            
-            List<SaintData> listFrom1 = e.getValue();
-            
-            // no present, simply add
-            if (listFrom2==null) {
-                saintsByCrusadeSkill2ThenGlobal.put(crusadeSkillFrom1, listFrom1);
-            }
-            // merge
-            else {
-                TreeSet<SaintData> toAdd = new TreeSet<>(comparatorByIdDescending);
-                toAdd.addAll(listFrom2);
-                toAdd.addAll(listFrom1);
-                saintsByCrusadeSkill2ThenGlobal.put(crusadeSkillFrom1, new ArrayList<>(toAdd));
-            }
-        });
-        
-        Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
-            .filter(e->!e.getKey().name.isEmpty())
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                
-        return toReturn;
-        
-        
-        
-//        saintsByCrusadeSkill2ThenGlobal.forEach(((s,l)-> {
-//           System.out.println(s.name+": "+l.stream()
-//               .map(sd->{ return sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY); } )
-//               .sorted().collect(Collectors.toList() ) ); 
-//        }));
-	}
+	/*
+	 * private static Map<Skill, List<SaintData>>
+	 * mergeByOldWay(Collection<SaintData> saintDataCollection) {
+	 * Function<SaintData,Skill> byCrusadeSkill1Classifier = t ->
+	 * t.skills.getCrusade1(); Function<SaintData,Skill> byCrusadeSkill2Classifier =
+	 * t -> t.skills.getCrusade2();
+	 * 
+	 * Map<Skill, List<SaintData>> saintsByCrusadeSkill1 =
+	 * saintDataCollection.stream() .filter(filterNotUsefulSaints)
+	 * .collect(Collectors.groupingBy(byCrusadeSkill1Classifier,
+	 * ConcurrentSkipListMap::new, Collectors.toList()));
+	 * 
+	 * Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal =
+	 * saintDataCollection.stream() .filter(filterNotUsefulSaints)
+	 * .collect(Collectors.groupingBy(byCrusadeSkill2Classifier,
+	 * ConcurrentSkipListMap::new, Collectors.toList()));
+	 * 
+	 * saintsByCrusadeSkill1.entrySet().parallelStream().forEach(e->{ Skill
+	 * crusadeSkillFrom1 = e.getKey();
+	 * 
+	 * List<SaintData> listFrom2 =
+	 * saintsByCrusadeSkill2ThenGlobal.get(crusadeSkillFrom1);
+	 * 
+	 * List<SaintData> listFrom1 = e.getValue();
+	 * 
+	 * // no present, simply add if (listFrom2==null) {
+	 * saintsByCrusadeSkill2ThenGlobal.put(crusadeSkillFrom1, listFrom1); } // merge
+	 * else { TreeSet<SaintData> toAdd = new TreeSet<>(comparatorByIdDescending);
+	 * toAdd.addAll(listFrom2); toAdd.addAll(listFrom1);
+	 * saintsByCrusadeSkill2ThenGlobal.put(crusadeSkillFrom1, new
+	 * ArrayList<>(toAdd)); } });
+	 * 
+	 * Map<Skill, List<SaintData>> toReturn =
+	 * saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
+	 * .filter(e->!e.getKey().name.isEmpty())
+	 * .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	 * 
+	 * return toReturn;
+	 * 
+	 * 
+	 * 
+	 * // saintsByCrusadeSkill2ThenGlobal.forEach(((s,l)-> { //
+	 * System.out.println(s.name+": "+l.stream() // .map(sd->{ return
+	 * sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY); } ) //
+	 * .sorted().collect(Collectors.toList() ) ); // })); }
+	 */
 	
 	
 	
@@ -200,7 +240,12 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                 List<SaintData> list = e.getValue();
                 s+= list.size()+": ";
                 s+= list.stream()
-                       .map(sd->{ return sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY); } )
+                       .map(sd->{
+                    	   String s_d = "";
+//                    	   sd.imageSmall
+                    	   s_d = sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY)+":"+sd.id;
+                    	   return s_d;
+                	   })
 //                       .sorted()
                        .collect(Collectors.toList() );
                 return s;
