@@ -118,7 +118,35 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	};
 	
 	
-	
+	// God, OCE, Athena Exclamation
+    private static final boolean isAGoodGold(String saintName) {
+        return saintName.contains("God") || saintName.contains("OCE") || saintName.contains("Odin") || saintName.contains("A.E.") || saintName.equalsIgnoreCase("Aries Shion");
+    }
+    private static final Predicate<SaintData> filterNotUsefulSaints = sd -> {
+        // SSE
+        boolean isSSE = sd.name.contains("SSE");
+        if (isSSE) return true;
+        
+        // remove simple bronze saints, some silver, etc
+        int overBronzeThreshold = 10004000; // this id is a threshold to exclude bronze, silver, etc
+        int saintId = Integer.parseInt(sd.id);
+        if (saintId < overBronzeThreshold) {
+            return false;
+        }        
+        
+        ClothKindEnum clothKindEnum = ClothKindEnum.valueOf( sd.stats.clothKind.max.value.toUpperCase().replace(StringUtils.SPACE, StringUtils.UNDERSCORE) );
+        
+        // God Gold Cloth
+        boolean isGodGoldCloth = ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && isAGoodGold(sd.name);
+        if (isGodGoldCloth) return true;
+        if (ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && !isAGoodGold(sd.name)) {
+            System.out.println("removing Gold Saint: "+sd.name);
+            return false;
+        }        
+        
+        // default, by cloth
+        return usefulCloths.contains(clothKindEnum);
+    };
 	private static final Function<SaintData, SaintData> crusadeSkill1NameFlattingRemapper = sd -> {
 		Skill crusadeSkill1 = sd.skills.getCrusade1();
 		skillToRemapStringsMap.entrySet().parallelStream()
@@ -133,47 +161,6 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		.map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill2.name = s);
         return sd;
 	};
-	
-	/*
-	 * private static final Function<Entry<Skill, List<SaintData>>,
-	 * SimpleEntry<Skill, List<SaintData>>> skillNameRemapper = e -> { Skill skill =
-	 * e.getKey(); skill.name = skill.name
-	 * .replace("(A.E. Exclusive) Score Plus BBA",
-	 * "Score Plus BBA (A.E. Exclusive)") .replace("(LG Exclusive) Score Plus BBA",
-	 * "Score Plus BBA (LG Exclusive)") .replace("[Specter Exclusive] Combo Plus",
-	 * "Combo Plus [Specter Exclusive]"); return new AbstractMap.SimpleEntry<>(
-	 * skill, e.getValue() ); };
-	 */
-
-    // God, OCE, Athena Exclamation
-    private static final boolean isAGoodGold(String saintName) {
-    	return saintName.contains("God") || saintName.contains("OCE") || saintName.contains("Odin") || saintName.contains("A.E.") || saintName.equalsIgnoreCase("Aries Shion");
-    }
-	private static final Predicate<SaintData> filterNotUsefulSaints = sd -> {
-        // SSE
-        boolean isSSE = sd.name.contains("SSE");
-        if (isSSE) return true;
-        
-        // remove simple bronze saints, some silver, etc
-        int overBronzeThreshold = 10004000; // this id is a threshold to exclude bronze, silver, etc
-        int saintId = Integer.parseInt(sd.id);
-        if (saintId < overBronzeThreshold) {
-        	return false;
-        }        
-        
-        ClothKindEnum clothKindEnum = ClothKindEnum.valueOf( sd.stats.clothKind.max.value.toUpperCase().replace(StringUtils.SPACE, StringUtils.UNDERSCORE) );
-        
-        // God Gold Cloth
-        boolean isGodGoldCloth = ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && isAGoodGold(sd.name);
-        if (isGodGoldCloth) return true;
-        if (ClothKindEnum.GOLD_SAINT.equals(clothKindEnum) && !isAGoodGold(sd.name)) {
-        	System.out.println("removing Gold Saint: "+sd.name);
-        	return false;
-        }        
-        
-        // default, by cloth
-        return usefulCloths.contains(clothKindEnum);
-    };	
 	private static final Comparator<SaintData> comparatorByIdDescending = new Comparator<SaintData>() {
         @Override
         public int compare(SaintData o1, SaintData o2) {
@@ -182,7 +169,8 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             if (o1L > o2L) return 1;
             if (o1L < o2L) return -1;
             return 0;
-        }};
+        }
+    };
 	
 	/*
 	 * private static Map<Skill, List<SaintData>>
@@ -236,23 +224,43 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	private static String mapToString(Map<Skill, List<SaintData>> merged) {
 	    String mergedToPrint = merged.entrySet().stream()
             .map(e->{
-                String s = e.getKey().name.replace("Score Plus ", StringUtils.EMPTY)+":: ";
+                String s = e.getKey().name/*.replace("Score Plus ", StringUtils.EMPTY)*/+":: ";
                 List<SaintData> list = e.getValue();
                 s+= list.size()+": ";
                 s+= list.stream()
                        .map(sd->{
-                    	   String s_d = "";
 //                    	   sd.imageSmall
-                    	   s_d = sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY)+":"+sd.id;
-                    	   return s_d;
+//                    	   s_d = sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY)+":"+sd.id;
+                    	   String saintToJson = saintToJson(sd);
+                    	   return saintToJson;
                 	   })
 //                       .sorted()
+//                       .collect(Collectors.joining(";");
                        .collect(Collectors.toList() );
                 return s;
             })
             .sorted()
             .collect(Collectors.joining("\n"));
 	    return mergedToPrint;
+	}
+	private static final String saintToJson(SaintData saintData) {
+	    String s = "";
+	    s+="{"
+	            +"'name':'"+saintData.name.replace(StringUtils.COMMA, StringUtils.EMPTY)+"'"+","
+	            +"'crusade_skill_1':{"
+	                +"'name':'"+saintData.skills.getCrusade1().name+"',"
+	                +"'description':'"+saintData.skills.getCrusade1().description+"',"
+                    +"'imageSmall':'"+saintData.skills.getCrusade1().imageSmall+"'"
+                +"}";
+	    if (saintData.skills.hasCrusade2()) {
+    	        s+="'crusade_skill_2':{"
+                        +"'name':'"+saintData.skills.getCrusade2().name+"',"
+                        +"'description':'"+saintData.skills.getCrusade2().description+"',"
+                        +"'imageSmall':'"+saintData.skills.getCrusade2().imageSmall+"'"
+                    +"}";
+	    }
+	    s+="}";
+	    return s;
 	}
 	
 	private static void writeOnFile(String fileName, Date date, String stringToPrint) {
