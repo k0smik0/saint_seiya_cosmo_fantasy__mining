@@ -36,6 +36,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	
 	private static final Set<ClothKindEnum> usefulCloths = new HashSet<>();
 	private static final Map<String,String> skillToRemapStringsMap = new HashMap<>();
+	private static final Map<String, String> skillToColumnRangeMap = new HashMap<>();
 	static {
 		usefulCloths.addAll( Arrays.asList( ClothKindEnum.values() ) );
         usefulCloths.remove(ClothKindEnum.NO_CLOTH);
@@ -50,7 +51,19 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		skillToRemapStringsMap.put("HP Boost","HP Boost");
 		skillToRemapStringsMap.put("PHYS ATK Boost","PHYS ATK Boost");
 		skillToRemapStringsMap.put("RES Boost","RES Boost");
-		skillToRemapStringsMap.put("Recovery","Recovery");		
+		skillToRemapStringsMap.put("Recovery","Recovery");
+		
+		
+		skillToColumnRangeMap.put("BBA","crusade skills!A1:A150");
+        skillToColumnRangeMap.put("BT ","crusade skills!B1:B150");
+        skillToColumnRangeMap.put("Combo","crusade skills!C2:C150");
+        skillToColumnRangeMap.put("Cosmo Charge","crusade skills!D1:D150");
+        skillToColumnRangeMap.put("Damage","crusade skills!E1:E150");
+        skillToColumnRangeMap.put("HP Boost","crusade skills!F1:F150");
+        skillToColumnRangeMap.put("PHYS ATK Boost","crusade skills!G1:G150");
+        skillToColumnRangeMap.put("RES Boost","crusade skills!H1:H150");
+        skillToColumnRangeMap.put("Recovery","crusade skills!I1:I150");
+		
 	}
 
 	@Inject
@@ -60,6 +73,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
     }
 	
 	private static final DateFormat dateFormat__YYYMMDDHHmm = new SimpleDateFormat("YYYYMMddHHmm");
+	
 
 	@Override
 	public ExporterStatus export(Collection<SaintData> saintDataCollection, boolean overwrite) {		
@@ -68,18 +82,32 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		Map<Skill, List<SaintData>> mergedByStreamAndMerge = mergeByStreamAndMerge(saintDataCollection);
 //		String mergedByStreamAndMergeToPrint = mapToString(mergedByStreamAndMerge);
 		// this list of list is the structure google spreadsheet accepts
-		List<List<String>> mapToListOfListsByColumn = mapToListOfListsByColumn(mergedByStreamAndMerge);
+		Map<Skill, List<List<Object>>> skillWithSaintsMapByColumn = skillToSaintsMapToSkillToSkillWithSaintsMapByColumn(mergedByStreamAndMerge);
+
+//		skillWithSaintsMapByColumn.forEach((s,l)->{
+//		    String range = skillToColumnRangeMap.get(s.name);
+//		    try {
+////                boolean putValuesToSpreadsheet = putValuesToSpreadsheet(range, l);
+//            } catch (Exception e1) {
+//                e1.printStackTrace();
+//            }
+//		});
 		
-		String collect = mapToListOfListsByColumn.stream()
-		.map(el->el.stream().collect(Collectors.joining(",")))
+		
+		String collect = skillWithSaintsMapByColumn.entrySet().stream()
+		        .map(e->{
+		            Skill skill = e.getKey();
+		            List<List<Object>> value = e.getValue();
+
+		            String s = skill.name+":: "
+		                    +value.get(0).stream().map(o->o+StringUtils.EMPTY).collect(Collectors.joining(","));
+		
+		            return s;
+		        })
 		.collect(Collectors.joining("\n\n"));
 		
 //		writeOnFile("mergedByStreamAndMergeToPrint",now, mergedByStreamAndMergeToPrint);
 		System.out.println(collect);
-		
-//		Map<Skill, List<SaintData>> mergedByOldWay = mergeByOldWay(saintDataCollection);
-//		String mergedByOldWayToPrint = mapToString(mergedByOldWay);
-//		writeOnFile("mergedByOldWayToPrint",now, mergedByOldWayToPrint);
 		
 		return ExporterStatus.OK;
 	}
@@ -88,12 +116,12 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	    Function<SaintData,Skill> byCrusadeSkill1Classifier = t -> t.skills.getCrusade1();
         Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
                 
-        Map<Skill, List<SaintData>> saintsByCrusadeSkill1 = saintDataCollection.stream()
+        Map<Skill, List<SaintData>> saintsByCrusadeSkill1 = saintDataCollection.parallelStream()
                 .filter(filterNotUsefulSaints)
                 .map(crusadeSkill1NameFlattingRemapper)
                 .collect(Collectors.groupingBy(byCrusadeSkill1Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
         
-        Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.stream()
+        Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.parallelStream()
                 .filter(filterNotUsefulSaints)
                 .map(crusadeSkill2NameFlattingRemapper)
                 .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
@@ -146,19 +174,18 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         return usefulCloths.contains(clothKindEnum);
     };
 	private static final Function<SaintData, SaintData> crusadeSkill1NameFlattingRemapper = sd -> {
-		Skill crusadeSkill1 = sd.skills.getCrusade1();
-		skillToRemapStringsMap.entrySet().parallelStream()
-		.filter(n->crusadeSkill1.name.contains(n.getKey()) )
-		.map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill1.name = s);
+		crusadeSkillNameFlattingRemapper(sd.skills.getCrusade1());
         return sd;
 	};
 	private static final Function<SaintData, SaintData> crusadeSkill2NameFlattingRemapper = sd -> {
-		Skill crusadeSkill2 = sd.skills.getCrusade2();
-		skillToRemapStringsMap.entrySet().parallelStream()
-		.filter(n->crusadeSkill2.name.contains(n.getKey()) )
-		.map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill2.name = s);
+		crusadeSkillNameFlattingRemapper(sd.skills.getCrusade2());
         return sd;
 	};
+	private static final void crusadeSkillNameFlattingRemapper(Skill crusadeSkill) {
+        skillToRemapStringsMap.entrySet().parallelStream()
+        .filter(n->crusadeSkill.name.contains(n.getKey()) )
+        .map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill.name = s);
+	}
 	private static final Comparator<SaintData> comparatorByIdDescending = new Comparator<SaintData>() {
         @Override
         public int compare(SaintData o1, SaintData o2) {
@@ -170,19 +197,26 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         }
     };
 		
-	private static List<List<String>> mapToListOfListsByColumn(Map<Skill, List<SaintData>> merged) {
-	    List<List<String>> skillWithSaintsByColumns = merged.entrySet().stream()
-            .map(e->{	
-            	List<String> skillWithSaints = new ArrayList<>();
-				Skill skill = e.getKey();
-				String skillAsString = "{'name':'" + skill.name + "','imageSmall':'" + skill.imageSmall + "'}";
-				skillWithSaints.add(skillAsString);
-				List<String> saintsToJsonList = saintsToJsonList(e.getValue());
-				skillWithSaints.addAll(saintsToJsonList);
-				return skillWithSaints;
-            })
-            .collect(Collectors.toList());
-	    return skillWithSaintsByColumns;
+	private static Map<Skill, List<List<Object>>> skillToSaintsMapToSkillToSkillWithSaintsMapByColumn(Map<Skill, List<SaintData>> merged) {
+//	    List<List<Object>> skillWithSaintsByColumns = 
+	        Function<Map.Entry<Skill, List<SaintData>>, List<List<Object>>> valueMapper = t -> {
+                List<Object> skillWithSaints = new ArrayList<>();
+                Skill skill = t.getKey();
+                String skillAsString = "{'name':'" + skill.name + "','imageSmall':'" + skill.imageSmall + "'}";
+                skillWithSaints.add(skillAsString);
+                List<String> saintsToJsonList = saintsToJsonList(t.getValue());
+                skillWithSaints.addAll(saintsToJsonList);
+                
+                List<List<Object>> externalSkillWithSaints = new ArrayList<>();
+                externalSkillWithSaints.add(skillWithSaints);
+                
+                return externalSkillWithSaints;
+            };
+            
+            Map<Skill, List<List<Object>>>result = merged.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e->valueMapper.apply(e)));
+	    
+            return result;
 	}
 	private static final List<String> saintsToJsonList(List<SaintData> saints) {
         List<String> saintToJsonList = saints.stream()
