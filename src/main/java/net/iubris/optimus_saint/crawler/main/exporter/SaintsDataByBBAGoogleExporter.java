@@ -102,14 +102,6 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             .parallelStream()
             .forEach(e -> saintsByCrusadeSkill2ThenGlobal.merge(e.getKey(), e.getValue(), valuesRemappingFunction));
         
-//        AtomicInteger i = new AtomicInteger(0);
-//        System.out.println( saintsByCrusadeSkill2ThenGlobal
-//                .keySet()
-//                .stream()
-//                .map(s->i.incrementAndGet()+": "+s.name)
-//                .collect( Collectors.joining("\n") ) 
-//        );
-        
         Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
         .filter(e->!e.getKey().name.isEmpty())        
 //        .map(skillNameRemapper)
@@ -224,19 +216,20 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	private static String mapToString(Map<Skill, List<SaintData>> merged) {
 	    String mergedToPrint = merged.entrySet().stream()
             .map(e->{
-                String s = e.getKey().name/*.replace("Score Plus ", StringUtils.EMPTY)*/+":: ";
-                List<SaintData> list = e.getValue();
-                s+= list.size()+": ";
-                s+= list.stream()
-                       .map(sd->{
-//                    	   sd.imageSmall
-//                    	   s_d = sd.getName().replace(StringUtils.COMMA, StringUtils.EMPTY)+":"+sd.id;
-                    	   String saintToJson = saintToJson(sd);
-                    	   return saintToJson;
-                	   })
-//                       .sorted()
-//                       .collect(Collectors.joining(";");
-                       .collect(Collectors.toList() );
+                Skill skill = e.getKey();
+                String s = "{";
+                        s+="'skill':{";
+                            s+="'name':'"+skill.name+"','imageSmall':'"+skill.imageSmall
+                            +"'},";
+                        List<SaintData> list = e.getValue();
+                        s+="'saints':";
+                        s+= list.stream()
+                               .map(sd->{
+                            	   String saintToJson = saintToJson(sd);
+                            	   return saintToJson;
+                        	   })
+                               .collect(Collectors.toList() );
+                        s+="}";
                 return s;
             })
             .sorted()
@@ -249,13 +242,17 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	            +"'name':'"+saintData.name.replace(StringUtils.COMMA, StringUtils.EMPTY)+"'"+","
 	            +"'crusade_skill_1':{"
 	                +"'name':'"+saintData.skills.getCrusade1().name+"',"
-	                +"'description':'"+saintData.skills.getCrusade1().description+"',"
+	                +"'description':'"+saintData.skills.getCrusade1().description
+	                    .replace(StringUtils.NEW_LINE, StringUtils.SPACE)
+	                    .replace(StringUtils.QUOTE, StringUtils.PIPE)+"',"
                     +"'imageSmall':'"+saintData.skills.getCrusade1().imageSmall+"'"
                 +"}";
 	    if (saintData.skills.hasCrusade2()) {
     	        s+="'crusade_skill_2':{"
                         +"'name':'"+saintData.skills.getCrusade2().name+"',"
-                        +"'description':'"+saintData.skills.getCrusade2().description+"',"
+                        +"'description':'"+saintData.skills.getCrusade2().description
+                            .replace(StringUtils.NEW_LINE, StringUtils.SPACE)
+                            .replace(StringUtils.QUOTE, StringUtils.PIPE)+"',"
                         +"'imageSmall':'"+saintData.skills.getCrusade2().imageSmall+"'"
                     +"}";
 	    }

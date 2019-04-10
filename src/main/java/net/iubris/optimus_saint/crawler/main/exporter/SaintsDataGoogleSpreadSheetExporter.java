@@ -92,8 +92,8 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
 		        return ExporterStatus.OK;
 		    }
 
-		    boolean puttedALl = putValuesToSpreadsheet(valuesToAdd, RANGE_TO_POPULATE);
-		    if (puttedALl) {
+		    boolean puttedAll = putValuesToSpreadsheet(RANGE_TO_POPULATE, valuesToAdd);
+		    if (puttedAll) {
 		        return ExporterStatus.OK;
 		    }
 		} catch (GeneralSecurityException e) {

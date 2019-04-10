@@ -33,7 +33,7 @@ public class GoogleSpreadSheetExporterUtils {
         return clearResponse.getClearedRange();
     }
     
-    protected static boolean putValuesToSpreadsheet(Sheets sheetService, List<List<Object>> valuesToAdd, String spreadsheetId, String rangeToPopulate) throws IOException {
+    protected static boolean putValuesToSpreadsheet(Sheets sheetService, String spreadsheetId, String rangeToPopulate, List<List<Object>> valuesToAdd) throws IOException {
 //        String first = "=Rows($A$1:A2)";
 //        List<Object> rowAsList = Arrays.asList("Total", "=E1+E4");
         ValueRange appendBody = new ValueRange()

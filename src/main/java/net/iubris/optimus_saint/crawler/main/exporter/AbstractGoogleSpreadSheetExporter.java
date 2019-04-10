@@ -5,7 +5,6 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ClearValuesRequest;
 import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -35,26 +34,11 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
         return clearResponse.getClearedRange();
     }
     
-    protected boolean putValuesToSpreadsheet(List<List<Object>> valuesToAdd, String rangeToPopulate) throws GeneralSecurityException, IOException {
+    protected boolean putValuesToSpreadsheet(String rangeToPopulate, List<List<Object>> valuesToAdd) throws GeneralSecurityException, IOException {
     	Sheets sheetService = getSheetService();
-//        String first = "=Rows($A$1:A2)";
-//        List<Object> rowAsList = Arrays.asList("Total", "=E1+E4");
-        ValueRange appendBody = new ValueRange()
-                .setValues(valuesToAdd);
-        AppendValuesResponse appendResult = sheetService.spreadsheets().values()
-                .append(spreadsheetId, rangeToPopulate, appendBody)
-                .setValueInputOption("USER_ENTERED")
-                .setInsertDataOption("INSERT_ROWS")
-                .setIncludeValuesInResponse(true)
-                .execute();
-
-        ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
-        
-        System.out.println( "updated range: "+appendResult.getUpdates().getUpdatedRange() );
-        
-        boolean OK = valuesToAdd.size() == totalSent.getValues().size();
-        
-        return OK;
+    	
+    	boolean putValuesToSpreadsheet = GoogleSpreadSheetExporterUtils.putValuesToSpreadsheet(sheetService, spreadsheetId, rangeToPopulate, valuesToAdd);
+    	return putValuesToSpreadsheet;
     }
 	
 	protected List<List<Object>> getValuesFromSpreadSheet(String rangeToRetrieve) throws GeneralSecurityException, IOException {
