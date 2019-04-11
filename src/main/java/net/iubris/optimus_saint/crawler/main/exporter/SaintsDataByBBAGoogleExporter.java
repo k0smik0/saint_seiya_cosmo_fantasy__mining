@@ -32,39 +32,42 @@ import net.iubris.optimus_saint.crawler.utils.Printer;
 
 public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExporter<ExporterStatus> {
 
-	private Printer printer;
+	private final Printer printer;
+	
+	private static final DateFormat dateFormat__YYYMMDDHHmm = new SimpleDateFormat("YYYYMMddHHmm");
 	
 	private static final Set<ClothKindEnum> usefulCloths = new HashSet<>();
 	private static final Map<String,String> skillToRemapStringsMap = new HashMap<>();
 	private static final Map<String, String> skillToColumnRangeMap = new HashMap<>();
+	private static final String SHEET_NAME = "crusade skills - private";
 	static {
 		usefulCloths.addAll( Arrays.asList( ClothKindEnum.values() ) );
         usefulCloths.remove(ClothKindEnum.NO_CLOTH);
         usefulCloths.remove(ClothKindEnum.BLACK_SAINT);
         usefulCloths.remove(ClothKindEnum.MARINA);
 		
-		skillToRemapStringsMap.put("BBA","BBA");
-		skillToRemapStringsMap.put("BT ","BT");
-		skillToRemapStringsMap.put("Combo","Combo");
+		skillToRemapStringsMap.put("Score Plus BBA","BBA");
+		skillToRemapStringsMap.put("Score Plus BT","BT");
+		skillToRemapStringsMap.put("Combo Plus","Combo");
 		skillToRemapStringsMap.put("Cosmo Charge","Cosmo Charge");
-		skillToRemapStringsMap.put("Damage","Damage Cut");
+		skillToRemapStringsMap.put("Damage Cut","Damage Cut");
 		skillToRemapStringsMap.put("HP Boost","HP Boost");
 		skillToRemapStringsMap.put("PHYS ATK Boost","PHYS ATK Boost");
 		skillToRemapStringsMap.put("RES Boost","RES Boost");
 		skillToRemapStringsMap.put("Recovery","Recovery");
 		
-		
-		skillToColumnRangeMap.put("BBA","crusade skills!A1:A150");
-        skillToColumnRangeMap.put("BT ","crusade skills!B1:B150");
-        skillToColumnRangeMap.put("Combo","crusade skills!C2:C150");
-        skillToColumnRangeMap.put("Cosmo Charge","crusade skills!D1:D150");
-        skillToColumnRangeMap.put("Damage","crusade skills!E1:E150");
-        skillToColumnRangeMap.put("HP Boost","crusade skills!F1:F150");
-        skillToColumnRangeMap.put("PHYS ATK Boost","crusade skills!G1:G150");
-        skillToColumnRangeMap.put("RES Boost","crusade skills!H1:H150");
-        skillToColumnRangeMap.put("Recovery","crusade skills!I1:I150");
-		
+		skillToColumnRangeMap.put("BBA",SHEET_NAME+"!A1:A150");
+        skillToColumnRangeMap.put("BT",SHEET_NAME+"!B1:B150");
+        skillToColumnRangeMap.put("Combo",SHEET_NAME+"!C2:C150");
+        skillToColumnRangeMap.put("Cosmo Charge",SHEET_NAME+"!D1:D150");
+        skillToColumnRangeMap.put("Damage Cut",SHEET_NAME+"!E1:E150");
+        skillToColumnRangeMap.put("HP Boost",SHEET_NAME+"!F1:F150");
+        skillToColumnRangeMap.put("PHYS ATK Boost",SHEET_NAME+"!G1:G150");
+        skillToColumnRangeMap.put("RES Boost",SHEET_NAME+"!H1:H150");
+        skillToColumnRangeMap.put("Recovery",SHEET_NAME+"!I1:I150");
 	}
+	
+    private boolean reallyAct = true;
 
 	@Inject
 	public SaintsDataByBBAGoogleExporter(Printer printer) {
@@ -72,9 +75,6 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         this.printer = printer;
     }
 	
-	private static final DateFormat dateFormat__YYYMMDDHHmm = new SimpleDateFormat("YYYYMMddHHmm");
-	
-
 	@Override
 	public ExporterStatus export(Collection<SaintData> saintDataCollection, boolean overwrite) {		
 	    Date now = new Date();
@@ -84,30 +84,34 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		// this list of list is the structure google spreadsheet accepts
 		Map<Skill, List<List<Object>>> skillWithSaintsMapByColumn = skillToSaintsMapToSkillToSkillWithSaintsMapByColumn(mergedByStreamAndMerge);
 
-//		skillWithSaintsMapByColumn.forEach((s,l)->{
-//		    String range = skillToColumnRangeMap.get(s.name);
-//		    try {
-////                boolean putValuesToSpreadsheet = putValuesToSpreadsheet(range, l);
-//            } catch (Exception e1) {
-//                e1.printStackTrace();
-//            }
-//		});
-		
-		
-		String collect = skillWithSaintsMapByColumn.entrySet().stream()
-		        .map(e->{
-		            Skill skill = e.getKey();
-		            List<List<Object>> value = e.getValue();
-
-		            String s = skill.name+":: "
-		                    +value.get(0).stream().map(o->o+StringUtils.EMPTY).collect(Collectors.joining(","));
-		
-		            return s;
-		        })
-		.collect(Collectors.joining("\n\n"));
-		
-//		writeOnFile("mergedByStreamAndMergeToPrint",now, mergedByStreamAndMergeToPrint);
-		System.out.println(collect);
+		if (reallyAct) {
+    		skillWithSaintsMapByColumn.forEach((s,l)->{
+    		    String range = skillToColumnRangeMap.get(s.name);
+    		    try {
+    		        printer.println(range+": begin");
+                    boolean putValuesToSpreadsheet = putValuesToSpreadsheet(range, l);
+                    printer.println(range+": "+putValuesToSpreadsheet);
+                    printer.println(range+": end");
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+    		});
+		} else {
+    		String collect = skillWithSaintsMapByColumn.entrySet().stream()
+    		        .map(e->{
+    		            Skill skill = e.getKey();
+    		            List<List<Object>> value = e.getValue();
+    
+    		            String s = skill.name+":: "
+    		                    +value.get(0).stream().map(o->o+StringUtils.EMPTY).collect(Collectors.joining(","));
+    		
+    		            return s;
+    		        })
+    		.collect(Collectors.joining("\n\n"));
+    		
+    //		writeOnFile("mergedByStreamAndMergeToPrint",now, mergedByStreamAndMergeToPrint);
+    		System.out.println(collect);
+		}
 		
 		return ExporterStatus.OK;
 	}
