@@ -33,7 +33,16 @@ public class GoogleSpreadSheetExporterUtils {
         return clearResponse.getClearedRange();
     }
     
-    protected static boolean putValuesToSpreadsheet(Sheets sheetService, String spreadsheetId, String rangeToPopulate, List<List<Object>> valuesToAdd) throws IOException {
+	/**
+	 * 
+	 * @param sheetService
+	 * @param spreadsheetId
+	 * @param rangeToPopulate
+	 * @param valuesToAdd
+	 * @return the updated range
+	 * @throws IOException
+	 */
+    protected static String putValuesToSpreadsheet(Sheets sheetService, String spreadsheetId, String rangeToPopulate, List<List<Object>> valuesToAdd) throws IOException {
 //        String first = "=Rows($A$1:A2)";
 //        List<Object> rowAsList = Arrays.asList("Total", "=E1+E4");
         ValueRange appendBody = new ValueRange()
@@ -47,11 +56,15 @@ public class GoogleSpreadSheetExporterUtils {
 
         ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
         
-        System.out.println( "updated range: "+appendResult.getUpdates().getUpdatedRange() );
+//        System.out.println( "updated range: "+appendResult.getUpdates().getUpdatedRange() );
         
         boolean OK = valuesToAdd.size() == totalSent.getValues().size();
+        if (!OK) {
+        	System.err.println("error updating "+rangeToPopulate);
+        	return null;
+        }
         
-        return OK;
+        return appendResult.getUpdates().getUpdatedRange();        
     }
 	
 	protected static List<List<Object>> getValuesFromSpreadSheet(Sheets sheetService, String spreadsheetId, String rangeToRetrieve) throws GeneralSecurityException, IOException {

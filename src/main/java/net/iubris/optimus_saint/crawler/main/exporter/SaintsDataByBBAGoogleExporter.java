@@ -1,7 +1,9 @@
 package net.iubris.optimus_saint.crawler.main.exporter;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,15 +58,15 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		skillToRemapStringsMap.put("RES Boost","RES Boost");
 		skillToRemapStringsMap.put("Recovery","Recovery");
 		
-		skillToColumnRangeMap.put("BBA",SHEET_NAME+"!A1:A150");
-        skillToColumnRangeMap.put("BT",SHEET_NAME+"!B1:B150");
-        skillToColumnRangeMap.put("Combo",SHEET_NAME+"!C2:C150");
-        skillToColumnRangeMap.put("Cosmo Charge",SHEET_NAME+"!D1:D150");
-        skillToColumnRangeMap.put("Damage Cut",SHEET_NAME+"!E1:E150");
-        skillToColumnRangeMap.put("HP Boost",SHEET_NAME+"!F1:F150");
-        skillToColumnRangeMap.put("PHYS ATK Boost",SHEET_NAME+"!G1:G150");
-        skillToColumnRangeMap.put("RES Boost",SHEET_NAME+"!H1:H150");
-        skillToColumnRangeMap.put("Recovery",SHEET_NAME+"!I1:I150");
+		skillToColumnRangeMap.put("BBA",SHEET_NAME+"!A1:BG1");
+        skillToColumnRangeMap.put("BT",SHEET_NAME+"!A2:BG2");
+        skillToColumnRangeMap.put("Combo",SHEET_NAME+"!A3:BG3");
+        skillToColumnRangeMap.put("Cosmo Charge",SHEET_NAME+"!A4:BG4");
+        skillToColumnRangeMap.put("Damage Cut",SHEET_NAME+"!A5:BG5");
+        skillToColumnRangeMap.put("HP Boost",SHEET_NAME+"!A6:BG6");
+        skillToColumnRangeMap.put("PHYS ATK Boost",SHEET_NAME+"!A7:BG7");
+        skillToColumnRangeMap.put("RES Boost",SHEET_NAME+"!A8:BG8");
+        skillToColumnRangeMap.put("Recovery",SHEET_NAME+"!A9:BG9");
 	}
 	
     private boolean reallyAct = true;
@@ -85,24 +87,37 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		Map<Skill, List<List<Object>>> skillWithSaintsMapByColumn = skillToSaintsMapToSkillToSkillWithSaintsMapByColumn(mergedByStreamAndMerge);
 
 		if (reallyAct) {
-    		skillWithSaintsMapByColumn.forEach((s,l)->{
-    		    String range = skillToColumnRangeMap.get(s.name);
+			try {
+				String clearedExistingValues = clearExistingValues(SHEET_NAME+"!A1:BG");
+				printer.println("cleared: "+clearedExistingValues);
+			} catch (GeneralSecurityException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	        
+    		skillWithSaintsMapByColumn.forEach((skill,saintDataList)->{
+    		    String range = skillToColumnRangeMap.get(skill.name);
     		    try {
     		        printer.println(range+": begin");
-                    boolean putValuesToSpreadsheet = putValuesToSpreadsheet(range, l);
-                    printer.println(range+": "+putValuesToSpreadsheet);
-                    printer.println(range+": end");
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+    		        printer.print(range+": ");
+                    String putValuesToSpreadsheet = putValuesToSpreadsheet(range, saintDataList);
+                    printer.println(putValuesToSpreadsheet);
+                    printer.println(range+": end\n");
+    		    } catch (GeneralSecurityException e) {
+    				e.printStackTrace();
+    			} catch (IOException e) {
+    				e.printStackTrace();
+    			}
     		});
 		} else {
     		String collect = skillWithSaintsMapByColumn.entrySet().stream()
     		        .map(e->{
     		            Skill skill = e.getKey();
+    		            String range = skillToColumnRangeMap.get(skill.name);
     		            List<List<Object>> value = e.getValue();
     
-    		            String s = skill.name+":: "
+    		            String s = skill.name+":: "+range+":: "
     		                    +value.get(0).stream().map(o->o+StringUtils.EMPTY).collect(Collectors.joining(","));
     		
     		            return s;
@@ -131,7 +146,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                 .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
-            Set<SaintData> set = new TreeSet<>(comparatorByIdDescending);
+            Set<SaintData> set = new TreeSet<>(saintsComparatorByIdDescending);
             set.addAll(v1);
             set.addAll(v2);
             return new ArrayList<>(set);
@@ -144,7 +159,11 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
         .filter(e->!e.getKey().name.isEmpty())        
 //        .map(skillNameRemapper)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(Collectors.toMap(Map.Entry::getKey, 
+//        		e->e.getValue().stream().sorted(saintsComparatorByIdDescending).collect(Collectors.toList())
+        		Map.Entry::getValue
+        		))
+        ;
         return toReturn;
 	};	
 	
@@ -190,13 +209,13 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         .filter(n->crusadeSkill.name.contains(n.getKey()) )
         .map(n->n.getValue()).findFirst().ifPresent(s->crusadeSkill.name = s);
 	}
-	private static final Comparator<SaintData> comparatorByIdDescending = new Comparator<SaintData>() {
+	private static final Comparator<SaintData> saintsComparatorByIdDescending = new Comparator<SaintData>() {
         @Override
         public int compare(SaintData o1, SaintData o2) {
             long o1L = Long.parseLong(o1.id);
             long o2L = Long.parseLong(o2.id);
-            if (o1L > o2L) return 1;
-            if (o1L < o2L) return -1;
+            if (o1L > o2L) return -1;
+            if (o1L < o2L) return 1;
             return 0;
         }
     };
@@ -206,7 +225,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	        Function<Map.Entry<Skill, List<SaintData>>, List<List<Object>>> valueMapper = t -> {
                 List<Object> skillWithSaints = new ArrayList<>();
                 Skill skill = t.getKey();
-                String skillAsString = "{'name':'" + skill.name + "','imageSmall':'" + skill.imageSmall + "'}";
+                String skillAsString = "{'name':'" + skill.name + "', 'imageSmall':'" + skill.imageSmall + "'}";
                 skillWithSaints.add(skillAsString);
                 List<String> saintsToJsonList = saintsToJsonList(t.getValue());
                 skillWithSaints.addAll(saintsToJsonList);
@@ -224,7 +243,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	}
 	private static final List<String> saintsToJsonList(List<SaintData> saints) {
         List<String> saintToJsonList = saints.stream()
-				.sorted(comparatorByIdDescending)
+				.sorted(saintsComparatorByIdDescending)
 				.map(sd -> {
 					String saintToJson = saintToJson(sd);
 					return saintToJson;

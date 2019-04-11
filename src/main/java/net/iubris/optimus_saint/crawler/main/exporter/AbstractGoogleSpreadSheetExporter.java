@@ -29,15 +29,15 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 	        .clear(spreadsheetId, rangeToClear, new ClearValuesRequest())
 	        .execute();
         
-        System.out.println( "cleared range: "+clearResponse.getClearedRange() );
+//        System.out.println( "cleared range: "+clearResponse.getClearedRange() );
         
         return clearResponse.getClearedRange();
     }
     
-    protected boolean putValuesToSpreadsheet(String rangeToPopulate, List<List<Object>> valuesToAdd) throws GeneralSecurityException, IOException {
+    protected String putValuesToSpreadsheet(String rangeToPopulate, List<List<Object>> valuesToAdd) throws GeneralSecurityException, IOException {
     	Sheets sheetService = getSheetService();
     	
-    	boolean putValuesToSpreadsheet = GoogleSpreadSheetExporterUtils.putValuesToSpreadsheet(sheetService, spreadsheetId, rangeToPopulate, valuesToAdd);
+    	String putValuesToSpreadsheet = GoogleSpreadSheetExporterUtils.putValuesToSpreadsheet(sheetService, spreadsheetId, rangeToPopulate, valuesToAdd);
     	return putValuesToSpreadsheet;
     }
 	
