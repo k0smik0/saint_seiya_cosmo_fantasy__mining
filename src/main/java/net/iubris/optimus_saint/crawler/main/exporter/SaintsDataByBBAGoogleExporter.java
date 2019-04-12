@@ -98,7 +98,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         this.printer = printer;
     }
 	
-	boolean experiment = true;
+	boolean toExperiment = true;
 	
 	@Override
 	public ExporterStatus export(Collection<SaintData> saintDataCollection, boolean overwrite) {		
@@ -107,8 +107,8 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 		Map<Skill, List<SaintData>> mergedByStreamAndMerge = mergeByStreamAndMerge(saintDataCollection);
 //		String mergedByStreamAndMergeToPrint = mapToString(mergedByStreamAndMerge);
 		
-		if (experiment) {
-		    experiment(mergedByStreamAndMerge);
+		if (toExperiment) {
+		    doExperiment(mergedByStreamAndMerge);
 		}
 		else {
 		    
@@ -176,6 +176,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.parallelStream()
                 .filter(filterNotUsefulSaints)
                 .map(crusadeSkill2NameFlattingRemapper)
+//                .sorted(skillsComparatorByPriorityDescending)https://vignette.wikia.nocookie.net/nonciclopedia/images/2/26/Renato_Pozzetto_-_Eau_la_Madonna.jpg/revision/latest?cb=20140717151508
                 .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, ConcurrentSkipListMap::new, Collectors.toList()));
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
@@ -189,11 +190,14 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             .parallelStream()
             .forEach(e -> saintsByCrusadeSkill2ThenGlobal.merge(e.getKey(), e.getValue(), valuesRemappingFunction));
         
-        Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().parallelStream()
+        Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().stream()
         .filter(e->!e.getKey().name.isEmpty())        
 //        .map(skillNameRemapper)
         .sorted(skillsComparatorByPriorityDescending)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1,v2)->v1, ConcurrentSkipListMap::new) );
+        
+        System.out.println(toReturn.keySet().stream().map(s->s.name).collect(Collectors.joining(", ")));
+        
         return toReturn;
 	};
     private static final Predicate<SaintData> filterNotUsefulSaints = sd -> {
@@ -256,10 +260,10 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         Skill o2Skill = o2.getKey();
         Integer o2Priority = skillToPriorityMap.get(o2Skill.name);
         
-        if (o1Priority.intValue() < o2Priority.intValue()) {
+        if (o1Priority.intValue() > o2Priority.intValue()) {
             return -1;
         }
-        if (o1Priority.intValue() > o2Priority.intValue()) {
+        if (o1Priority.intValue() < o2Priority.intValue()) {
             return 1;
         }
         return 0;
@@ -334,7 +338,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         }
 	}
 	
-	private static void experiment(Map<Skill, List<SaintData>> skillsToSaintsListMap) {
+	private static void doExperiment(Map<Skill, List<SaintData>> skillsToSaintsListMap) {
 	    
 	    List<List<String>> externalList = new ArrayList<>();
 	    
@@ -348,7 +352,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	    
 	    int columnsIndex = 1;
 	    
-	    int futureColumnsNumber = entrySet.size();
+//	    int futureColumnsNumber = entrySet.size();
 	    
 	    for (Entry<Skill, List<SaintData>> entry : entrySet) {
             Skill skill = entry.getKey();
@@ -360,29 +364,34 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             // that is the max the new column could reach
             int futureColumnSize = saintsListPerSkill.size();
             int externalListSize = externalList.size();
+            System.out.println("skill: "+skill.name+", saints: "+futureColumnSize);
             if (futureColumnSize>externalListSize) {
-                System.out.println("futureColumnSize:"+futureColumnSize+">"+externalListSize+":"+externalListSize);
-                int diff = futureColumnSize-externalListSize;
+                System.out.println("futureColumnSize:"+futureColumnSize+" > externalListSize"+":"+externalListSize);
+                int diff = futureColumnSize-externalListSize+1;
                 System.out.println("adding "+(diff)+" lists");
                 for (int d=0;d<diff;d++) {
-                    externalList.add( new ArrayList<String>());
+                    externalList.add( new ArrayList<String>() );
                 }
+                System.out.println("");
             }
 
             // here the business
-            for (int r=0;r<saintsListPerSkill.size();r++) {
-                List<String> row = externalList.get(r+1);
-                System.out.println("row:"+(r+1));
+            for (int i=0;i<saintsListPerSkill.size();i++) {
+                int rowIndex = i+1;
+                List<String> row = externalList.get(rowIndex);
+                System.out.println("row:"+(rowIndex));
                 if (row.size()>0) {
-                    row.set(0, ""+r+1);
-                    System.out.println("setting "+(r+1)+" at externalList["+(r+1)+"][0]");
+                    System.out.println("setting "+(rowIndex)+" at externalList["+(rowIndex)+"][0]");
+                    row.set(0, ""+rowIndex);
+                    
                 } else {
-                    row.add(""+r+1);
-                    System.out.println("adding "+(r+1)+" at externalList["+(r+1)+"]");
+                    System.out.println("adding "+(rowIndex)+" at externalList["+(rowIndex)+"][0]");
+                    row.add(""+rowIndex);
                 }
-                String saintName = saintsListPerSkill.get(r).name;
+                String saintName = saintsListPerSkill.get(i).name;
+                System.out.println("adding "+saintName+" at externalList["+rowIndex+"]["+columnsIndex+"]");
                 row.add(columnsIndex, saintName);
-                System.out.println("adding "+saintName+" at externalList["+(r+1)+"]");
+                System.out.println(".");
             }
             
             columnsIndex++;
