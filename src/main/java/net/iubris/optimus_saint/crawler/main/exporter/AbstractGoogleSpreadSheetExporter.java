@@ -23,7 +23,9 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 	}
 
 	protected String clearExistingValues(String rangeToClear) throws GeneralSecurityException, IOException {
-		Sheets sheetService = GoogleSpreadSheetExporterUtils.getSheetService(applicationName, spreadsheetId, rangeToClear);
+		Sheets sheetService = 
+//		        GoogleSpreadSheetExporterUtils.getSheetService(applicationName, spreadsheetId, rangeToClear);
+		getSheetService();
 		
         ClearValuesResponse clearResponse = sheetService.spreadsheets().values()
 	        .clear(spreadsheetId, rangeToClear, new ClearValuesRequest())
