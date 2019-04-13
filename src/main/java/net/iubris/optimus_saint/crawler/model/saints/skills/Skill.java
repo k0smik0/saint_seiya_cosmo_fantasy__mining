@@ -16,6 +16,8 @@ public class Skill extends IddableDefinition implements Comparable<Skill> {
 	public String description;
 	public String imageSmall;
 	
+	public String descriptionIT;
+	
     @Override
     public int compareTo(Skill o) {
         return name.compareTo(o.name);

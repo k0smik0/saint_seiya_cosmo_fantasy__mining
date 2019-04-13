@@ -111,54 +111,68 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
         list.add(index.incrementAndGet());
         // id
         list.add(sd.id);
-        // name
-        list.add("{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
+        // name+image+description
+        list.add(ToJSON.saintRichNameToJsonString(sd)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
         // type
         list.add(sd.type.name().toLowerCase());
         // lane
         list.add(sd.lane.name().toLowerCase());
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.first));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.second));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.third));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.fourth));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getSeventhSense()));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade1()));
-        list.add(DescriptionBuilder.skillToJsonString(sd.skills.getCrusade2()));
+        list.add(ToJSON.skillToJsonString(sd.skills.first));
+        list.add(ToJSON.skillToJsonString(sd.skills.second));
+        list.add(ToJSON.skillToJsonString(sd.skills.third));
+        list.add(ToJSON.skillToJsonString(sd.skills.fourth));
+        list.add(ToJSON.skillToJsonString(sd.skills.getSeventhSense()));
+        list.add(ToJSON.skillToJsonString(sd.skills.getCrusade1()));
+        list.add(ToJSON.skillToJsonString(sd.skills.getCrusade2()));
         list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
         
         return list;
     }
-    private static class DescriptionBuilder {
     
-        private static String skillToJsonString(Skill skill) {
-            String descriptionEN = normalizeDescription(skill);
+    private static class ToJSON {        
+        static String saintRichNameToJsonString(SaintData saintData) {
+            String nameImageDescriptionToJsonString = nameImageDescriptionToJsonString(saintData.name, saintData.description, saintData.descriptionIT, saintData.imageSmall);
+            return nameImageDescriptionToJsonString;
+        }
+        
+        static String skillToJsonString(Skill skill) {
+            String skillNameImageDescriptionToJsonString = nameImageDescriptionToJsonString(skill.name, skill.description, skill.descriptionIT, skill.imageSmall);
+            return skillNameImageDescriptionToJsonString;
+        }
+        
+        private static String nameImageDescriptionToJsonString(String name, String descriptionEN, String descriptionIT, String imageSmall) {
             String s = b 
-                        +m+name+m+t+m+skill.name+m+c
+                        +m+name+m+t+m+name+m+c
                         +m+description+m+t
                         +b;
             if (hasDescription(descriptionEN)) {
                             s+=m+EN+m+t+m+descriptionEN+m+c;
-                            s+=m+IT+m+t+m+MISSING+m;
+                            if (hasDescription(descriptionIT)) {
+                                s+=m+IT+m+t+m+normalizeDescription(descriptionIT)+m;
+                            } else {
+                                s+=m+IT+m+t+m+MISSING+m;
+                            }
             } else {
                             s+=m+EN+m+t+m+DASH+m+c;
                             s+=m+IT+m+t+m+DASH+m;
             }
                       s+=e+c;
-                      s+=m+imageSmall+m+t+m+skill.imageSmall+m
+                      s+=m+imageSmall+m+t+m+imageSmall+m
                      +e;
             s=s.replace(QUOTE, PIPE);
             return s;
         }
         
-        private static String normalizeDescription(Skill skill) {
-            return skill.description.trim()
+        
+        private static String normalizeDescription(String descr) {
+            return descr.trim()
 //                    .replace(QUOTE, EMPTY)
                     .replace(MARKS, QUOTE)
                     .replace(NEW_LINE, SPACE);
         }
     
-        private static boolean hasDescription(String descriptionEN) {
-            if (org.apache.commons.lang3.StringUtils.isNotBlank(descriptionEN)) {
+        private static boolean hasDescription(String descr) {
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(descr)) {
                 return true;
             }
             return false;

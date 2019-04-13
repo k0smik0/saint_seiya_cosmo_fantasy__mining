@@ -45,6 +45,8 @@ public class SaintData {
 //	@JsonbTypeAdapter(DescriptionAdapter.class)
 	public String description;
 	
+	public String descriptionIT;
+	
 	@JsonbProperty(value="small")
 	public String imageSmall;
 	@JsonbProperty(value="thumb")
