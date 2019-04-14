@@ -12,7 +12,8 @@ public class Skill extends IddableDefinition implements Comparable<Skill> {
         this.name = name;
     }
 	
-	public String name;
+	String name = "";
+	String shortName = "";
 	public String description;
 	public String imageSmall;
 	
@@ -21,5 +22,24 @@ public class Skill extends IddableDefinition implements Comparable<Skill> {
     @Override
     public int compareTo(Skill o) {
         return name.compareTo(o.name);
+    }
+
+    public void setName(String name) {
+        if (name != null) {
+            this.name = name;
+            this.shortName = name;
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+    
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+    
+    public String getShortName() {
+        return shortName;
     }
 }

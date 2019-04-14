@@ -46,7 +46,7 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 		Skill skill = new Skill();
 		skill.id = idS;
 		skill.description = descriptionString;
-		skill.name = name;
+		skill.setName(name);
 		skill.imageSmall = jsonObjectRoot.getString(FIELD_IMAGE_SMALL);
 		
 		return skill;

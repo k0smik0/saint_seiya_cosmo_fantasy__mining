@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Get;
 import com.google.api.services.sheets.v4.model.ClearValuesRequest;
 import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -27,7 +28,8 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 //		        GoogleSpreadSheetExporterUtils.getSheetService(applicationName, spreadsheetId, rangeToClear);
 		getSheetService();
 		
-        ClearValuesResponse clearResponse = sheetService.spreadsheets().values()
+        ClearValuesResponse clearResponse = sheetService.spreadsheets()
+            .values()
 	        .clear(spreadsheetId, rangeToClear, new ClearValuesRequest())
 	        .execute();
         
@@ -35,6 +37,11 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
         
         return clearResponse.getClearedRange();
     }
+	
+	protected void removeEmptyRows() throws GeneralSecurityException, IOException {
+	    Sheets sheetService = getSheetService();
+//sheetService.spreadsheets().sheets()	    
+	}
     
     protected String putValuesToSpreadsheet(String rangeToPopulate, List<List<Object>> valuesToAdd) throws GeneralSecurityException, IOException {
     	Sheets sheetService = getSheetService();

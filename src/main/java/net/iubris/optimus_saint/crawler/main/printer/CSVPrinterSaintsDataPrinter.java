@@ -53,7 +53,7 @@ public class CSVPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrinte
     }
     private static String skillNameWithDescriptionToString(Skill skill) {
         String descriptionEN = normalizeDescription(skill);
-        String s = skill.name+t+t+SPACE+descriptionEN;
+        String s = skill.getName()+t+t+SPACE+descriptionEN;
         return s;
     }
     private static final String t = COLONS;

@@ -1,14 +1,5 @@
 package net.iubris.optimus_saint.crawler.main.exporter;
 
-import static net.iubris.optimus_saint.common.StringUtils.COLONS;
-import static net.iubris.optimus_saint.common.StringUtils.COMMA;
-import static net.iubris.optimus_saint.common.StringUtils.DASH;
-import static net.iubris.optimus_saint.common.StringUtils.MARKS;
-import static net.iubris.optimus_saint.common.StringUtils.NEW_LINE;
-import static net.iubris.optimus_saint.common.StringUtils.PIPE;
-import static net.iubris.optimus_saint.common.StringUtils.QUOTE;
-import static net.iubris.optimus_saint.common.StringUtils.SPACE;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -25,7 +16,6 @@ import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
 import net.iubris.optimus_saint.crawler.model.SaintData;
-import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
 public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadSheetExporter<ExporterStatus> {
@@ -112,83 +102,21 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
         // id
         list.add(sd.id);
         // name+image+description
-        list.add(ToJSON.saintRichNameToJsonString(sd)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
+        list.add(SaintDataToJSON.SheetSaints.saintRichNameToJsonString(sd)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
         // type
         list.add(sd.type.name().toLowerCase());
         // lane
         list.add(sd.lane.name().toLowerCase());
-        list.add(ToJSON.skillToJsonString(sd.skills.first));
-        list.add(ToJSON.skillToJsonString(sd.skills.second));
-        list.add(ToJSON.skillToJsonString(sd.skills.third));
-        list.add(ToJSON.skillToJsonString(sd.skills.fourth));
-        list.add(ToJSON.skillToJsonString(sd.skills.getSeventhSense()));
-        list.add(ToJSON.skillToJsonString(sd.skills.getCrusade1()));
-        list.add(ToJSON.skillToJsonString(sd.skills.getCrusade2()));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.first));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.second));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.third));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.fourth));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.getSeventhSense()));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.getCrusade1()));
+        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.getCrusade2()));
         list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
         
         return list;
     }
-    
-    private static class ToJSON {        
-        static String saintRichNameToJsonString(SaintData saintData) {
-            String nameImageDescriptionToJsonString = nameImageDescriptionToJsonString(saintData.name, saintData.description, saintData.descriptionIT, saintData.imageSmall);
-            return nameImageDescriptionToJsonString;
-        }
-        
-        static String skillToJsonString(Skill skill) {
-            String skillNameImageDescriptionToJsonString = nameImageDescriptionToJsonString(skill.name, skill.description, skill.descriptionIT, skill.imageSmall);
-            return skillNameImageDescriptionToJsonString;
-        }
-        
-        private static String nameImageDescriptionToJsonString(String name, String descriptionEN, String descriptionIT, String imageSmall) {
-            String s = b 
-                        +m+name+m+t+m+name+m+c
-                        +m+description+m+t
-                        +b;
-            if (hasDescription(descriptionEN)) {
-                            s+=m+EN+m+t+m+descriptionEN+m+c;
-                            if (hasDescription(descriptionIT)) {
-                                s+=m+IT+m+t+m+normalizeDescription(descriptionIT)+m;
-                            } else {
-                                s+=m+IT+m+t+m+MISSING+m;
-                            }
-            } else {
-                            s+=m+EN+m+t+m+DASH+m+c;
-                            s+=m+IT+m+t+m+DASH+m;
-            }
-                      s+=e+c;
-                      s+=m+imageSmall+m+t+m+imageSmall+m
-                     +e;
-            s=s.replace(QUOTE, PIPE);
-            return s;
-        }
-        
-        
-        private static String normalizeDescription(String descr) {
-            return descr.trim()
-//                    .replace(QUOTE, EMPTY)
-                    .replace(MARKS, QUOTE)
-                    .replace(NEW_LINE, SPACE);
-        }
-    
-        private static boolean hasDescription(String descr) {
-            if (org.apache.commons.lang3.StringUtils.isNotBlank(descr)) {
-                return true;
-            }
-            return false;
-        }
-        
-        private static final String m = MARKS;
-        private static final String c = COMMA;
-        private static final String t = COLONS;
-        private static final String b = "{";
-        private static final String e = "}";
-        private static final String name = "name";
-        private static final String description = "description";
-        private static final String imageSmall = "imageSmall";
-        private static final String EN = "en";
-        private static final String IT = "it";
-        private static final String MISSING = "MISSING";
-    }
-   
+
 }

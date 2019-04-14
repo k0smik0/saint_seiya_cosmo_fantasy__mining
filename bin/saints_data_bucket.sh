@@ -5,4 +5,4 @@ DOWNLOAD=$1
 
 ARGS="$@"
 MAIN="net.iubris.optimus_saint.crawler.main.Main"
-mvn -q exec:java -Dexec.mainClass=$MAIN -Dexec.args="$ARGS"
+mvn exec:java -Dexec.mainClass=$MAIN -Dexec.args="$ARGS"
