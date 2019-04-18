@@ -31,7 +31,8 @@ public class SkillsGroup {
 	}
 	
 	public boolean hasCrusade2() {
-        return StringUtils.isNotBlank(crusade2.name);
+	    return crusade2.isExistant();
+//        return StringUtils.isNotBlank(crusade2.name);
     }
 	
 	public Skill getCrusade1() {

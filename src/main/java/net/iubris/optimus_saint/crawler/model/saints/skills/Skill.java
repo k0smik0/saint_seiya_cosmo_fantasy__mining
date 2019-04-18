@@ -1,5 +1,8 @@
 package net.iubris.optimus_saint.crawler.model.saints.skills;
 
+import org.apache.commons.text.StringSubstitutor;
+
+import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.model.IddableDefinition;
 
 public class Skill extends IddableDefinition implements Comparable<Skill> {
@@ -12,8 +15,8 @@ public class Skill extends IddableDefinition implements Comparable<Skill> {
         this.name = name;
     }
 	
-	String name = "";
-	String shortName = "";
+	String name = StringUtils.EMPTY;
+	String shortName = name;
 	public String description;
 	public String imageSmall;
 	
@@ -41,5 +44,15 @@ public class Skill extends IddableDefinition implements Comparable<Skill> {
     
     public String getShortName() {
         return shortName;
+    }
+    
+    public boolean isExistant() {
+        return !name.isEmpty(); 
+//        !StringUtils.UNDERSCORE.equalsIgnoreCase(shortName) || !StringUtils.UNDERSCORE.equalsIgnoreCase(name);
+    }
+
+    public boolean hasShortName() {
+        return !shortName.isEmpty();
+//        !StringUtils.EMPTY.equalsIgnoreCase(shortName) && !StringUtils.UNDERSCORE.equalsIgnoreCase(shortName);
     }
 }

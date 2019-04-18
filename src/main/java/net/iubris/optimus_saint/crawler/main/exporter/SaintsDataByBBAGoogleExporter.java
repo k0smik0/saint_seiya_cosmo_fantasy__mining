@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -178,39 +179,58 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	/*
 	 * the filter and merge zone - begin
 	 */
+	private Map<Skill, List<SaintData>> mergeManually(Collection<SaintData> saintDataCollection) {
+	    printer.println("mergeManually - begin");
+	    Function<SaintData,Skill> byCrusadeSkill1Classifier = t -> t.skills.getCrusade1();
+	    Map<Skill, List<SaintData>> saintsByCrusadeSkill1 = saintDataCollection.parallelStream()
+            .filter(filterNotUsefulSaints)
+            .map(crusadeSkill1NameFlattingRemapper)
+            .sorted(comparatorBySaintSkill1PriorityDescending)
+            .collect(Collectors.groupingBy(byCrusadeSkill1Classifier, 
+                    concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
+	    
+	    // only saints having skill2
+	    Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
+	    Map<Skill, List<SaintData>> saintsByCrusadeSkill2 = saintDataCollection.parallelStream()
+            .filter(filterNotUsefulSaints)
+            .map(crusadeSkill1NameFlattingRemapper)
+            .sorted(comparatorBySaintSkill2PriorityDescending)
+            .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, 
+                    concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
+	    
+	    saintsByCrusadeSkill2.entrySet().parallelStream().forEach(e->{
+//	        e.ge
+	    });
+	    
+	    
+	    printer.println("mergeManually - end");
+	    return saintsByCrusadeSkill1;
+	}
+	
 	private Map<Skill, List<SaintData>> mergeByStreamAndMerge(Collection<SaintData> saintDataCollection) {
 	    printer.println("merge - begin");
 	    Function<SaintData,Skill> byCrusadeSkill1Classifier = t -> t.skills.getCrusade1();
-        Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
-                
+        
+
         Map<Skill, List<SaintData>> saintsByCrusadeSkill1 = saintDataCollection.parallelStream()
                 .filter(filterNotUsefulSaints)
                 .map(crusadeSkill1NameFlattingRemapper)
                 .sorted(comparatorBySaintSkill1PriorityDescending)
                 .collect(Collectors.groupingBy(byCrusadeSkill1Classifier, 
                         /*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
-        printer.println("saintsByCrusadeSkill1.skills: "
-                +saintsByCrusadeSkill1.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
-        
+//        printer.println("saintsByCrusadeSkill1.skills: "
+//                +saintsByCrusadeSkill1.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
+        printSkillsToSaints(saintsByCrusadeSkill1, "saintsByCrusadeSkill1.skills");
+
+        Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
         Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.parallelStream()
                 .filter(filterNotUsefulSaints)
+                .filter(sd->sd.skills.hasCrusade2())
                 .map(crusadeSkill2NameFlattingRemapper)
                 .sorted(comparatorBySaintSkill2PriorityDescending)
                 .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, 
                         /*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
-        printer.println("saintsByCrusadeSkill2.skills: "
-                +saintsByCrusadeSkill2ThenGlobal.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
-        printer.println("saintsByCrusadeSkill2.skills <-> saints: "+
-                    saintsByCrusadeSkill2ThenGlobal.entrySet().stream()
-                        .map(e->{
-                            Skill skill = e.getKey();
-                            List<SaintData> value = e.getValue();
-                            String s = skill.getShortName()+":: ";
-                            s+=value.stream().map(sd->sd.name).collect(Collectors.joining(","));
-                            return s;
-                        })
-                        .collect(Collectors.joining("\n\n"))
-                );
+        printSkillsToSaints(saintsByCrusadeSkill2ThenGlobal, "saintsByCrusadeSkill2.skills");
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
             Set<SaintData> set = new TreeSet<>(saintsComparatorByIdDescending);
@@ -228,14 +248,30 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().stream()
             .filter(e->!e.getKey().getShortName().isEmpty())        
             .sorted(comparatorEntryBySkillPriorityDescending)
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1,v2)->v1, 
-                    /*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier) );
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, 
+                    (v1,v2)->v1,/*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier) );
         
-        printer.println("skills: "+toReturn.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(",")));
+        printer.println("\nskills: "+toReturn.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(",")));
     
         printer.println("merge - end");
         return toReturn;
 	};
+	private void printSkillsToSaints(Map<Skill, List<SaintData>> saintsByCrusadeSkill, String message) {
+	    printer.println(message+":: "
+                +saintsByCrusadeSkill.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
+        printer.println(message+".skills <-> saints: "+"\n"+
+                    saintsByCrusadeSkill.entrySet().stream()
+                        .map(e->{
+                            Skill skill = e.getKey();
+                            List<SaintData> value = e.getValue();
+                            String s = skill.getShortName()+":: ";
+                            s+=value.stream().map(sd->sd.name).collect(Collectors.joining(","));
+                            return s;
+                        })
+                        .collect(Collectors.joining("\n"))
+                        +"\n"
+                );
+	}
 	private static final Supplier<Map<Skill, List<SaintData>>> concurrentSkipListMapWithSkillComparatorSupplier = new Supplier<Map<Skill,List<SaintData>>>() {
         @Override
         public Map<Skill, List<SaintData>> get() {
@@ -323,23 +359,24 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             Skill sd1Skill = sd1.skills.getCrusade2();
             Skill sd2Skill = sd2.skills.getCrusade2();
             
-            if (sd1Skill.getShortName().isEmpty() && sd2Skill.getShortName().isEmpty()) {
+            if (sd1Skill.isExistant() /*getShortName().isEmpty()*/ && sd2Skill.isExistant() /*getShortName().isEmpty()*/) {
                 return 0;
+            }
+            
+            if (!sd1Skill.hasShortName() && sd2Skill.hasShortName()) {
+                return 1;
+            }
+            if (sd2Skill.hasShortName() && !sd2Skill.hasShortName()) {
+                return -1;
             }
             
             Integer sd1Priority = skillToPriorityMap.get(sd1Skill.getShortName());
             Integer sd2Priority = skillToPriorityMap.get(sd2Skill.getShortName());
             
             if (sd1Priority==null) {
-                return 1;
-            }
-            if (sd2Priority==null) {
                 return -1;
             }
-            if (sd1Skill.getShortName().isEmpty()) {
-                return 1;
-            }
-            if (sd2Skill.getShortName().isEmpty()) {
+            if (sd2Priority==null) {
                 return 1;
             }
             
@@ -352,32 +389,31 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             return 0;
         }
     };
-    private static final Comparator<Entry<Skill,List<SaintData>>> comparatorEntryBySkillPriorityDescending = (o1, o2) -> {
-        Skill o1Skill = o1.getKey();
-        Integer o1Priority = skillToPriorityMap.get(o1Skill.getShortName());
-        Skill o2Skill = o2.getKey();
-        Integer o2Priority = skillToPriorityMap.get(o2Skill.getShortName());
+    private static final Comparator<Entry<Skill,List<SaintData>>> comparatorEntryBySkillPriorityDescending = (e1, e2) -> {
+        Skill skill1 = e1.getKey();
+        Integer s1Priority = skillToPriorityMap.get(skill1.getShortName());
+        Skill skill2 = e2.getKey();
+        Integer s2Priority = skillToPriorityMap.get(skill2.getShortName());
         
-        if (o1Priority.intValue() > o2Priority.intValue()) {
+        if (s1Priority.intValue() > s2Priority.intValue()) {
             return -1;
         }
-        if (o1Priority.intValue() < o2Priority.intValue()) {
+        if (s1Priority.intValue() < s2Priority.intValue()) {
             return 1;
         }
         return 0;
     };
     private static final Comparator<Skill> comparatorSkillByPriorityDescending = new Comparator<Skill>() {
-
         @Override
         public int compare(Skill s1, Skill s2) {
             if (s1.getShortName().isEmpty() && s2.getShortName().isEmpty()) {
                 return 0;
             }
             
-            if (s1.getShortName().isEmpty()) {
+            if (!s1.hasShortName()) {
                 return -1;
             }
-            if (s2.getShortName().isEmpty()) {
+            if (!s2.hasShortName()) {
                 return 1;
             }
             
