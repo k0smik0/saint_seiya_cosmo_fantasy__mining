@@ -200,6 +200,17 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                         /*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
         printer.println("saintsByCrusadeSkill2.skills: "
                 +saintsByCrusadeSkill2ThenGlobal.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
+        printer.println("saintsByCrusadeSkill2.skills <-> saints: "+
+                    saintsByCrusadeSkill2ThenGlobal.entrySet().stream()
+                        .map(e->{
+                            Skill skill = e.getKey();
+                            List<SaintData> value = e.getValue();
+                            String s = skill.getShortName()+":: ";
+                            s+=value.stream().map(sd->sd.name).collect(Collectors.joining(","));
+                            return s;
+                        })
+                        .collect(Collectors.joining("\n\n"))
+                );
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
             Set<SaintData> set = new TreeSet<>(saintsComparatorByIdDescending);
@@ -481,12 +492,20 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                 SaintData saintData = saintsListPerSkill.get(i);
 //                String saintName = saintsListPerSkill.get(i).name;
                 String saintDataAsJson = SaintDataToJSON.SheetCrusadeSkill.saintToJson(saintData);
+                boolean isJsonValid = SaintDataToJSON.isJSONValid(saintDataAsJson);
 //                printer.print("adding "+saintName+" at externalList["+rowIndex+"]["+columnsIndex+"] ("+skill.name+")");
 //                printer.print(" -- rowSize:"+row.size());
-                if (row.size() < columnsIndex) {
-                    row.add(saintDataAsJson);
+                String data = "{\"error\":\"json not valid for "+saintData.name+"\"}";
+                if (!isJsonValid) {
+                    printer.println("   * json not valid for "+saintData.name+" *");
+                    printer.println("not valid: "+saintDataAsJson);
                 } else {
-                    row.add(columnsIndex, saintDataAsJson);
+                    data = saintDataAsJson;
+                }
+                if (row.size() < columnsIndex) {
+                    row.add(data);
+                } else {
+                    row.add(columnsIndex, data);
                 }
 //                printer.print("["+rowIndex+"]["+columnsIndex+"] ");
 //                printer.println(".");

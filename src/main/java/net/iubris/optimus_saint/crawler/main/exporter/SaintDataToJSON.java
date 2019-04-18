@@ -1,6 +1,18 @@
 package net.iubris.optimus_saint.crawler.main.exporter;
 
-import static net.iubris.optimus_saint.common.StringUtils.*;
+import static net.iubris.optimus_saint.common.StringUtils.COLONS;
+import static net.iubris.optimus_saint.common.StringUtils.COMMA;
+import static net.iubris.optimus_saint.common.StringUtils.DASH;
+import static net.iubris.optimus_saint.common.StringUtils.EMPTY;
+import static net.iubris.optimus_saint.common.StringUtils.MARKS;
+import static net.iubris.optimus_saint.common.StringUtils.NEW_LINE;
+import static net.iubris.optimus_saint.common.StringUtils.PIPE;
+import static net.iubris.optimus_saint.common.StringUtils.QUOTE;
+import static net.iubris.optimus_saint.common.StringUtils.SPACE;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
@@ -50,29 +62,23 @@ public class SaintDataToJSON {
                 +m+tagImageSmall+m+t+m+saintData.imageSmall+m+c
                 +m+"crusade_skill_1"+m+t+bo
                     +m+tagName+m+t+m+saintData.skills.getCrusade1().getName()+m+c
-                    +m+tagDescription+m+t+m+saintData.skills.getCrusade1().description
-                                .replace(NEW_LINE, SPACE)
-                                .replace(QUOTE, PIPE)+m+c;                        
-                if (exists(saintData.skills.getCrusade1().descriptionIT)) {
-                    s+=m+tagDescription+m+t+m+saintData.skills.getCrusade1().descriptionIT
-                                .replace(NEW_LINE, SPACE)
-                                .replace(QUOTE, PIPE)+m+c;
+                    +m+tagDescription+m+t+m+normalizeDescription(saintData.skills.getCrusade1().description)+m+c;
+                String crusade1DescriptionIT = saintData.skills.getCrusade1().descriptionIT;
+                if (exists(crusade1DescriptionIT)) {
+                    s+=m+tagDescription+m+t+m+normalizeDescription(crusade1DescriptionIT)+m+c;
                 }
                     s+=m+tagImageSmall+m+t+m+saintData.skills.getCrusade1().imageSmall+m;
                 s+=bc;
                 if (saintData.skills.hasCrusade2()) {
-                    s+=c+m+"crusade_skill_2"+m+t+m+bo
-                        +m+tagName+m+t+m+saintData.skills.getCrusade2().getName()+m+c
-                        +m+tagDescription+m+t+m+saintData.skills.getCrusade2().description
-                                .replace(NEW_LINE, SPACE)
-                                .replace(QUOTE, PIPE)+m+c;
-                        if (exists(saintData.skills.getCrusade2().descriptionIT)) {
-                            s+=m+tagDescription+m+t+m+saintData.skills.getCrusade2().descriptionIT
-                                        .replace(NEW_LINE, SPACE)
-                                        .replace(QUOTE, PIPE)+m+c;
+                    s+=c+m+"crusade_skill_2"+m+t+bo
+                            +m+tagName+m+t+m+saintData.skills.getCrusade2().getName()+m+c
+                            +m+tagDescription+m+t+m+normalizeDescription(saintData.skills.getCrusade2().description)+m+c;
+                        String crusade2DescriptionIT = saintData.skills.getCrusade2().descriptionIT;
+                        if (exists(crusade2DescriptionIT)) {
+                          s+=m+tagDescription+m+t+m+normalizeDescription(crusade2DescriptionIT)+m+c;
                         }
                         s+=m+tagImageSmall+m+t+m+saintData.skills.getCrusade2().imageSmall+m;
-                        s+=bc;
+                    s+=bc;
                 }
             s+=bc;
             return s;
@@ -82,6 +88,7 @@ public class SaintDataToJSON {
     private static String normalizeDescription(String descr) {
         return descr.trim()
 //                .replace(QUOTE, EMPTY)
+                .replace(QUOTE, PIPE)
                 .replace(MARKS, QUOTE)
                 .replace(NEW_LINE, SPACE);
     }
@@ -91,6 +98,22 @@ public class SaintDataToJSON {
             return true;
         }
         return false;
+    }
+    
+    public static boolean isJSONValid(String s) {
+        try {
+            new JSONObject(s);
+            return true;
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                new JSONArray(s);
+                return true;
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
     }
     
     
