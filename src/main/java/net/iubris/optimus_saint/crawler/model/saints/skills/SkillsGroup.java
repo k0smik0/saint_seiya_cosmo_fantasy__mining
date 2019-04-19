@@ -1,5 +1,8 @@
 package net.iubris.optimus_saint.crawler.model.saints.skills;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class SkillsGroup {
@@ -48,5 +51,14 @@ public class SkillsGroup {
     }
     public void setCrusade2(Skill crusade2) {
         this.crusade2 = crusade2;
+    }
+    
+    public List<Skill> getAllCrusade() {
+        List<Skill> l = new ArrayList<Skill>();
+        l.add( crusade1 );
+        if (hasCrusade2()) {
+            l.add( crusade2 );    
+        }
+        return l;
     }
 }

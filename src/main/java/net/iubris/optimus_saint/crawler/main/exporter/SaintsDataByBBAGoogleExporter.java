@@ -30,8 +30,10 @@ import javax.inject.Inject;
 
 import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
+import net.iubris.optimus_saint.crawler.main.printer.TableList;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
+import net.iubris.optimus_saint.crawler.model.saints.skills.SkillsGroup;
 import net.iubris.optimus_saint.crawler.model.saints.stats.literal.ClothKind.ClothKindEnum;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
@@ -220,8 +222,10 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                         /*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
 //        printer.println("saintsByCrusadeSkill1.skills: "
 //                +saintsByCrusadeSkill1.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
-        printSkillsToSaints(saintsByCrusadeSkill1, "saintsByCrusadeSkill1.skills");
-
+//        printSkills(saintsByCrusadeSkill1, "saintsByCrusadeSkill1.skills");
+        printSkillsToSaints(saintsByCrusadeSkill1, "saintsByCrusadeSkill1:: skills <-> saints");
+        printer.println("\n\n");
+        
         Function<SaintData,Skill> byCrusadeSkill2Classifier = t -> t.skills.getCrusade2();
         Map<Skill, List<SaintData>> saintsByCrusadeSkill2ThenGlobal = saintDataCollection.parallelStream()
                 .filter(filterNotUsefulSaints)
@@ -230,7 +234,9 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                 .sorted(comparatorBySaintSkill2PriorityDescending)
                 .collect(Collectors.groupingBy(byCrusadeSkill2Classifier, 
                         /*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier, Collectors.toList()));
-        printSkillsToSaints(saintsByCrusadeSkill2ThenGlobal, "saintsByCrusadeSkill2.skills");
+//        printSkills(saintsByCrusadeSkill2ThenGlobal, "saintsByCrusadeSkill2ThenGlobal.skills");
+        printSkillsToSaints(saintsByCrusadeSkill2ThenGlobal, "saintsByCrusadeSkill2ThenGlobal:: skills <-> saints:");
+        printer.println("\n\n");
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
             Set<SaintData> set = new TreeSet<>(saintsComparatorByIdDescending);
@@ -246,26 +252,36 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 //        printer.println("post-merge: saintsByCrusadeSkill2.skills: "+saintsByCrusadeSkill2ThenGlobal.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
         
         Map<Skill, List<SaintData>> toReturn = saintsByCrusadeSkill2ThenGlobal.entrySet().stream()
-            .filter(e->!e.getKey().getShortName().isEmpty())        
+            .filter(e->e.getKey().hasShortName())
             .sorted(comparatorEntryBySkillPriorityDescending)
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, 
                     (v1,v2)->v1,/*ConcurrentSkipListMap::new*/concurrentSkipListMapWithSkillComparatorSupplier) );
+//        printSkills(toReturn, "toReturn.skills");
+        printSkillsToSaints(toReturn, "toReturn:: skills <-> saints:");
+        printer.println("\n\n");
         
-        printer.println("\nskills: "+toReturn.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(",")));
+//        printer.println("\nskills: "+toReturn.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(",")));
     
         printer.println("merge - end");
         return toReturn;
 	};
+
+    /*
+     * private void printSkills(Map<Skill, List<SaintData>> saintsByCrusadeSkill,
+     * String prefix) { printer.println(prefix+": "
+     * +saintsByCrusadeSkill.keySet().stream().map(s->s.getShortName()).collect(
+     * Collectors.joining(", "))); }
+     */
 	private void printSkillsToSaints(Map<Skill, List<SaintData>> saintsByCrusadeSkill, String message) {
-	    printer.println(message+":: "
+	    printer.println(message+":"
                 +saintsByCrusadeSkill.keySet().stream().map(s->s.getShortName()).collect(Collectors.joining(", ")));
-        printer.println(message+".skills <-> saints: "+"\n"+
+        printer.println(message+": \n"+
                     saintsByCrusadeSkill.entrySet().stream()
                         .map(e->{
                             Skill skill = e.getKey();
                             List<SaintData> value = e.getValue();
                             String s = skill.getShortName()+":: ";
-                            s+=value.stream().map(sd->sd.name).collect(Collectors.joining(","));
+                            s+=value.stream().map(sd->sd.name).collect(Collectors.joining(", "));
                             return s;
                         })
                         .collect(Collectors.joining("\n"))
@@ -487,19 +503,37 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	    printer.println("- transposeAndTransformSkillWithSaintDataToString: begin");
 	    List<List<Object>> externalList = new ArrayList<>();
 	    
-	    externalList.add(new ArrayList<Object>() );
+	    List<List<String>> debugExternalList = new ArrayList<>();
+	    
+	    externalList.add(new ArrayList<Object>() );	    
 	    List<Object> header = externalList.get(0);
-	    header.add("index - do not touch");
+	    header.add("id");
+	    
+	    debugExternalList.add(new ArrayList<String>() );
+	    List<String> debugHeader = debugExternalList.get(0);
+	    debugHeader.add("id");
 	    
 	    Set<Entry<Skill, List<SaintData>>> entrySet = skillsToSaintsListMap.entrySet();
+	    
+	    List<String> skillsAsList = entrySet.stream()
+        .map(e->e.getKey().getShortName().trim()).collect(Collectors.toList());
+	    List<String> headerAsList = new ArrayList<>();
+	    headerAsList.add("id");
+	    headerAsList.addAll(skillsAsList);
+	    headerAsList.add("last");	    
+	    
+	    
+	    int skillsQuantityAsColumnsNumber = entrySet.size();
+	    TableList tableList = new TableList(skillsQuantityAsColumnsNumber+2,  headerAsList.toArray(new String[] {})).withSpacing(5);
+	    int headerSize = skillsQuantityAsColumnsNumber+2;
 	    
 	    int columnsIndex = 1;
 	    
 	    for (Entry<Skill, List<SaintData>> entry : entrySet) {
             Skill skill = entry.getKey();
             header.add( skill.getShortName()  );
-            printer.println("added skill "+skill.getShortName()+" to header");
-            
+            debugHeader.add( skill.getShortName()  );
+            printer.println("added skill "+skill.getShortName()+" to header");            
             
             List<SaintData> saintsListPerSkill = entry.getValue();
             
@@ -511,8 +545,16 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             if (futureColumnSize>externalListSize) {
 //                printer.print("futureColumnSize:"+futureColumnSize+" > externalListSize"+":"+externalListSize+" -> ");
                 int diff = futureColumnSize-externalListSize+1;
-                for (int d=1;d<=diff;d++) {
-                    externalList.add( new ArrayList<Object>() );
+                for (int d=1;d<=diff;d++) {                    
+                    Object[] emptyArrayO = new Object[headerSize];
+                    String[] emptyArrayS = new String[headerSize];
+                    for (int i=0;i<emptyArrayO.length;i++) {
+                        emptyArrayO[i] = "";
+                        emptyArrayS[i] = "";
+                    }
+                    externalList.add( Arrays.asList(emptyArrayO) );
+                    debugExternalList.add( Arrays.asList(emptyArrayS) );
+                    tableList.addRow(skillsQuantityAsColumnsNumber+2);
                 }
 //                printer.println("added "+diff+" lists - externalList.size:"+externalList.size());
             }
@@ -521,14 +563,48 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             for (int i=0;i<saintsListPerSkill.size();i++) {
                 int rowIndex = i+1;
                 List<Object> row = externalList.get(rowIndex);
+                int tableListRowIndex = tableList.size()-1;
+                printer.println("rowIndex:"+rowIndex+" ?= tableListRowIndex:"+tableListRowIndex);
+                String[] tableListRow = tableList.getRow(tableListRowIndex);
 //                printer.print("row:"+(rowIndex)+":: ");
-                if (row.size()==0) {
+//                if (row.get( size()==0) {
 //                    printer.print("adding "+(rowIndex)+" at externalList["+(rowIndex)+"][0] - ");
-                    row.add(""+rowIndex);
+                    row.set(0, ""+rowIndex);
 //                    printer.print("["+rowIndex+"][0] ");
-                }
+                    tableListRow[0] = ""+rowIndex;
+//                }
+                
+                List<String> debugRow = debugExternalList.get(rowIndex);
+//                if (debugRow.size()==0) {
+                    debugRow.set(0, ""+rowIndex);
+//                }
+                
                 SaintData saintData = saintsListPerSkill.get(i);
-//                String saintName = saintsListPerSkill.get(i).name;
+                String skillShortNameFromHeader = ((String)header.get(columnsIndex)).trim();
+                
+                SkillsGroup saintSkills = saintData.skills;
+                String skill1ShortName = saintSkills.getCrusade1().getShortName().trim();
+                // skill1 not match header
+                if (!skillShortNameFromHeader.equalsIgnoreCase(skill1ShortName)) {
+                    if (saintSkills.hasCrusade2()) {
+                        String skill2ShortName = saintSkills.getCrusade2().getShortName().trim();
+                        // skill2 not match header
+                        if (!skillShortNameFromHeader.equalsIgnoreCase(skill2ShortName)) {
+                            printer.println("skipping "+saintData.name+": its skills ("+skill1ShortName+","+skill2ShortName+") not matching header ("+skillShortNameFromHeader+") [[ externalList["+rowIndex+"]["+columnsIndex+"] ]]");
+                            row.set(columnsIndex, "");
+                            debugRow.set(columnsIndex, ".");
+                            tableListRow[columnsIndex] = "";
+                            continue;
+                        }
+                    } else {
+                        printer.println("skipping "+saintData.name+": its unique skill1 ("+skill1ShortName+") not matching header ("+skillShortNameFromHeader+") [[ externalList["+rowIndex+"]["+columnsIndex+"] ]]");
+                        row.set(columnsIndex, "");
+                        debugRow.set(columnsIndex, ",");
+                        tableListRow[columnsIndex] = "";
+                        continue;
+                    }
+                }
+//                saintData.skills.getAllCrusade().stream().filter(s->skillShortNameFromHeader.equalsIgnoreCase( s.getShortName());
                 String saintDataAsJson = SaintDataToJSON.SheetCrusadeSkill.saintToJson(saintData);
                 boolean isJsonValid = SaintDataToJSON.isJSONValid(saintDataAsJson);
                 printer.println("adding "+saintData.name+" at externalList["+rowIndex+"]["+columnsIndex+"] ("+skill.getShortName()+")");
@@ -540,25 +616,34 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                 } else {
                     data = saintDataAsJson;
                 }
-                if (row.size() < columnsIndex) {
+                /*if (row.size() < columnsIndex) {
                     row.add(data);
+                    debugRow.add(saintData.name);
                 } else {
                     row.add(columnsIndex, data);
-                }
+                    debugRow.add(columnsIndex, saintData.name);
+                }*/
+                row.set(columnsIndex, data);
+                debugRow.set(columnsIndex, saintData.name);
+                tableListRow[columnsIndex] = saintData.name.replace(StringUtils.SPACE, StringUtils.NEW_LINE);
+                
 //                printer.print("["+rowIndex+"]["+columnsIndex+"] ");
 //                printer.println(".");
             }
 //            printer.println("");
             
             columnsIndex++;
-        }
+        }	    
+	    header.add("last");
 	    
-	    header.add("last - do not touch");
+	    debugExternalList.stream().forEach(il->{
+	        il.forEach(e->printer.print(e+"\t"));
+	        printer.println("");
+	    });
+	    printer.println("\n");
 	    
-	    /*externalList.stream().forEach(l->{
-	        l.forEach(ll->System.out.print("# "));
-	        System.out.println("");
-	    });*/
+	    tableList.print();
+	    printer.println("");
 	    
 	    printer.println("- transposeAndTransformSkillWithSaintDataToString: end");
 	    
