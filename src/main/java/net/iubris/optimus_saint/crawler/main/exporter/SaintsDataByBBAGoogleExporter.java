@@ -497,7 +497,9 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	    
 	    for (Entry<Skill, List<SaintData>> entry : entrySet) {
             Skill skill = entry.getKey();
-            header.add( skill.getShortName());
+            header.add( skill.getShortName()  );
+            printer.println("added skill "+skill.getShortName()+" to header");
+            
             
             List<SaintData> saintsListPerSkill = entry.getValue();
             
@@ -529,7 +531,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 //                String saintName = saintsListPerSkill.get(i).name;
                 String saintDataAsJson = SaintDataToJSON.SheetCrusadeSkill.saintToJson(saintData);
                 boolean isJsonValid = SaintDataToJSON.isJSONValid(saintDataAsJson);
-//                printer.print("adding "+saintName+" at externalList["+rowIndex+"]["+columnsIndex+"] ("+skill.name+")");
+                printer.println("adding "+saintData.name+" at externalList["+rowIndex+"]["+columnsIndex+"] ("+skill.getShortName()+")");
 //                printer.print(" -- rowSize:"+row.size());
                 String data = "{\"error\":\"json not valid for "+saintData.name+"\"}";
                 if (!isJsonValid) {
