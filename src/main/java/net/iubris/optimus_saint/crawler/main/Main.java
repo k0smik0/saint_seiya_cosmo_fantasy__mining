@@ -24,6 +24,7 @@ import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataGoogleSpreadShee
 import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.model.SaintData;
+import net.iubris.optimus_saint.crawler.utils.JsonbUtils;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
 public class Main {
@@ -167,10 +168,15 @@ public class Main {
 //System.out.println("create injected instance in: " + (end - start) + "ms");
 
             main.doStuff(commandLineOptions);
+            
+            JsonbUtils jsonbUtils = injector.getInstance(JsonbUtils.class);
+            jsonbUtils.close();
         } catch (ParseException e) {
             System.out.println(args + " are not valid options");
             CommandLineOptions.printFormattedHelp();
             return;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 	}
 }

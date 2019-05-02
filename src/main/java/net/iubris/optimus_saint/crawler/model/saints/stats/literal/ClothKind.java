@@ -2,7 +2,6 @@ package net.iubris.optimus_saint.crawler.model.saints.stats.literal;
 
 import javax.json.JsonObject;
 
-import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.model.Localization;
 import net.iubris.optimus_saint.crawler.model.saints.stats.StatsValue;
 
@@ -27,7 +26,8 @@ public class ClothKind extends LiteralStat {
 	    
         @Override
 		public String getLocalized(Localization localization) {
-			return StringUtils.toCamelCase(name());
+//			return StringUtils.toCamelCase(name());
+			return name();
 		}
 				
 	}

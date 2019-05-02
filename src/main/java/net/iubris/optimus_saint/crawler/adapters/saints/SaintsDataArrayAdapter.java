@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.model.SaintData;

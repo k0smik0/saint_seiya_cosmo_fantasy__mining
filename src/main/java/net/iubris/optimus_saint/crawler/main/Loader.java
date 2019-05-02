@@ -1,5 +1,7 @@
 package net.iubris.optimus_saint.crawler.main;
 
+import static net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints.SAINTS_DATASET_FILE;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,12 +10,8 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.logging.log4j.LogManager;
-
 import net.iubris.optimus_saint.crawler.model.SaintsData;
 import net.iubris.optimus_saint.crawler.utils.JsonbUtils;
-
-import static net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints.SAINTS_DATASET_FILE;
 
 @Singleton
 public class Loader {
@@ -32,10 +30,10 @@ public class Loader {
 	        return;
 	    }
 		try ( FileInputStream fis = new FileInputStream(Config.Dataset.Saints.SAINTS_DATASET_FILE); ) {
-			jsonbUtils.getParser().fromJson(fis, SaintsData.class);
+			jsonbUtils.getEngine().fromJson(fis, SaintsData.class);
 		} finally {
 			try {
-				jsonbUtils.closeParser();
+				jsonbUtils.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

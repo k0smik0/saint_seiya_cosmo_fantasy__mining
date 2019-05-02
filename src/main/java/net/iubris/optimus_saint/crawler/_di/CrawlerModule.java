@@ -2,8 +2,8 @@ package net.iubris.optimus_saint.crawler._di;
 
 import com.google.inject.AbstractModule;
 
-import net.iubris.optimus_saint.crawler.main.printer.FullDetailsConsoleDataPrinter;
 import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
+import net.iubris.optimus_saint.crawler.main.printer.SaintsDataWithSkillsPrinter;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 import net.iubris.optimus_saint.crawler.utils.SimplePrinter;
 
@@ -19,6 +19,7 @@ public class CrawlerModule extends AbstractModule {
     protected void configure() {
         bind(Printer.class).to(SimplePrinter.class);
 //        bind(SaintsDataPrinter.class).to(SaintsDataSimplePrinter.class);
-        bind(SaintsDataPrinter.class).to(FullDetailsConsoleDataPrinter.class);
+//        bind(SaintsDataPrinter.class).to(FullDetailsConsoleDataPrinter.class);
+        bind(SaintsDataPrinter.class).to(SaintsDataWithSkillsPrinter.class);
     }
 }

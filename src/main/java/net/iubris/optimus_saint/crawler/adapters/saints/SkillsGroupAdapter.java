@@ -1,13 +1,16 @@
 package net.iubris.optimus_saint.crawler.adapters.saints;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
+import java.util.stream.Collectors;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
@@ -21,8 +24,11 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 					(a,b)->null, 
 					a->a, 
 					Characteristics.IDENTITY_FINISH );
+	
+	private static final String FIELD_EFFECTS = "effects";
 
     private static final String FIELD_IMAGE_SMALL = "small";
+    
 	
 	private static final Function<JsonValue, Skill> jsonValueToSkill = jv->{
 		JsonObject jsonObjectRoot = jv.asJsonObject();
@@ -47,6 +53,11 @@ public class SkillsGroupAdapter extends AbstractArrayAdapter<SkillsGroup> {
 		skill.id = idS;
 		skill.description = descriptionString;
 		skill.setName(name);
+		
+		JsonArray effectsArray = jsonObjectRoot.getJsonArray(FIELD_EFFECTS);
+		List<String> effects = effectsArray.getValuesAs(JsonString.class).stream().map(js->js.getString()).collect(Collectors.toList());
+		skill.effects.addAll(effects);
+		
 		skill.imageSmall = jsonObjectRoot.getString(FIELD_IMAGE_SMALL);
 		
 		return skill;

@@ -24,15 +24,15 @@ public class JsonbUtils {
 		jc = new JsonbConfig()
 //				.withAdapters(new MaterialArrayAdapter())
 				.withFormatting(true);
-//		jsonb = JsonbBuilder.create(jc);
+		jsonb = JsonbBuilder.create(jc);
 	}
 	
-	public Jsonb getParser() {
-	    jsonb = JsonbBuilder.create(jc);
+	public Jsonb getEngine() {
+//	    jsonb = JsonbBuilder.create(jc);
 		return jsonb;
 	}
 	
-	public void closeParser() throws Exception {
+	public void close() throws Exception {
 		if (jsonb!=null) {
 			jsonb.close();
 		}

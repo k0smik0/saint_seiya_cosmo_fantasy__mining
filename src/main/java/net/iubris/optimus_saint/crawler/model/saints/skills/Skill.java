@@ -1,6 +1,7 @@
 package net.iubris.optimus_saint.crawler.model.saints.skills;
 
-import org.apache.commons.text.StringSubstitutor;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.model.IddableDefinition;
@@ -18,6 +19,7 @@ public class Skill extends IddableDefinition implements Comparable<Skill> {
 	String name = StringUtils.EMPTY;
 	String shortName = name;
 	public String description;
+	public List<String> effects = new ArrayList<>();
 	public String imageSmall;
 	
 	public String descriptionIT;

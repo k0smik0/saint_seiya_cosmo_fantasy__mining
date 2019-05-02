@@ -481,7 +481,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         List<String> saintToJsonList = saints.stream()
 				.sorted(saintsComparatorByIdDescending)
 				.map(sd -> {
-					String saintToJson = SaintDataToJSON.SheetCrusadeSkill.saintToJson(sd);
+					String saintToJson = SheetCrusadeSkillJsonExporter.saintToJson(sd);
 					return saintToJson;
 				})
 				.collect(Collectors.toList());
@@ -605,7 +605,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                     }
                 }
 //                saintData.skills.getAllCrusade().stream().filter(s->skillShortNameFromHeader.equalsIgnoreCase( s.getShortName());
-                String saintDataAsJson = SaintDataToJSON.SheetCrusadeSkill.saintToJson(saintData);
+                String saintDataAsJson = SheetCrusadeSkillJsonExporter.saintToJson(saintData);
                 boolean isJsonValid = SaintDataToJSON.isJSONValid(saintDataAsJson);
                 printer.println("adding "+saintData.name+" at externalList["+rowIndex+"]["+columnsIndex+"] ("+skill.getShortName()+")");
 //                printer.print(" -- rowSize:"+row.size());

@@ -25,12 +25,16 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
 	private static final String RANGE_TO_CLEAR = SHEET_NAME+"!A2:O";
 	
 	private final SaintsDataBucket saintsDataBucket;
+    private final SheetSaintsJsonExporter sheetSaintsJsonExporter;
     private final Printer printer;
 	
 	@Inject
-	public SaintsDataGoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, Printer printer) {
+	public SaintsDataGoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, 
+	        SheetSaintsJsonExporter sheetSaintsJsonExporter, 
+	        Printer printer) {
 		super(GoogleConfig.APPLICATION_NAME, GoogleConfig.SPREADSHEET_ID);
         this.saintsDataBucket = saintsDataBucket;
+        this.sheetSaintsJsonExporter = sheetSaintsJsonExporter;
         this.printer = printer;
     }
 
@@ -95,25 +99,25 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
 		return ExporterStatus.KO;
 	}
     
-    private static List<Object> saintDataToList(AtomicInteger index, SaintData sd) {
+    private List<Object> saintDataToList(AtomicInteger index, SaintData sd) {
         List<Object> list = new ArrayList<>();
         // index
         list.add(index.incrementAndGet());
         // id
         list.add(sd.id);
         // name+image+description
-        list.add(SaintDataToJSON.SheetSaints.saintRichNameToJsonString(sd)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
+        list.add(sheetSaintsJsonExporter.saintRichNameToJsonString(sd)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
         // type
         list.add(sd.type.name().toLowerCase());
         // lane
         list.add(sd.lane.name().toLowerCase());
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.first));
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.second));
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.third));
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.fourth));
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.getSeventhSense()));
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.getCrusade1()));
-        list.add(SaintDataToJSON.SheetSaints.skillToJsonString(sd.skills.getCrusade2()));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.first));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.second));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.third));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.fourth));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getSeventhSense()));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getCrusade1()));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getCrusade2()));
         list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
         
         return list;
