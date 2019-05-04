@@ -106,19 +106,19 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
         // id
         list.add(sd.id);
         // name+image+description
-        list.add(sheetSaintsJsonExporter.saintRichNameToJsonString(sd)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
+        list.add(sheetSaintsJsonExporter.saintRichNameToJsonString(sd).replace(StringUtils.NEW_LINE, StringUtils.SPACE)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");
         // type
         list.add(sd.type.name().toLowerCase());
         // lane
         list.add(sd.lane.name().toLowerCase());
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.first));
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.second));
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.third));
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.fourth));
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getSeventhSense()));
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getCrusade1()));
-        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getCrusade2()));
-        list.add(sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.first).replace(StringUtils.NEW_LINE, StringUtils.SPACE));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.second).replace(StringUtils.NEW_LINE, StringUtils.SPACE));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.third).replace(StringUtils.NEW_LINE, StringUtils.SPACE));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.fourth).replace(StringUtils.NEW_LINE, StringUtils.SPACE));
+        list.add(sheetSaintsJsonExporter.skillToJsonString(sd.skills.getSeventhSense()).replace(StringUtils.NEW_LINE, StringUtils.SPACE));
+        list.add( sheetSaintsJsonExporter.skillToJsonString(sd.skills.getCrusade1()).replace(StringUtils.NEW_LINE, StringUtils.SPACE) );
+        list.add( sheetSaintsJsonExporter.skillToJsonString(sd.skills.getCrusade2()).replace(StringUtils.NEW_LINE, StringUtils.SPACE) );
+        list.add( sd.keywords.stream().sorted().collect(Collectors.joining(StringUtils.COMMA+StringUtils.SPACE)) );
         
         return list;
     }
