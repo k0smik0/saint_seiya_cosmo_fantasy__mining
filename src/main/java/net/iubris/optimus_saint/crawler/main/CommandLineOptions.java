@@ -12,6 +12,7 @@ public enum CommandLineOptions {
 	PRINT("p","print","print loaded data"),
 	SPREADSHEET("s","spreadsheet","export data into spreadsheet, appending"),
 	SPREADSHEET_OVERWRITE("S","spreadsheet-overwrite","export data into spreadsheet, overwriting existing data"),
+	JSON("j","json", "print as json string"),
 	CSV("c","csv","export data on csv file"),
 	MINIMAL_ANALYSIS("a", "analysis", "minimal stats analysis"),
 	HELP("h","help","show this help menu"), 

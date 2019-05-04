@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -96,9 +95,12 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	
     private boolean reallyAct = true;
 
+    private final SaintDataToJsonForSheetCrusadeSkill saintDataToJsonForSheetCrusadeSkill;
+
 	@Inject
-	public SaintsDataByBBAGoogleExporter(Printer printer) {
+	public SaintsDataByBBAGoogleExporter(SaintDataToJsonForSheetCrusadeSkill saintDataToJsonForSheetCrusadeSkill, Printer printer) {
 		super(GoogleConfig.APPLICATION_NAME, GoogleConfig.SPREADSHEET_ID);
+        this.saintDataToJsonForSheetCrusadeSkill = saintDataToJsonForSheetCrusadeSkill;
         this.printer = printer;
     }
 	
@@ -457,7 +459,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
      */
 		
     // only for console pretty print
-	private static Map<Skill, List<List<Object>>> skillToSaintsMapToSkillToSkillWithSaintsMapByColumn(Map<Skill, List<SaintData>> merged) {
+	private Map<Skill, List<List<Object>>> skillToSaintsMapToSkillToSkillWithSaintsMapByColumn(Map<Skill, List<SaintData>> merged) {
 	        Function<Map.Entry<Skill, List<SaintData>>, List<List<Object>>> valueMapper = t -> {
                 List<Object> skillWithSaints = new ArrayList<>();
                 Skill skill = t.getKey();
@@ -477,11 +479,11 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	    
             return result;
 	}
-	private static final List<String> saintsToJsonList(List<SaintData> saints) {
+	private final List<String> saintsToJsonList(List<SaintData> saints) {
         List<String> saintToJsonList = saints.stream()
 				.sorted(saintsComparatorByIdDescending)
 				.map(sd -> {
-					String saintToJson = SheetCrusadeSkillJsonExporter.saintToJson(sd);
+					String saintToJson = saintDataToJsonForSheetCrusadeSkill.saintToJson(sd);
 					return saintToJson;
 				})
 				.collect(Collectors.toList());
@@ -605,8 +607,8 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
                     }
                 }
 //                saintData.skills.getAllCrusade().stream().filter(s->skillShortNameFromHeader.equalsIgnoreCase( s.getShortName());
-                String saintDataAsJson = SheetCrusadeSkillJsonExporter.saintToJson(saintData);
-                boolean isJsonValid = SaintDataToJSON.isJSONValid(saintDataAsJson);
+                String saintDataAsJson = saintDataToJsonForSheetCrusadeSkill.saintToJson(saintData);
+                boolean isJsonValid = AbstractSaintDataToJSON.isJSONValid(saintDataAsJson);
                 printer.println("adding "+saintData.name+" at externalList["+rowIndex+"]["+columnsIndex+"] ("+skill.getShortName()+")");
 //                printer.print(" -- rowSize:"+row.size());
                 String data = "{\"error\":\"json not valid for "+saintData.name+"\"}";

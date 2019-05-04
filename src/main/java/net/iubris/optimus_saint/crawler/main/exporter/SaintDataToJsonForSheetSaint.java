@@ -15,12 +15,13 @@ import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.utils.JsonbUtils;
 
 @Singleton
-public class SheetSaintsJsonExporter extends SaintDataToJSON {
+public class SaintDataToJsonForSheetSaint extends AbstractSaintDataToJSON {
 
     @Inject
-    public SheetSaintsJsonExporter(JsonbUtils jsonbUtils) {
+    public SaintDataToJsonForSheetSaint(JsonbUtils jsonbUtils) {
         super(jsonbUtils);
     }
+    
     public String saintRichNameToJsonString(SaintData saintData) {
         String nameImageDescriptionToJsonString = nameImageDescriptionToJsonString(saintData.name, saintData.description, saintData.descriptionIT, saintData.imageSmall);
         return nameImageDescriptionToJsonString;
@@ -61,19 +62,30 @@ public class SheetSaintsJsonExporter extends SaintDataToJSON {
         toJson = toJson.replace(QUOTE, PIPE);
         return toJson;
     }
-    private static class SaintToStringDTO {
-        public String name;
-        public String descriptionEN = DASH;
-        public String descriptionIT = DASH;
-        public String imageSmall;
+    public static class SaintToStringDTO {
+        private String name;
+        private String descriptionEN = DASH;
+        private String descriptionIT = DASH;
+        private String imageSmall;
         public SaintToStringDTO(String name, String imageSmall) {
             this.name = name;
             this.descriptionEN = descriptionEN;
             this.descriptionIT = descriptionIT;
             this.imageSmall = imageSmall;
         }
-        
         public SaintToStringDTO() {}
+        public String getName() {
+            return name;
+        }
+        public String getDescriptionEN() {
+            return descriptionEN;
+        }
+        public String getDescriptionIT() {
+            return descriptionIT;
+        }
+        public String getImageSmall() {
+            return imageSmall;
+        }
     }
     
     @SuppressWarnings("resource")
@@ -82,7 +94,7 @@ public class SheetSaintsJsonExporter extends SaintDataToJSON {
 //                    skill.description, 
 //                    skill.descriptionIT, 
 //                    skill.imageSmall);
-        SheetSaintsJsonExporter.SkillToStringDTO skillToStringDTO = new SkillToStringDTO(skill.getName(), 
+        SaintDataToJsonForSheetSaint.SkillToStringDTO skillToStringDTO = new SkillToStringDTO(skill.getName(), 
                 normalizeDescription(skill.description), skill.effects, skill.imageSmall);
         if (exists(skill.descriptionIT)) {
             skillToStringDTO.descriptionIT = normalizeDescription(skill.descriptionIT);
@@ -92,11 +104,11 @@ public class SheetSaintsJsonExporter extends SaintDataToJSON {
         toJson = toJson.replace(QUOTE, PIPE);
         return toJson; //skillNameImageDescriptionWithEffectsToJsonString;
     }
-    private static class SkillToStringDTO {
-        public String name;
-        public String description;
-        public String descriptionIT = MISSING;
-        public String imageSmall;
+    public static class SkillToStringDTO {
+        private String name;
+        private String description;
+        private String descriptionIT = MISSING;
+        private String imageSmall;
         private List<String> effects;
         
         public SkillToStringDTO(String name, String description, List<String> effects, String imageSmall) {
@@ -106,7 +118,21 @@ public class SheetSaintsJsonExporter extends SaintDataToJSON {
             this.imageSmall = imageSmall;
             this.descriptionIT = descriptionIT;
         }
-        
         public SkillToStringDTO() {}
+        public final String getName() {
+            return name;
+        }
+        public final String getDescription() {
+            return description;
+        }
+        public final String getDescriptionIT() {
+            return descriptionIT;
+        }
+        public final String getImageSmall() {
+            return imageSmall;
+        }
+        public final List<String> getEffects() {
+            return effects;
+        }
     }
-    }
+}

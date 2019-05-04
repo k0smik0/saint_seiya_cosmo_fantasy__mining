@@ -14,11 +14,11 @@ import org.json.JSONObject;
 
 import net.iubris.optimus_saint.crawler.utils.JsonbUtils;
 
-public abstract class SaintDataToJSON {
+public abstract class AbstractSaintDataToJSON {
     
     protected JsonbUtils jsonbUtils;
     
-    public SaintDataToJSON(JsonbUtils jsonbUtils) {
+    public AbstractSaintDataToJSON(JsonbUtils jsonbUtils) {
         this.jsonbUtils = jsonbUtils;
     }
 
@@ -57,11 +57,11 @@ public abstract class SaintDataToJSON {
     static final String m = MARKS; // "
     static final String c = COMMA; // ,
     static final String t = COLONS; // :
-    static final String bo = "{";
-    static final String bc = "}";
-    static final String tagName = "name";
-    static final String tagDescription = "description";
-    static final String tagImageSmall = "imageSmall";
+//    static final String bo = "{";
+//    static final String bc = "}";
+//    static final String tagName = "name";
+//    static final String tagDescription = "description";
+//    static final String tagImageSmall = "imageSmall";
     static final String EN = "en";
     static final String IT = "it";
     static final String MISSING = "MISSING";

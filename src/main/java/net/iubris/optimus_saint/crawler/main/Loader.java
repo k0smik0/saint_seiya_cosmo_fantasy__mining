@@ -24,13 +24,15 @@ public class Loader {
 //        System.out.println( LogManager.getFormatterLogger() );
     }
     
-	public void loadFromDataset() throws FileNotFoundException, IOException {
+	public SaintsData loadFromDataset() throws FileNotFoundException, IOException {
 	    if (!new File(SAINTS_DATASET_FILE).exists()) {
-	        System.err.println("saints dataset not exists as file at location: "+SAINTS_DATASET_FILE+" - exiting");
-	        return;
+	        String msg = "saints dataset not exists as file at location: "+SAINTS_DATASET_FILE+" - exiting";
+	        System.err.println(msg);
+	        throw new FileNotFoundException(msg);
 	    }
 		try ( FileInputStream fis = new FileInputStream(Config.Dataset.Saints.SAINTS_DATASET_FILE); ) {
-			jsonbUtils.getEngine().fromJson(fis, SaintsData.class);
+			SaintsData saintsData = jsonbUtils.getEngine().fromJson(fis, SaintsData.class);
+			return saintsData;
 		} finally {
 			try {
 				jsonbUtils.close();

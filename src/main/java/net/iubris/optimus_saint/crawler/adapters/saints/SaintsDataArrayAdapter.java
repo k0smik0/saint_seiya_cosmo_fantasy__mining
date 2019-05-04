@@ -23,18 +23,15 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
     private final SaintDataAdapter saintDataAdapter;
     private final SaintsPromoteDataLoader saintsDataUpgrader;
 
-//    @Inject
-    public SaintsDataArrayAdapter(/*SaintsDataBucket saintsDataBucket, Printer printer*/) {
-        
-        this.saintsDataBucket = /*saintsDataBucket*/ ProviderNotDI.INSTANCE.getSaintsDataBucket();
-//        this.printer = /*printer*/ProviderNotDI.INSTANCE.getPrinter();
+    public SaintsDataArrayAdapter() {
+        this.saintsDataBucket = ProviderNotDI.INSTANCE.getSaintsDataBucket();
         this.saintDataAdapter = new SaintDataAdapter();
         this.saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
     }
 
     @Override
     public List<SaintData> adaptFromJson(JsonArray jsonArray) throws Exception {
-        saintsDataUpgrader.reset();
+//        saintsDataUpgrader.reset();
 
         List<SaintData> saints = jsonArray.stream()
         .filter(jv -> {
@@ -94,9 +91,11 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
         .filter(sd -> !sd.incomplete)
         .collect(Collectors.toList());
 
-        saintsDataBucket.setSaints(saints);
-
-        saintsDataUpgrader.prepare(saints.size()).start();
+//        saintsDataBucket.setSaints(saints);
+//
+//        saintsDataUpgrader.prepare(saints.size()).start();
+        
+        System.out.println("returning "+saints.size()+" saints");
 
         return saints;
     }

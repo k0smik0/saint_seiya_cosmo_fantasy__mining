@@ -2,6 +2,7 @@ package net.iubris.optimus_saint.crawler.main;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -22,8 +23,11 @@ import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
 import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataByBBAGoogleExporter;
 import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataGoogleSpreadSheetExporter;
 import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
+import net.iubris.optimus_saint.crawler.main.printer.JsonPrinterSaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.main.printer.SaintsDataPrinter;
 import net.iubris.optimus_saint.crawler.model.SaintData;
+import net.iubris.optimus_saint.crawler.model.SaintsData;
+import net.iubris.optimus_saint.crawler.model.promote.SaintsPromoteDataLoader;
 import net.iubris.optimus_saint.crawler.utils.JsonbUtils;
 import net.iubris.optimus_saint.crawler.utils.Printer;
 
@@ -35,6 +39,7 @@ public class Main {
 	private final SaintsDataAnalyzer saintsDataAnalyzer;
 	private final SaintsDataGoogleSpreadSheetExporter googleSpreadSheetExporter;
 	private final CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter;
+	private final JsonPrinterSaintsDataPrinter jsonPrinterSaintsDataPrinter;
 	private final Printer printer;
 	private final SaintsDataBucket saintsDataBucket;
     private final SaintsDataByBBAGoogleExporter saintsDataByBBAGoogleExporter;
@@ -44,6 +49,7 @@ public class Main {
 			SaintsDataAnalyzer saintsDataAnalyzer,
 			SaintsDataGoogleSpreadSheetExporter saintsDataGoogleSpreadSheetExporter,
 			SaintsDataByBBAGoogleExporter saintsDataByBBAGoogleExporter,
+			JsonPrinterSaintsDataPrinter jsonPrinterSaintsDataPrinter,
 			CSVPrinterSaintsDataPrinter csvPrinterSaintsDataPrinter,
 			SaintsDataBucket saintsDataBucket,
 			Printer printer) {
@@ -53,6 +59,7 @@ public class Main {
 		this.saintsDataAnalyzer = saintsDataAnalyzer;
 		this.googleSpreadSheetExporter = saintsDataGoogleSpreadSheetExporter;
         this.saintsDataByBBAGoogleExporter = saintsDataByBBAGoogleExporter;
+        this.jsonPrinterSaintsDataPrinter = jsonPrinterSaintsDataPrinter;
 		this.csvPrinterSaintsDataPrinter = csvPrinterSaintsDataPrinter;
 		this.saintsDataBucket = saintsDataBucket;
 		this.printer = printer;
@@ -83,7 +90,20 @@ public class Main {
 		if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.LOAD)) {
 			try {
 			    printer.println("* load phase - begin *");
-				loader.loadFromDataset();
+			    
+			    SaintsPromoteDataLoader saintsPromoteDataLoader = SaintsPromoteDataLoader.INSTANCE;
+			    
+			    saintsPromoteDataLoader.reset();
+			    
+				SaintsData saintsData = loader.loadFromDataset();
+				List<SaintData> saints = saintsData.getSaints();
+				saintsDataBucket.setSaints(saints);
+
+				saints.forEach(sd->{
+				    saintsPromoteDataLoader.handleItemToUpdate(sd.id);
+				});				
+				saintsPromoteDataLoader.prepare(saints.size()).start();
+				
 				printer.println("* load phase - end *\n");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -115,6 +135,12 @@ public class Main {
 		        csvPrinterSaintsDataPrinter.print(saints);
 		        printer.println("* csv print phase - end *\n");
 		    }
+		    
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.JSON)) {
+                printer.println("* json phase - begin *");
+                jsonPrinterSaintsDataPrinter.print(saints);
+                printer.println("* json print phase - end *\n");
+            }
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET)) {
 		        printer.println("* google spreadsheet exporter phase - begin *");

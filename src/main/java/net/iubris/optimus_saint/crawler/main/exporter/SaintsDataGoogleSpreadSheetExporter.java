@@ -25,12 +25,12 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
 	private static final String RANGE_TO_CLEAR = SHEET_NAME+"!A2:O";
 	
 	private final SaintsDataBucket saintsDataBucket;
-    private final SheetSaintsJsonExporter sheetSaintsJsonExporter;
+    private final SaintDataToJsonForSheetSaint sheetSaintsJsonExporter;
     private final Printer printer;
 	
 	@Inject
 	public SaintsDataGoogleSpreadSheetExporter(SaintsDataBucket saintsDataBucket, 
-	        SheetSaintsJsonExporter sheetSaintsJsonExporter, 
+	        SaintDataToJsonForSheetSaint sheetSaintsJsonExporter, 
 	        Printer printer) {
 		super(GoogleConfig.APPLICATION_NAME, GoogleConfig.SPREADSHEET_ID);
         this.saintsDataBucket = saintsDataBucket;

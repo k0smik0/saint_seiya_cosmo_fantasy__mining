@@ -17,4 +17,11 @@ public class SaintsData {
 		this.saints = saints;
 	}
 	
+	public void setSaints(List<SaintData> saints) {
+        this.saints = saints;
+    }
+	
+	public List<SaintData> getSaints() {
+        return saints;
+    }
 }
