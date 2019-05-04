@@ -48,13 +48,13 @@ public class SaintDataToJsonForSheetSaint extends AbstractSaintDataToJSON {
                   s+=m+tagImageSmall+m+t+m+imageSmall+m
                  +bc;
                   */
-        SaintToStringDTO saintToStringDTO = new SaintToStringDTO(name, imageSmall);
+        ToJsonDTO saintToStringDTO = new ToJsonDTO(name, imageSmall);
         if (exists(descriptionEN)) {
-            saintToStringDTO.descriptionEN = normalizeDescription(descriptionEN);
+            saintToStringDTO.description.EN = normalizeDescription(descriptionEN);
             if (exists(descriptionIT)) {
-                saintToStringDTO.descriptionIT = normalizeDescription(descriptionIT);
+                saintToStringDTO.description.IT = normalizeDescription(descriptionIT);
             } else {
-                saintToStringDTO.descriptionIT = MISSING;
+                saintToStringDTO.description.IT = MISSING;
             }
         }
         Jsonb engine = jsonbUtils.getEngine();
@@ -62,38 +62,38 @@ public class SaintDataToJsonForSheetSaint extends AbstractSaintDataToJSON {
         toJson = toJson.replace(QUOTE, PIPE);
         return toJson;
     }
-    public static class SaintToStringDTO {
+    public static class ToJsonDTO {
         private String name;
-        private String descriptionEN = DASH;
-        private String descriptionIT = DASH;
+        private DescriptionDTO description = new DescriptionDTO();
         private String imageSmall;
-        public SaintToStringDTO(String name, String imageSmall) {
+        public ToJsonDTO(String name, String imageSmall) {
             this.name = name;
-            this.descriptionEN = descriptionEN;
-            this.descriptionIT = descriptionIT;
             this.imageSmall = imageSmall;
         }
-        public SaintToStringDTO() {}
+        public ToJsonDTO() {}
         public String getName() {
             return name;
         }
-        public String getDescriptionEN() {
-            return descriptionEN;
-        }
-        public String getDescriptionIT() {
-            return descriptionIT;
+        public DescriptionDTO getDescription() {
+            return description;
         }
         public String getImageSmall() {
             return imageSmall;
         }
     }
+    public static class DescriptionDTO {
+        private String EN = DASH;
+        private String IT = DASH;
+        public final String getEN() {
+            return EN;
+        }
+        public final String getIT() {
+            return IT;
+        }
+    }
     
     @SuppressWarnings("resource")
     public String skillToJsonString(Skill skill) {
-//            String skillNameImageDescriptionWithEffectsToJsonString = skillToJsonString(skill.getName(), 
-//                    skill.description, 
-//                    skill.descriptionIT, 
-//                    skill.imageSmall);
         SaintDataToJsonForSheetSaint.SkillToStringDTO skillToStringDTO = new SkillToStringDTO(skill.getName(), 
                 normalizeDescription(skill.description), skill.effects, skill.imageSmall);
         if (exists(skill.descriptionIT)) {
