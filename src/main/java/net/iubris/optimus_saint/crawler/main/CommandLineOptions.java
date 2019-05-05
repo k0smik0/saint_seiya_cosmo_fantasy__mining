@@ -10,13 +10,13 @@ public enum CommandLineOptions {
 	DOWNLOAD("d","download","download saints definition from http://www.sscfdb.com"),
 	LOAD("l","load","load data saints from file"),
 	PRINT("p","print","print loaded data"),
-	SPREADSHEET("s","spreadsheet","export data into spreadsheet, appending"),
-	SPREADSHEET_OVERWRITE("S","spreadsheet-overwrite","export data into spreadsheet, overwriting existing data"),
+	SPREADSHEET("s","spreadsheet","export saints data google spreadsheet (sheet: 'saints'), appending"),
+	SPREADSHEET_OVERWRITE("S","spreadsheet-overwrite","export saints data google spreadsheet (sheet: 'saints'), overwriting existing data"),
 	JSON("j","json", "print as json string"),
 	CSV("c","csv","export data on csv file"),
 	MINIMAL_ANALYSIS("a", "analysis", "minimal stats analysis"),
 	HELP("h","help","show this help menu"), 
-	SPREADSHEET_BBA("B", "bba classifier", "bba classifier for google") 
+	SPREADSHEET_BBA("B", "bba classifier", "export classified crusade skills data to google spreadsheet (sheet: 'crusade skills')")
 	;
 	
 	private final String shortOption;
@@ -53,7 +53,8 @@ public enum CommandLineOptions {
 	
 	public static void printFormattedHelp() {
 		HelpFormatter helpFormatter = new HelpFormatter();
-		helpFormatter.printHelp("Saints Data Crawler"/*Main.class.getSimpleName()*/, options);
+		helpFormatter.setWidth(150);
+		helpFormatter.printHelp("Saints Data Crawler/Exporter", options);
 	}
 	
 	public static boolean areAllFalse(CommandLine commandLineOptions) {
