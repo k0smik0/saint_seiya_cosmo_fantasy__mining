@@ -1,12 +1,6 @@
 package net.iubris.optimus_saint.crawler.main.exporter;
 
-import static net.iubris.optimus_saint.common.StringUtils.COLONS;
-import static net.iubris.optimus_saint.common.StringUtils.COMMA;
-import static net.iubris.optimus_saint.common.StringUtils.MARKS;
-import static net.iubris.optimus_saint.common.StringUtils.NEW_LINE;
-import static net.iubris.optimus_saint.common.StringUtils.PIPE;
-import static net.iubris.optimus_saint.common.StringUtils.QUOTE;
-import static net.iubris.optimus_saint.common.StringUtils.SPACE;
+import static net.iubris.optimus_saint.common.StringUtils.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,9 +19,14 @@ public abstract class AbstractSaintDataToJSON {
     static String normalizeDescription(String descr) {
         return descr.trim()
 //                .replace(QUOTE, EMPTY)
-                .replace(QUOTE, PIPE)
-                .replace(MARKS, QUOTE)
-                .replace(NEW_LINE, SPACE);
+            .replace(QUOTE, PIPE)
+            .replace(MARKS, QUOTE)
+            .replace(NEW_LINE, EMPTY)
+            ;
+    }
+    
+    public static String normalizeJson(String jsonAsString) {
+        return jsonAsString.trim().replaceAll("[\\s]{2,}", "");
     }
 
     static boolean exists(String descr) {

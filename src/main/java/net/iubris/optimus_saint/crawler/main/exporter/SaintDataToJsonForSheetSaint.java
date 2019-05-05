@@ -23,7 +23,8 @@ public class SaintDataToJsonForSheetSaint extends AbstractSaintDataToJSON {
     }
     
     public String saintRichNameToJsonString(SaintData saintData) {
-        String nameImageDescriptionToJsonString = nameImageDescriptionToJsonString(saintData.name, saintData.description, saintData.descriptionIT, saintData.imageSmall);
+        String nameImageDescriptionToJsonString = nameImageDescriptionToJsonString(saintData.name, 
+                saintData.description, saintData.descriptionIT, saintData.imageSmall);
         return nameImageDescriptionToJsonString;
     }
     @SuppressWarnings("resource")
@@ -60,6 +61,7 @@ public class SaintDataToJsonForSheetSaint extends AbstractSaintDataToJSON {
         Jsonb engine = jsonbUtils.getEngine();
         String toJson = engine.toJson(saintToStringDTO);
         toJson = toJson.replace(QUOTE, PIPE);
+//        toJson = normalizeJson(toJson);
         return toJson;
     }
     public static class ToJsonDTO {
@@ -116,7 +118,7 @@ public class SaintDataToJsonForSheetSaint extends AbstractSaintDataToJSON {
             this.description = description;
             this.effects = effects;
             this.imageSmall = imageSmall;
-            this.descriptionIT = descriptionIT;
+//            this.descriptionIT = descriptionIT;
         }
         public SkillToStringDTO() {}
         public final String getName() {

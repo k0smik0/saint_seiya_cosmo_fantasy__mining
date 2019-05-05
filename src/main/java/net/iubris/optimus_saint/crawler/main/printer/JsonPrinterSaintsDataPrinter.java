@@ -1,8 +1,12 @@
 package net.iubris.optimus_saint.crawler.main.printer;
 
+import static net.iubris.optimus_saint.common.StringUtils.EMPTY;
+import static net.iubris.optimus_saint.common.StringUtils.NEW_LINE;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import net.iubris.optimus_saint.crawler.main.exporter.AbstractSaintDataToJSON;
 import net.iubris.optimus_saint.crawler.main.exporter.SaintDataToJsonForSheetSaint;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.utils.Printer;
@@ -24,19 +28,20 @@ public class JsonPrinterSaintsDataPrinter extends AbstractConsoleSaintsDataPrint
         super(printer);
         this.saintDataToJsonForSheetSaint = saintDataToJsonForSheetSaint;
     }
-
+    
     @Override
     protected String saintDataToString(SaintData saintData) {
-        String s = "-----------------------------------------------------";
-        s+="SAINT:"+saintDataToJsonForSheetSaint.saintRichNameToJsonString(saintData)+"\n";
-        s+="SKILL_1:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.first)+"\n";
-        s+="SKILL_2:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.second)+"\n";
-        s+="SKILL_3:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.third)+"\n";
-        s+="SKILL_4:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.fourth)+"\n";
-        s+="SKILL_7:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.getSeventhSense())+"\n";
-        s+="SKILL_C1:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.getCrusade1())+"\n";
-        s+="SKILL_C2:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.getCrusade2())+"\n";
-        s+="------------------------------------------------------------\n";
+        String s = "-----------------------------------------------------"+NEW_LINE;
+        s+="SAINT:"+saintDataToJsonForSheetSaint.saintRichNameToJsonString(saintData)+NEW_LINE;
+        s+="SKILL_1:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.first)+NEW_LINE;
+        s+="SKILL_2:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.second)+NEW_LINE;
+        s+="SKILL_3:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.third)+NEW_LINE;
+        s+="SKILL_4:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.fourth)+NEW_LINE;
+        s+="SKILL_7:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.getSeventhSense())+NEW_LINE;
+        s+="SKILL_C1:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.getCrusade1())+NEW_LINE;
+        s+="SKILL_C2:"+saintDataToJsonForSheetSaint.skillToJsonString(saintData.skills.getCrusade2())+NEW_LINE;
+        s+="-------------------------------------------------------------"+NEW_LINE;
+        s = AbstractSaintDataToJSON.normalizeJson(s);
         return s;
     }
 
