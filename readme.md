@@ -1,4 +1,4 @@
-# Optimus Saints
+# Optimus Saint
 
 ## a Java crawler/analyzer/exporter data of "saint seiya cosmo fantasy" game.
 
