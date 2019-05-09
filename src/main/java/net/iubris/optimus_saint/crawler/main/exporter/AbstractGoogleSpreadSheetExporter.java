@@ -2,12 +2,15 @@ package net.iubris.optimus_saint.crawler.main.exporter;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Collection;
 import java.util.List;
 
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ClearValuesRequest;
 import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
+
+import net.iubris.optimus_saint.crawler.model.SaintData;
 
 abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S> {
 	
@@ -21,6 +24,11 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 		this.applicationName = applicationName;
 		this.spreadsheetId = spreadsheetId;
 	}
+	
+	@Override
+    public TestStatus test(Collection<SaintData> saintDataCollection) {
+        return TestStatus.KO;
+    }
 
 	protected String clearExistingValues(String rangeToClear) throws GeneralSecurityException, IOException {
 		Sheets sheetService = 

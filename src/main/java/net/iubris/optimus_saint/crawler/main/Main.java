@@ -20,6 +20,7 @@ import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
 import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints;
 import net.iubris.optimus_saint.crawler.main.exporter.Exporter.ExporterStatus;
+import net.iubris.optimus_saint.crawler.main.exporter.Exporter.TestStatus;
 import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataByBBAGoogleExporter;
 import net.iubris.optimus_saint.crawler.main.exporter.SaintsDataGoogleSpreadSheetExporter;
 import net.iubris.optimus_saint.crawler.main.printer.CSVPrinterSaintsDataPrinter;
@@ -155,11 +156,18 @@ public class Main {
                 printer.println("* google spreadsheet exporter (overwriting) phase - end*\n");
             }
 		    
+		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET_BBA_TEST)) {
+                printer.println("* test google spreadsheet exporter classified by bba phase - begin *");
+                TestStatus status = saintsDataByBBAGoogleExporter.test(saints);
+                printer.println("spreadsheet test status: "+status);
+                printer.println("* test google spreadsheet exporter classified by bba phase - end*\n");
+            }
+		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET_BBA)) {
-                printer.println("* google spreadsheet exporter classified by bba phase - begin *");
+                printer.println("* test google spreadsheet exporter classified by bba phase - begin *");
                 ExporterStatus export = saintsDataByBBAGoogleExporter.export(saints, false);
                 printer.println("spreadsheet exporter status: "+export);
-                printer.println("* google spreadsheet exporter classified by bba phase - end*\n");
+                printer.println("* test google spreadsheet exporter classified by bba phase - end*\n");
             }
 		}
 		

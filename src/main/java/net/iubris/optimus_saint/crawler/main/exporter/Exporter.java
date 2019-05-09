@@ -6,10 +6,17 @@ import net.iubris.optimus_saint.crawler.model.SaintData;
 
 public interface Exporter<R> {
 
-	public R export(Collection<SaintData> saintDataCollection, boolean overwrite);
+	R export(Collection<SaintData> saintDataCollection, boolean overwrite);
+	
+	TestStatus test(Collection<SaintData> saintDataCollection);
 	
 	public static enum ExporterStatus {
 	    OK,
 	    KO;
 	}
+	
+	public static enum TestStatus {
+        OK,
+        KO;
+    }
 }

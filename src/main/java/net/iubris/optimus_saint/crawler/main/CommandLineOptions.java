@@ -15,8 +15,11 @@ public enum CommandLineOptions {
 	JSON("j","json", "print as json string"),
 	CSV("c","csv","export data on csv file"),
 	MINIMAL_ANALYSIS("a", "analysis", "minimal stats analysis"),
-	HELP("h","help","show this help menu"), 
-	SPREADSHEET_BBA("B", "bba classifier", "export classified crusade skills data to google spreadsheet (sheet: 'crusade skills')")
+	
+	SPREADSHEET_BBA_TEST("b", "bba classifier", "test the classified crusade skills data exporter to google spreadsheet (sheet: 'crusade skills')"),
+	SPREADSHEET_BBA("B", "bba classifier", "export classified crusade skills data to google spreadsheet (sheet: 'crusade skills'), overwriting existing data"),
+	
+	HELP("h","help","show this help menu")
 	;
 	
 	private final String shortOption;
