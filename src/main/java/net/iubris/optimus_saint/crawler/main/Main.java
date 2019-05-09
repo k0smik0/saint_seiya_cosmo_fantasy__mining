@@ -164,10 +164,10 @@ public class Main {
             }
 		    
 		    if (CommandLineOptions.hasOption(commandLineOptions, CommandLineOptions.SPREADSHEET_BBA)) {
-                printer.println("* test google spreadsheet exporter classified by bba phase - begin *");
-                ExporterStatus export = saintsDataByBBAGoogleExporter.export(saints, false);
+                printer.println("* google spreadsheet exporter classified by bba phase - begin *");
+                ExporterStatus export = saintsDataByBBAGoogleExporter.export(saints, true);
                 printer.println("spreadsheet exporter status: "+export);
-                printer.println("* test google spreadsheet exporter classified by bba phase - end*\n");
+                printer.println("* google spreadsheet exporter classified by bba phase - end*\n");
             }
 		}
 		
