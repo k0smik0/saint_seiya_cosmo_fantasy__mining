@@ -36,7 +36,7 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 		getSheetService();
 		
         ClearValuesResponse clearResponse = sheetService.spreadsheets()
-            .values()
+            .values()            
 	        .clear(spreadsheetId, rangeToClear, new ClearValuesRequest())
 	        .execute();
         

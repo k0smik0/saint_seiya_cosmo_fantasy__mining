@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import javax.json.bind.Jsonb;
 
 import net.iubris.optimus_saint.crawler.model.SaintData;
+import net.iubris.optimus_saint.crawler.model.saints.skills.Skill;
 import net.iubris.optimus_saint.crawler.utils.JsonbUtils;
 
 @Singleton
@@ -71,49 +72,53 @@ public class SaintDataToJsonForSheetCrusadeSkill extends AbstractSaintDataToJSON
         */
         
         ToJsonDTO toJsonDTO = new ToJsonDTO(saintData.getName(), saintData.imageSmall);
-        toJsonDTO.crusade_skill_1 = new CrusadeSkillToJson();
-        toJsonDTO.crusade_skill_1.description = normalizeDescription( saintData.skills.getCrusade1().description );
-        toJsonDTO.crusade_skill_1.imageSmall = saintData.skills.getCrusade1().imageSmall;
-        String crusade1DescriptionIT = saintData.skills.getCrusade1().descriptionIT;
+        Skill crusade1 = saintData.skills.getCrusade1();
+        toJsonDTO.crusade_skill_1.name = crusade1.getName(); 
+        toJsonDTO.crusade_skill_1.description = normalizeDescription( crusade1.description );
+        toJsonDTO.crusade_skill_1.image_small = crusade1.imageSmall;
+        toJsonDTO.crusade_skill_1.descriptionIT = MISSING;
+        String crusade1DescriptionIT = crusade1.descriptionIT;
         if (exists(crusade1DescriptionIT)) {
             toJsonDTO.crusade_skill_1.descriptionIT = normalizeDescription( crusade1DescriptionIT );
-        } else {
-            toJsonDTO.crusade_skill_1.descriptionIT = MISSING;
         }
         if (saintData.skills.hasCrusade2()) {
-            toJsonDTO.crusade_skill_2 = new CrusadeSkillToJson();
-            toJsonDTO.crusade_skill_2.description = normalizeDescription( saintData.skills.getCrusade2().description );
-            toJsonDTO.crusade_skill_2.imageSmall = saintData.skills.getCrusade2().imageSmall;
-            String crusade2DescriptionIT = saintData.skills.getCrusade2().descriptionIT;
+            Skill crusade2 = saintData.skills.getCrusade2();
+            toJsonDTO.crusade_skill_2.name = crusade2.getName();
+            toJsonDTO.crusade_skill_2.description = normalizeDescription( crusade2.description );
+            toJsonDTO.crusade_skill_2.image_small = crusade2.imageSmall;
+            String crusade2DescriptionIT = crusade2.descriptionIT;
+            toJsonDTO.crusade_skill_2.descriptionIT = MISSING;
             if (exists(crusade2DescriptionIT)) {
                 toJsonDTO.crusade_skill_2.descriptionIT = normalizeDescription( crusade2DescriptionIT );
-            } else {
-                toJsonDTO.crusade_skill_2.descriptionIT = MISSING;
             }
         }
         Jsonb engine = jsonbUtils.getEngine();
         String toJson = engine.toJson(toJsonDTO);
-        toJson = toJson.replace(QUOTE, PIPE);
+        toJson = toJson.replace(QUOTE, PIPE).trim();
         return toJson;
     }
     public static class ToJsonDTO {
-        public String name;
-        public String imageSmall;
-        public CrusadeSkillToJson crusade_skill_1;
-        public CrusadeSkillToJson crusade_skill_2;
+//        public String saint_name;
+//        public String saint_image_small;
+        public SaintToJson saint = new SaintToJson();
+        public CrusadeSkillToJson crusade_skill_1 = new CrusadeSkillToJson();
+        public CrusadeSkillToJson crusade_skill_2 = new CrusadeSkillToJson();
         
         public ToJsonDTO(String name, String imageSmall) {
-            this.name = name;
-            this.imageSmall = imageSmall;
+            this.saint.name = name;
+            this.saint.image_small = imageSmall;
         }
         public ToJsonDTO() {};
     }
     
-    public static class CrusadeSkillToJson {
-        public String name;
+    public static abstract class AbstractToJson {
+    	public String name;
+    	public String image_small;
+    }
+    public static class SaintToJson extends AbstractToJson {}    
+    public static class CrusadeSkillToJson extends AbstractToJson{
         public String description;
         public String descriptionIT;
         public List<String> effects;
-        public String imageSmall;
     }
 }

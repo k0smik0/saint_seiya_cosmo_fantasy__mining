@@ -124,7 +124,6 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             skillToPriorityMap.put(skillShortNameGrouper,i);
             skillToColumnRangeMap.put(skillShortNameGrouper, SHEET_NAME+"!A"+(i+1)+"BZ"+(i+1));
         }
-        
 	}
 	
 
@@ -162,7 +161,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 	public void reallyExportToGoogleSpreadsheet(List<List<Object>> skillNameOnHeaderWithSaintDataToJsonOnNextRows, boolean overwrite) {
 	    if (overwrite) {
     	    try {
-                String clearedExistingValues = clearExistingValues(GLOBAL_RANGE);
+				String clearedExistingValues = clearExistingValues(GLOBAL_RANGE);
                 printer.println("cleared: "+clearedExistingValues);
             } catch (GeneralSecurityException e) {
                 e.printStackTrace();
