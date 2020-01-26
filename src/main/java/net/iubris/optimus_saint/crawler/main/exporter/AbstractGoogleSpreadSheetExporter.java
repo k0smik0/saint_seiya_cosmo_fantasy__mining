@@ -67,7 +67,7 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 	}
 	
 	protected Sheets getSheetService() throws GeneralSecurityException, IOException {
-		return GoogleSpreadSheetExporterUtils.getSheetService(applicationName, GoogleConfig.CLIENT_ID, GoogleConfig.CLIENT_SECRET);
+		return GoogleSpreadSheetExporterUtils.getSheetService(applicationName/* , GoogleConfig.CLIENT_ID, GoogleConfig.CLIENT_SECRET */);
 	}
 	
 

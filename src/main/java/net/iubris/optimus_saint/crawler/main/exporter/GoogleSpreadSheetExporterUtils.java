@@ -1,6 +1,9 @@
 package net.iubris.optimus_saint.crawler.main.exporter;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +12,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -75,9 +79,9 @@ public class GoogleSpreadSheetExporterUtils {
       return values;
 	}
 	
-	protected static Sheets getSheetService(String applicationName, String CLIENT_ID, String CLIENT_SECRET) throws GeneralSecurityException, IOException {
+	protected static Sheets getSheetService(String applicationName/* , String CLIENT_ID, String CLIENT_SECRET */) throws GeneralSecurityException, IOException {
 	    NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-	    Sheets sheetService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, CLIENT_ID, CLIENT_SECRET))
+		Sheets sheetService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT/* , CLIENT_ID, CLIENT_SECRET */))
         .setApplicationName(applicationName)
         .build();
 	    return sheetService;
@@ -96,6 +100,7 @@ public class GoogleSpreadSheetExporterUtils {
     */
    protected static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 //   protected static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+   protected static final String CREDENTIALS_FILE_PATH = "google/credentials.json";
 	
    
 	/**
@@ -106,14 +111,15 @@ public class GoogleSpreadSheetExporterUtils {
     * @return An authorized Credential object.
     * @throws IOException If the credentials.json file cannot be found.
     */
-   private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String CLIENT_ID, String CLIENT_SECRET) throws IOException {
+	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT/* , String CLIENT_ID, String CLIENT_SECRET */) throws IOException {
        // Load client secrets.
-       /*InputStream in = SheetsQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+//       InputStream in = Main.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+       InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-        */
        
        // Build flow and trigger user authorization request.
-   	   GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, CLIENT_ID, CLIENT_SECRET, SCOPES)
+//   	   GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, CLIENT_ID, CLIENT_SECRET, SCOPES)
+		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
        	.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
        	.setAccessType("offline")
        	.build();

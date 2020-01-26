@@ -1,11 +1,14 @@
 package net.iubris.optimus_saint.crawler.adapters.saints;
 
+//import java.awt.desktop.FilesEvent;
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.json.JsonObject;
 
+import net.iubris.optimus_saint.crawler.main.Config;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.saints.skills.SkillsGroup;
 import net.iubris.optimus_saint.crawler.model.saints.stats.StatsGroup;
@@ -111,7 +114,18 @@ public class SaintDataAdapter extends AbstractObjectAdapter<SaintData> {
 		
 		saintData.imageSmall = saintAsJsonObject.getString("small");
 //		SkillsAdapter
+		
+		handlePromote(stringId, saintData);
 
 		return saintData;
+	}
+	
+	private void handlePromote(String id, SaintData saintData) {
+		File file = new File(Config.Dataset.Saints.SAINTS_DATASET_DIR+File.separator+id+".json");
+		if (!file.exists()) {
+			return;
+		}
+		
+		
 	}
 }

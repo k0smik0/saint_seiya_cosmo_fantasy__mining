@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
-import net.iubris.optimus_saint.crawler._di.ProviderNotDI;
-import net.iubris.optimus_saint.crawler.bucket.SaintsDataBucket;
 import net.iubris.optimus_saint.crawler.model.SaintData;
 import net.iubris.optimus_saint.crawler.model.promote.SaintsPromoteDataLoader;
 
@@ -19,12 +17,14 @@ public class SaintsDataArrayAdapter extends AbstractArrayAdapter<List<SaintData>
 
 //    private final Printer printer;
 
-    private final SaintsDataBucket saintsDataBucket;
+	// no more used
+//    private final SaintsDataBucket saintsDataBucket;
+
     private final SaintDataAdapter saintDataAdapter;
     private final SaintsPromoteDataLoader saintsDataUpgrader;
 
     public SaintsDataArrayAdapter() {
-        this.saintsDataBucket = ProviderNotDI.INSTANCE.getSaintsDataBucket();
+//        this.saintsDataBucket = ProviderNotDI.INSTANCE.getSaintsDataBucket();
         this.saintDataAdapter = new SaintDataAdapter();
         this.saintsDataUpgrader = SaintsPromoteDataLoader.INSTANCE;
     }

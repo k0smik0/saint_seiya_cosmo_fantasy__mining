@@ -1,7 +1,7 @@
 package net.iubris.optimus_saint.crawler.model.promote;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+
+import static net.iubris.optimus_saint.crawler.main.Config.Dataset.Saints.SAINTS_DATASET_DIR;
 
 import net.iubris.optimus_saint.common.StringUtils;
 import net.iubris.optimus_saint.crawler.main.Config.Dataset.Promotions;
@@ -87,7 +89,7 @@ System.out.println("total to download: "+amount);
 				try {
 					URL website = new URL(ITEM_UPDATE_URL_PREFIX + urlIntId);
 //System.out.println("downloading from: "+website);
-					String outputFilePath = "data" + File.separator + "promote" + File.separator + id + ".json";
+					String outputFilePath = SAINTS_DATASET_DIR + File.separator + "promote" + File.separator + id + ".json";
 					int downloaded = HttpUtils.httpDownloader_2(website, outputFilePath);
 					double size = Math.floor(downloaded/1024/1024f);
 System.out.println("Downloaded "+id+": "+String.format("%.2f", size)+"MB");
