@@ -103,7 +103,7 @@ public class SaintsDataGoogleSpreadSheetExporter extends AbstractGoogleSpreadShe
         List<Object> list = new ArrayList<>();
         // index
         list.add(index.incrementAndGet());
-        // id
+        // id as fresher
         list.add(sd.id);
         // name+image+description
         list.add(sheetSaintsJsonExporter.saintRichNameToJsonString(sd).replace(StringUtils.NEW_LINE, StringUtils.SPACE)); // "{"+"\"name\":\""+sd.name+"\",\"imageSmall\":\""+sd.imageSmall+"\"}");

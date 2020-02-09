@@ -109,14 +109,19 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             new String[] {"Combo Plus","Combo"},
             new String[] {"Cosmo Charge","Cosmo Charge"},
             new String[] {"Cosmo Damage","Cosmo Damage"},
-            new String[] {"FURY ATK Boost I","FURY ATK Boost"},
             new String[] {"HP Boost","HP Boost"},
+            new String[] {"FURY ATK Boost I","FURY ATK Boost"},
             new String[] {"PHYS ATK Boost","PHYS ATK Boost"},
             new String[] {"RES Boost","RES Boost"},
+            new String[] {"Launch/Blowback Resistance","Launch/Blowback Resistance"},
+            new String[] {"Silence Resistance","Silence Resistance"},
+            new String[] {"Skill Cancel Resistance","Skill Cancel Resistance"},
+            new String[] {"Stun Resistance","Stun Resistance"},
             new String[] {"Damage Cut","Damage Cut"},
-            new String[] {"Recovery","Recovery"}, // J
-            new String[] {"DEF Boost II","DEF Boost II"} // K
-        };        
+            new String[] {"DEF Boost I","DEF Boost I"},
+            new String[] {"DEF Boost II","DEF Boost II"},
+            new String[] {"Recovery","Recovery"} // Q
+        };
         for (int i=0;i<skillNameToShortNameArray.length;i++) {
             String[] sts = skillNameToShortNameArray[i];
             String skillName = sts[0];
@@ -282,7 +287,8 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
         printer.println("\n\n");
         
         BiFunction<? super List<SaintData>, ? super List<SaintData>, ? extends List<SaintData>> valuesRemappingFunction = (v1, v2) -> {
-            Set<SaintData> set = new TreeSet<>(saintsComparatorByIdDescending);
+//            Set<SaintData> set = new TreeSet<>(saintsComparatorByIdDescending);
+            Set<SaintData> set = new TreeSet<>(comparatorBySaintNameAscending);
             set.addAll(v1);
             set.addAll(v2);
             return new ArrayList<>(set);
@@ -394,33 +400,31 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
             return 0;
         }
     };
-    private static final Comparator<SaintData> comparatorBySaintSkill1PriorityDescending = new Comparator<SaintData>() {
-        @Override
+    private static final Comparator<SaintData> comparatorBySaintNameAscending = new Comparator<SaintData>() {
+    	@Override
         public int compare(SaintData o1, SaintData o2) {
-            Skill o1Skill = o1.skills.getCrusade1();
-            Skill o2Skill = o2.skills.getCrusade1();
-            return compareSkillByPriorityOnShortNameAscending(o1Skill, o2Skill);
+    		String s1Name = o1.name;
+            String s2Name = o2.name;
+            int compared = o1.name.compareTo(s2Name);
+            return compared;
         }
     };
-    private static final Comparator<SaintData> comparatorBySaintSkill2PriorityAscending = new Comparator<SaintData>() {
-        @Override
-        public int compare(SaintData sd1, SaintData sd2) {
-            Skill sd1Skill = sd1.skills.getCrusade2();
-            Skill sd2Skill = sd2.skills.getCrusade2();
-            return compareSkillByPriorityOnShortNameAscending(sd1Skill, sd2Skill);   
-        }
-    };
+    private static final Comparator<SaintData> comparatorBySaintSkill1PriorityDescending = (o1, o2) -> {
+	    Skill o1Skill = o1.skills.getCrusade1();
+	    Skill o2Skill = o2.skills.getCrusade1();
+	    return -1*compareSkillByPriorityOnShortNameAscending(o1Skill, o2Skill);
+	};
+    private static final Comparator<SaintData> comparatorBySaintSkill2PriorityAscending = (sd1, sd2) -> {
+	    Skill sd1Skill = sd1.skills.getCrusade2();
+	    Skill sd2Skill = sd2.skills.getCrusade2();
+	    return compareSkillByPriorityOnShortNameAscending(sd1Skill, sd2Skill);   
+	};
     private static final Comparator<Entry<Skill,List<SaintData>>> comparatorEntryBySkillPriorityAscending = (e1, e2) -> {
         Skill skill1 = e1.getKey();
-        Skill skill2 = e2.getKey();        
+        Skill skill2 = e2.getKey();
         return compareSkillByPriorityOnShortNameAscending(skill1, skill2);        
     };
-    private static final Comparator<Skill> comparatorSkillByPriorityAscending = new Comparator<Skill>() {
-        @Override
-        public int compare(Skill s1, Skill s2) {
-            return compareSkillByPriorityOnShortNameAscending(s1, s2);
-        }
-    };
+    private static final Comparator<Skill> comparatorSkillByPriorityAscending = (s1, s2) -> compareSkillByPriorityOnShortNameAscending(s1, s2);
         
     private static final int compareSkillByPriorityOnShortNameAscending(Skill skill1, Skill skill2) {
         
