@@ -26,68 +26,67 @@ import com.google.api.services.sheets.v4.model.ClearValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 public class GoogleSpreadSheetExporterUtils {
-	
-	protected static String clearExistingValues(Sheets sheetService, String spreadsheetId, String rangeToClear) throws IOException {
-        ClearValuesResponse clearResponse = sheetService.spreadsheets().values()
-        .clear(spreadsheetId, rangeToClear, new ClearValuesRequest())
-        .execute();
-        
-        System.out.println( "cleared range: "+clearResponse.getClearedRange() );
-        
-        return clearResponse.getClearedRange();
-    }
-    
+
+	protected static String clearExistingValues(final Sheets sheetService, final String spreadsheetId, final String rangeToClear) throws IOException {
+		ClearValuesResponse clearResponse = sheetService.spreadsheets().values()
+			.clear(spreadsheetId, rangeToClear, new ClearValuesRequest())
+			.execute();
+
+		System.out.println("cleared range: " + clearResponse.getClearedRange());
+
+		return clearResponse.getClearedRange();
+	}
+
 	/**
-	 * 
-	 * @param sheetService
-	 * @param spreadsheetId
-	 * @param rangeToPopulate
-	 * @param valuesToAdd
-	 * @return the updated range
+	 *
+	 * @param  sheetService
+	 * @param  spreadsheetId
+	 * @param  rangeToPopulate
+	 * @param  valuesToAdd
+	 * @return                 the updated range
 	 * @throws IOException
 	 */
-    protected static String putValuesToSpreadsheet(Sheets sheetService, String spreadsheetId, String rangeToPopulate, List<List<Object>> valuesToAdd) throws IOException {
+	protected static String putValuesToSpreadsheet(final Sheets sheetService, final String spreadsheetId, final String rangeToPopulate, final List<List<Object>> valuesToAdd) throws IOException {
 //        String first = "=Rows($A$1:A2)";
 //        List<Object> rowAsList = Arrays.asList("Total", "=E1+E4");
-        ValueRange appendBody = new ValueRange()
-                .setValues(valuesToAdd);
-        AppendValuesResponse appendResult = sheetService.spreadsheets().values()
-                .append(spreadsheetId, rangeToPopulate, appendBody)
-                .setValueInputOption("USER_ENTERED")
-                .setInsertDataOption("INSERT_ROWS")
-                .setIncludeValuesInResponse(true)
-                .execute();
+		ValueRange appendBody = new ValueRange().setValues(valuesToAdd);
+		AppendValuesResponse appendResult = sheetService.spreadsheets().values()
+			.append(spreadsheetId, rangeToPopulate, appendBody)
+			.setValueInputOption("USER_ENTERED")
+			.setInsertDataOption("INSERT_ROWS")
+			.setIncludeValuesInResponse(true)
+			.execute();
 
-        ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
-        
+		ValueRange totalSent = appendResult.getUpdates().getUpdatedData();
+
 //        System.out.println( "updated range: "+appendResult.getUpdates().getUpdatedRange() );
-        
-        boolean OK = valuesToAdd.size() == totalSent.getValues().size();
-        if (!OK) {
-        	System.err.println("error updating "+rangeToPopulate);
-        	return null;
-        }
-        
-        return appendResult.getUpdates().getUpdatedRange();        
-    }
-	
-	protected static List<List<Object>> getValuesFromSpreadSheet(Sheets sheetService, String spreadsheetId, String rangeToRetrieve) throws GeneralSecurityException, IOException {
-      ValueRange response = sheetService.spreadsheets().values()
-              .get(spreadsheetId, rangeToRetrieve)
-              .execute();      
-      List<List<Object>> values = response.getValues();
-      return values;
+
+		boolean OK = valuesToAdd.size() == totalSent.getValues().size();
+		if (!OK) {
+			System.err.println("error updating " + rangeToPopulate);
+			return null;
+		}
+
+		String updatedRange = appendResult.getUpdates().getUpdatedRange();
+		return updatedRange;
 	}
-	
-	protected static Sheets getSheetService(String applicationName/* , String CLIENT_ID, String CLIENT_SECRET */) throws GeneralSecurityException, IOException {
-	    NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+	protected static List<List<Object>> getValuesFromSpreadSheet(final Sheets sheetService, final String spreadsheetId, final String rangeToRetrieve) throws GeneralSecurityException, IOException {
+		ValueRange response = sheetService.spreadsheets().values()
+			.get(spreadsheetId, rangeToRetrieve)
+			.execute();
+		List<List<Object>> values = response.getValues();
+		return values;
+	}
+
+	protected static Sheets getSheetService(final String applicationName/* , String CLIENT_ID, String CLIENT_SECRET */) throws GeneralSecurityException, IOException {
+		NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 		Sheets sheetService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT/* , CLIENT_ID, CLIENT_SECRET */))
-        .setApplicationName(applicationName)
-        .build();
-	    return sheetService;
+			.setApplicationName(applicationName)
+			.build();
+		return sheetService;
 	}
-	
-	
+
 	/**
 	 * internal to drive
 	 */
@@ -95,37 +94,37 @@ public class GoogleSpreadSheetExporterUtils {
 	protected static final String TOKENS_DIRECTORY_PATH = "tokens";
 //	protected static final String APPLICATION_NAME = "Saint Seiya Searcher Engine Translations";
 	/**
-    * Global instance of the scopes required by this quickstart.
-    * If modifying these scopes, delete your previously saved tokens/ folder.
-    */
-   protected static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+	 * Global instance of the scopes required by this quickstart.
+	 * If modifying these scopes, delete your previously saved tokens/ folder.
+	 */
+	protected static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 //   protected static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-   protected static final String CREDENTIALS_FILE_PATH = "google/credentials.json";
-	
-   
+	protected static final String CREDENTIALS_FILE_PATH = "google/credentials.json";
+
 	/**
-    * Creates an authorized Credential object.
-    * @param HTTP_TRANSPORT The network HTTP Transport.
-	 * @param CLIENT_ID 
-	 * @param CLIENT_SECRET 
-    * @return An authorized Credential object.
-    * @throws IOException If the credentials.json file cannot be found.
-    */
+	 * Creates an authorized Credential object.
+	 * 
+	 * @param  HTTP_TRANSPORT The network HTTP Transport.
+	 * @param  CLIENT_ID
+	 * @param  CLIENT_SECRET
+	 * @return                An authorized Credential object.
+	 * @throws IOException    If the credentials.json file cannot be found.
+	 */
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT/* , String CLIENT_ID, String CLIENT_SECRET */) throws IOException {
-       // Load client secrets.
+		// Load client secrets.
 //       InputStream in = Main.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-       InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
-       GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-       
-       // Build flow and trigger user authorization request.
+		InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
+		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+		// Build flow and trigger user authorization request.
 //   	   GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, CLIENT_ID, CLIENT_SECRET, SCOPES)
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-       	.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-       	.setAccessType("offline")
-       	.build();
-       
-       LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-       return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-   }
+			.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+			.setAccessType("offline")
+			.build();
+
+		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+		return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+	}
 
 }

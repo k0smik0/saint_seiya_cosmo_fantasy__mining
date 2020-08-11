@@ -23,8 +23,10 @@ public class ClothKind extends LiteralStat {
 		MARINA, // 4
 		GOD_WARRIOR,
 		MASTER,
-      ANGEL,
-      STEEL_SAINT;
+        ANGEL,
+        STEEL_SAINT,
+        DRYAD,
+        GHOST;
 	    
         @Override
 		public String getLocalized(Localization localization) {
