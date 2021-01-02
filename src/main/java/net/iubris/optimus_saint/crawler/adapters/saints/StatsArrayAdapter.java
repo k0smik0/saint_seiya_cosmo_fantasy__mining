@@ -51,122 +51,120 @@ import net.iubris.optimus_saint.crawler.model.saints.stats.numerical.VitalityGro
 //import static net.iubris.optimus_saint.model.saint.data.SaintData.Saints.LocalizationDefault;
 
 public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
-	
 
 	private static final String NAME_NODE = "name";
-	
+
 	private static final String MIN = "min";
 	private static final String MAX = "max";
-	
+
 	private static final String TYPE_GRAPHIC__RARITY = "Rarity";
 	private static final String TYPE_LITERAL__CLASS_PROMOTION = "Class Pr.";
 	private static final String TYPE_LITERAL__CLOTH_KIND = "Cloth kind";
 	private static final String TYPE_LITERAL__ACTIVE_TIME = "Active time";
 	private static final String TYPE_NUMERICAL_COMPLEX__CATEGORY = "Category";
-	
-	private Map<String,Action> statsToHandlerMap = new HashMap<>();
-	private Map<String,Class<? extends NumericalStat>> numericalClassesMap = new HashMap<>();
-	
-	public StatsArrayAdapter() {		
+
+	private final Map<String, Action> statsToHandlerMap = new HashMap<>();
+	private final Map<String, Class<? extends NumericalStat>> numericalClassesMap = new HashMap<>();
+
+	public StatsArrayAdapter() {
 		initOtherStatsClassesToHandlerMap();
 		initNumericalStatsClassesToHandlerMap();
 	}
-	
+
 	@Override
-	public StatsGroup adaptFromJson(JsonArray statsJsonArray) {
-		
+	public StatsGroup adaptFromJson(final JsonArray statsJsonArray) {
+
 		StatsGroup stats = new StatsGroup();
-		
+
 //		JsonArray jsonArray = jo.asJsonArray();
 		for (JsonValue jsonValue : statsJsonArray) {
 //			LocalizedData localizedData = jsonb.fromJson(jsonValue.asJsonObject().toString(), LocalizedData.class);
-			
+
 			JsonObject jsonObject = jsonValue.asJsonObject();
-			String nameValue = 
-			        // LocalizationUtils.getLocalizedValue( jsonObject.getJsonObject(NAME_NODE) );
-			        jsonObject.getString(NAME_NODE);
-			
+			String nameValue =
+					// LocalizationUtils.getLocalizedValue( jsonObject.getJsonObject(NAME_NODE) );
+					jsonObject.getString(NAME_NODE);
+
 			Set<String> keySet = jsonObject.keySet();
-			keySet.stream().forEach(v->{
+			keySet.stream().forEach(v -> {
 				/*
 				 * handling rarity, category, LiteralStats (Class Pr., Cloth kind, Active Time -- Lane and Type are skipped)
 				 */
 				Action action = statsToHandlerMap.get(nameValue);
-				if (action!=null) {
+				if (action != null) {
 					action.adapt(jsonObject, nameValue, stats);
 				}
 				/*
 				 * handling numericStats:
-				 * 	Level, Power, Vitality Growth Rate, Aura Growth Rate, Tech. Growth Rate, Vitality, Aura, Technique, Max HP, 
-				 * 	Phys. Attack, Fury Attack, Phys. Defense, Fury Resistance, Phys. Critical, Fury Critical, Null Phys. Defense, 
-				 * 	Null Fury Resistance, HP Drain, Accuracy, Evasion, HP Recovery, Cosmo Recovery, Cosmo Cost Reduction, 
-				 * 	Silence Resistance
+				 * Level, Power, Vitality Growth Rate, Aura Growth Rate, Tech. Growth Rate, Vitality, Aura, Technique, Max HP,
+				 * Phys. Attack, Fury Attack, Phys. Defense, Fury Resistance, Phys. Critical, Fury Critical, Null Phys. Defense,
+				 * Null Fury Resistance, HP Drain, Accuracy, Evasion, HP Recovery, Cosmo Recovery, Cosmo Cost Reduction,
+				 * Silence Resistance
 				 */
 				else {
 					Class<? extends NumericalStat> extendingNumericalStatClass = numericalClassesMap.get(nameValue);
-					if (extendingNumericalStatClass!=null) {
+					if (extendingNumericalStatClass != null) {
 						NumericalStat numericalStat = parseAnExtendingNumericalStat(jsonObject, nameValue, extendingNumericalStatClass);
 						parseAnExtendingNumericalStat(jsonObject, nameValue, extendingNumericalStatClass);
-						
-						String fieldName = StringUtils.toCamelCase( extendingNumericalStatClass.getSimpleName() );
+
+						String fieldName = StringUtils.toCamelCase(extendingNumericalStatClass.getSimpleName());
 						try {
 							stats.getClass().getField(fieldName).set(stats, numericalStat);
 						} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-							e.printStackTrace();
+//							System.err.println(e.getMessage());
+							System.err.println(e.getMessage());
 						}
 					}
 				}
-				
-				
+
 			});
-			
+
 			// old, specific
-			/*if (nameValue.equals("Level")) {
-				Level level = new Level();
-				level.name.EN = nameValue;
-				level.min = Float.parseFloat(jsonObject.getString("min"));
-				level.max = Float.parseFloat(jsonObject.getString("max"));
-			}*/
+			/*
+			 * if (nameValue.equals("Level")) {
+			 * Level level = new Level();
+			 * level.name.EN = nameValue;
+			 * level.min = Float.parseFloat(jsonObject.getString("min"));
+			 * level.max = Float.parseFloat(jsonObject.getString("max"));
+			 * }
+			 */
 		}
-		
+
 		return stats;
 	}
-	
-	
+
 //	@SuppressWarnings("unchecked")
-	private static <eNS extends NumericalStat> eNS parseAnExtendingNumericalStat(JsonObject jsonObject, String nameValue, Class<eNS> eSClass) {
+	private static <eNS extends NumericalStat> eNS parseAnExtendingNumericalStat(final JsonObject jsonObject, final String nameValue, final Class<eNS> eSClass) {
 		eNS esInstance = null;
 		try {
 			float min = jsonObject.getJsonNumber(MIN).bigDecimalValue().floatValue();
 			float max = jsonObject.getJsonNumber(MAX).bigDecimalValue().floatValue();
-			
+
 			esInstance = eSClass.newInstance();
 			esInstance.min = min;
 			esInstance.max = max;
-		} catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException  e) {
-			e.printStackTrace();
+		} catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException e) {
+//			System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 		}
 		return esInstance;
 	}
-	
+
 	private void initOtherStatsClassesToHandlerMap() {
-		statsToHandlerMap.put(TYPE_GRAPHIC__RARITY, new Action() {
-			@Override
-			public void adapt(JsonObject jsonObject, String nameValue, StatsGroup stats) {
-				Rarity rarity = new Rarity();
-				rarity.min = Rarity.starsToNumber(jsonObject.getString(MIN));
-				rarity.max = Rarity.starsToNumber(jsonObject.getString(MAX));
-				stats.rarity = rarity;
-			}
+		statsToHandlerMap.put(TYPE_GRAPHIC__RARITY, (jsonObject, nameValue, stats) -> {
+			Rarity rarity = new Rarity();
+			rarity.min = Rarity.starsToNumber(jsonObject.getString(MIN));
+			rarity.max = Rarity.starsToNumber(jsonObject.getString(MAX));
+			stats.rarity = rarity;
 		});
-		
+
 		statsToHandlerMap.put(TYPE_NUMERICAL_COMPLEX__CATEGORY, (jsonObject, nameValue, stats) -> {
 			Category category = new Category();
-			category.min.addAll( jsonObject.getJsonArray(MIN).getValuesAs(JsonNumber.class).stream().map(f-> f.intValue() ).collect(Collectors.toList()) );
-			category.max.addAll( jsonObject.getJsonArray(MAX).getValuesAs(JsonNumber.class).stream().map(f-> f.intValue() ).collect(Collectors.toList()) );
+			category.min.addAll(jsonObject.getJsonArray(MIN).getValuesAs(JsonNumber.class).stream().map(f -> f.intValue()).collect(Collectors.toList()));
+			category.max.addAll(jsonObject.getJsonArray(MAX).getValuesAs(JsonNumber.class).stream().map(f -> f.intValue()).collect(Collectors.toList()));
 			stats.category = category;
 		});
-		
+
 		statsToHandlerMap.put(TYPE_LITERAL__CLASS_PROMOTION, (jsonObject, nameValue, stats) -> {
 			handleGenericalLiteralStat(jsonObject, nameValue, PromotionClass.class, stats, "promotionClass");
 		});
@@ -177,56 +175,60 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 			handleGenericalLiteralStat(jsonObject, nameValue, ActiveTime.class, stats, "activeTime");
 		});
 	}
-	private static interface Action {
+
+	private interface Action {
 		void adapt(JsonObject jsonObject, String nameValue, StatsGroup stats);
 	}
-	private <eLS extends LiteralStat> void handleGenericalLiteralStat(JsonObject jsonObject, String nameValue, 
-				Class<eLS> extendingLiteralStatClass, StatsGroup stats, String statsField) {
+
+	private <eLS extends LiteralStat> void handleGenericalLiteralStat(final JsonObject jsonObject, final String nameValue,
+			final Class<eLS> extendingLiteralStatClass, final StatsGroup stats, final String statsField) {
 		try {
 //			eLS eLS = handleLiteralStat(jsonObject, nameValue, extendingLiteralStatClass);
 //			stats.getClass().getField(statsField).set(stats, eLS);
-			
+
 			eLS extendingLiteralStat = extendingLiteralStatClass.newInstance();
-			
+
 			Localization localizationE = LocalizationUtils.getLocalization();
 			StatsValue minNotLocalized = extendingLiteralStat.findByInternalEnum(jsonObject, MIN);
 			String minAsString = minNotLocalized.getLocalized(localizationE);
 			StatValue min = new StatValue();
 			min.value = minAsString;
 			extendingLiteralStat.min = min;
-			
+
 			String maxAsString = extendingLiteralStat.findByInternalEnum(jsonObject, MAX).getLocalized(localizationE);
 			StatValue max = new StatValue();
 			max.value = maxAsString;
 			extendingLiteralStat.max = max;
-			
+
 			stats.getClass().getField(statsField).set(stats, extendingLiteralStat);
 		} catch (InstantiationException e) {
 			logger.error("error handling generical literal stat", e);
 		} catch (IllegalAccessException e) {
-		    logger.error("error handling generical literal stat", e);
+			logger.error("error handling generical literal stat", e);
 		} catch (IllegalArgumentException e) {
-		    logger.error("error handling generical literal stat", e);
+			logger.error("error handling generical literal stat", e);
 		} catch (NoSuchFieldException e) {
-		    logger.error("error handling generical literal stat", e);
+			logger.error("error handling generical literal stat", e);
 		} catch (SecurityException e) {
-		    logger.error("error handling generical literal stat", e);
+			logger.error("error handling generical literal stat", e);
 		}
 	}
-	/*private static <LS extends LiteralStat> LS handleLiteralStat(JsonObject jsonObject, String value, 
-			Class<LS> extendingLiteralStatClass) throws InstantiationException, IllegalAccessException {
-		LS literalStat = extendingLiteralStatClass.newInstance();
-		
-		Localization localizationE = LocalizationUtils.getLocalization();
-		String min = literalStat.findByInternalEnum(jsonObject, MIN).getLocalized(localizationE);
-		literalStat.min = min;
-		
-		String max = literalStat.findByInternalEnum(jsonObject, MAX).getLocalized(localizationE);
-		literalStat.max = max;
-		
-		return literalStat;
-	}*/
-	
+	/*
+	 * private static <LS extends LiteralStat> LS handleLiteralStat(JsonObject jsonObject, String value,
+	 * Class<LS> extendingLiteralStatClass) throws InstantiationException, IllegalAccessException {
+	 * LS literalStat = extendingLiteralStatClass.newInstance();
+	 *
+	 * Localization localizationE = LocalizationUtils.getLocalization();
+	 * String min = literalStat.findByInternalEnum(jsonObject, MIN).getLocalized(localizationE);
+	 * literalStat.min = min;
+	 *
+	 * String max = literalStat.findByInternalEnum(jsonObject, MAX).getLocalized(localizationE);
+	 * literalStat.max = max;
+	 *
+	 * return literalStat;
+	 * }
+	 */
+
 	private void initNumericalStatsClassesToHandlerMap() {
 		numericalClassesMap.put("Level", Level.class);
 		numericalClassesMap.put("Power", Power.class);
@@ -254,31 +256,33 @@ public class StatsArrayAdapter extends AbstractArrayAdapter<StatsGroup> {
 		numericalClassesMap.put("Silence Resistance", SilenceResistance.class);
 	}
 
-	
+	/*
+	 * @Override
+	 * public Stat adaptFromJson(JsonObject arg0) throws Exception {
+	 * Stat c = new Stat();
+	 * c.name = arg0.getJsonObject("name");
+	 * c.min = arg0.getString("min").split("&").length;
+	 * c.max = arg0.getString("max").split("&").length;
+	 * return c;
+	 * }
+	 *
+	 * @Override
+	 * public JsonObject adaptToJson(Stat arg0) throws Exception {
+	 * return Json.createObjectBuilder()
+	 * .add("name", arg0.name)
+	 * .add("min", arg0.min)
+	 * .add("max", arg0.max)
+	 * .build();
+	 * }
+	 */
 
-/*	@Override
-	public Stat adaptFromJson(JsonObject arg0) throws Exception {
-		Stat c = new Stat();
-      c.name = arg0.getJsonObject("name");
-      c.min = arg0.getString("min").split("&").length;
-      c.max = arg0.getString("max").split("&").length;
-      return c;
-	}
-
-	@Override
-	public JsonObject adaptToJson(Stat arg0) throws Exception {
-		return Json.createObjectBuilder()
-            .add("name", arg0.name)
-            .add("min", arg0.min)
-            .add("max", arg0.max)
-            .build();
-	}*/
-	
-	/*private static String firstCharToLowerCase(String string) {
-		char c[] = string.toCharArray();
-		c[0] += 32;
-		String s = new String(c);
-		return s;
-	}*/
+	/*
+	 * private static String firstCharToLowerCase(String string) {
+	 * char c[] = string.toCharArray();
+	 * c[0] += 32;
+	 * String s = new String(c);
+	 * return s;
+	 * }
+	 */
 
 }

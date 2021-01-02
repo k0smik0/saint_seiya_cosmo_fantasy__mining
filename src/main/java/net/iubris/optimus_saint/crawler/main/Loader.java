@@ -37,7 +37,7 @@ public class Loader {
 			try {
 				jsonbUtils.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 	}

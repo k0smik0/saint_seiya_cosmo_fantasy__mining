@@ -47,7 +47,7 @@ abstract public class AbstractGoogleSpreadSheetExporter<S> implements Exporter<S
 
 	protected void removeEmptyRows() throws GeneralSecurityException, IOException {
 		Sheets sheetService = getSheetService();
-//sheetService.spreadsheets().sheets()
+//sheetService.spreadsheets().sheets().
 	}
 
 	protected String putValuesToSpreadsheet(final String rangeToPopulate, final List<List<Object>> valuesToAdd) throws GeneralSecurityException, IOException {

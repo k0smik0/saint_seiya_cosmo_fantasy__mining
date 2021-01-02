@@ -167,9 +167,9 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 				String clearedExistingValues = clearExistingValues(GLOBAL_RANGE);
 				printer.println("cleared: " + clearedExistingValues);
 			} catch (GeneralSecurityException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 
@@ -181,9 +181,9 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 			printer.println(putValuesToSpreadsheet);
 			printer.println(range + ": end\n");
 		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 
@@ -505,7 +505,7 @@ public class SaintsDataByBBAGoogleExporter extends AbstractGoogleSpreadSheetExpo
 			System.out.println("wrote: " + realFileName);
 			printWriter.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 

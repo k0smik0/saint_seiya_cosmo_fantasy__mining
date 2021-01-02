@@ -51,9 +51,9 @@ public class StatsGroup {
 				NumericalStat numericalStat = (NumericalStat) field.get(this);
 				sum+=numericalStat.max;
 			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 		return sum;

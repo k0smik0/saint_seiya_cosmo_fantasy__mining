@@ -72,9 +72,9 @@ System.out.println("total to download: "+amount);
 			Callable<Void> task = buildDownloadingTask(urlIntId, idAsString);
 			tasks.add(task);
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		
 		return this;
@@ -95,7 +95,7 @@ System.out.println("total to download: "+amount);
 System.out.println("Downloaded "+id+": "+String.format("%.2f", size)+"MB");
 					toPrint = ""+downloading.get();
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.err.println(e.getMessage());
 					toPrint = "x";
 				}
 //				updateComplete(toPrint);
@@ -143,7 +143,7 @@ System.out.println("Downloaded "+id+": "+String.format("%.2f", size)+"MB");
 			newFixedThreadPool.invokeAll(tasks);
 			newFixedThreadPool.shutdown();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	
@@ -156,7 +156,7 @@ System.out.println("Downloaded "+id+": "+String.format("%.2f", size)+"MB");
 //			try {
 //				thread.join();
 //			} catch (InterruptedException e) {
-//				e.printStackTrace();
+//				System.err.println(e.getMessage());
 //			}
 		}
 	}*/

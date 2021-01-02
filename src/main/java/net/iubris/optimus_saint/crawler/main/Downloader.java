@@ -48,9 +48,9 @@ public class Downloader {
 			oneFixedThreadPool.shutdown();
 			future.get();
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (Exception e) {
-		    e.printStackTrace();
+		    System.err.println(e.getMessage());
 		}
 	}
 	
@@ -86,18 +86,18 @@ public class Downloader {
                 printer.println("copied "+outputFilePathWithTimestamp+" to "+outputFilePath);
 //              toPrint = ""+downloading.get();
             } catch(MalformedURLException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             } catch (KeyManagementException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             } 
             /*catch (Exception e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
 //              toPrint = "x";
             }*/
 //          updateComplete(toPrint);

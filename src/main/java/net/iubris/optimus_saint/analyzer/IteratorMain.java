@@ -45,7 +45,7 @@ public class IteratorMain {
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						System.err.println(e.getMessage());
 					}
 					if (!firstCollectedPrint) {
 						System.out.print("(collected: "+(iteratorIndex)+") ");

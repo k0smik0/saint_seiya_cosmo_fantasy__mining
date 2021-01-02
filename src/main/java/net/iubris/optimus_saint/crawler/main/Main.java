@@ -118,7 +118,7 @@ public class Main {
 
 			printer.println("* load phase - end *\n");
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 //		}
 
@@ -220,7 +220,7 @@ public class Main {
 			CommandLineOptions.printFormattedHelp();
 			return;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 }
